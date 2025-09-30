@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shared menu • mainu Web</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, sans-serif;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 24px;
+      }
+
+      main {
+        max-width: 520px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      section {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: clamp(1.6rem, 5vw, 2.2rem);
+        margin: 0;
+      }
+
+      h2 {
+        margin: 16px 0 8px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0;
+      }
+
+      li {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .dish-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+      }
+
+      .original {
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.2);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        font-size: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="/" style="color: inherit; opacity: 0.7">← Back to mainu</a>
+        <h1>Shared menu</h1>
+        <p>This menu link remains active for 24 hours.</p>
+      </header>
+
+      {% if menu.sections %}
+      {% for section in menu.sections %}
+      <section>
+        <h2>{{ section.title }}</h2>
+        <ul>
+          {% for dish in section.dishes %}
+          <li>
+            <div class="dish-title">
+              <span>{{ dish.translated_name }}</span>
+              <span>{{ dish.price or "" }}</span>
+            </div>
+            <div class="original">{{ dish.name }}</div>
+            {% if dish.description %}
+            <p>{{ dish.description }}</p>
+            {% endif %}
+            <div class="badges">
+              {% for allergen in dish.allergens %}
+              <span class="badge">Allergen: {{ allergen }}</span>
+              {% endfor %}
+              {% if dish.spice_level %}
+              <span class="badge">Spice: {{ dish.spice_level }}</span>
+              {% endif %}
+              {% for rec in dish.recommendations %}
+              <span class="badge">Pair: {{ rec }}</span>
+              {% endfor %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endfor %}
+      {% else %}
+      <section><p>No dishes found for this menu.</p></section>
+      {% endif %}
+    </main>
+  </body>
+</html>

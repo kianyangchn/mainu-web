@@ -1,7 +1,23 @@
 [project]
 name = "mainu-web"
 version = "0.1.0"
-description = "Add your description here"
+description = "Web experience for the mainu menu translation flow"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.29",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "pydantic-settings>=2.2",
+    "httpx>=0.27",
+    "openai>=1.30",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.4",
+    "ruff>=0.4",
+    "pytest>=8.3",
+    "coverage[toml]>=7.5",
+]

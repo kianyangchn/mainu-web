@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title }}</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background-color: #0f172a;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        background: linear-gradient(180deg, #0f172a 0%, #151f3b 100%);
+        color: #f8fafc;
+      }
+
+      .shell {
+        max-width: 480px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      h1 {
+        font-size: clamp(1.8rem, 5vw, 2.4rem);
+        margin: 0;
+        text-align: center;
+      }
+
+      p {
+        margin: 0;
+        text-align: center;
+        opacity: 0.9;
+      }
+
+      .cta {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        backdrop-filter: blur(12px);
+      }
+
+      label {
+        font-weight: 600;
+        text-align: left;
+      }
+
+      input[type="file"],
+      input[type="text"],
+      input[type="search"],
+      input[type="number"],
+      input[type="tel"] {
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.4);
+        background: rgba(15, 23, 42, 0.3);
+        color: inherit;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: #38bdf8;
+        color: #0f172a;
+        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: #e2e8f0;
+        border: 1px solid rgba(226, 232, 240, 0.3);
+        box-shadow: none;
+      }
+
+      h2 {
+        margin: 24px 0 0;
+        font-size: 1.25rem;
+        text-align: left;
+      }
+
+      h3 {
+        margin: 16px 0 8px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      li {
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.35);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .meta {
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      footer {
+        font-size: 0.75rem;
+        text-align: center;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <h1>{{ title }}</h1>
+      <p>{{ subtitle }}</p>
+      <section class="cta">
+        <form id="upload-form">
+          <label for="menu-files">Capture or upload menu photos</label>
+          <input
+            id="menu-files"
+            type="file"
+            name="files"
+            accept="image/*"
+            multiple
+            capture="environment"
+            required
+          />
+          <button type="submit">Process menu</button>
+        </form>
+        <form id="share-form" action="" method="get">
+          <label for="share-token">Open a shared menu</label>
+          <input
+            id="share-token"
+            name="token"
+            placeholder="Enter share code"
+            pattern="[A-Za-z0-9_-]{6,}"
+          />
+          <button type="submit" class="secondary">Open</button>
+        </form>
+      </section>
+      <section id="results" hidden>
+        <h2>Ready to share</h2>
+        <p><strong>Share link:</strong> <a id="share-link" href="#"></a></p>
+        <div id="menu-preview"></div>
+      </section>
+      <footer>Built for on-the-go menu translation • mainu web MVP</footer>
+    </main>
+    <script>
+      const uploadForm = document.getElementById("upload-form");
+      const shareForm = document.getElementById("share-form");
+      const resultsPanel = document.getElementById("results");
+      const shareLink = document.getElementById("share-link");
+      const menuPreview = document.getElementById("menu-preview");
+
+      uploadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const files = document.getElementById("menu-files").files;
+        if (!files.length) return;
+        const data = new FormData();
+        Array.from(files).forEach((file) => data.append("files", file));
+
+        const response = await fetch("/menu/process", {
+          method: "POST",
+          body: data,
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ detail: "Unknown error" }));
+          alert(error.detail || "Failed to process menu");
+          return;
+        }
+
+        const payload = await response.json();
+        shareLink.href = payload.share_url;
+        shareLink.textContent = payload.share_url;
+        menuPreview.innerHTML = renderMenu(payload.template);
+        resultsPanel.hidden = false;
+      });
+
+      shareForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const token = document.getElementById("share-token").value.trim();
+        if (!token) return;
+        window.location.href = `/share/${token}`;
+      });
+
+      function renderMenu(template) {
+        return template.sections
+          .map(
+            (section) => `
+            <article>
+              <h3>${section.title}</h3>
+              <ul>
+                ${section.dishes
+                  .map(
+                    (dish) => `
+                      <li>
+                        <strong>${dish.translated_name}</strong>
+                        <div class="meta">${dish.price || ""}</div>
+                        <p>${dish.description || ""}</p>
+                      </li>
+                    `,
+                  )
+                  .join("")}
+              </ul>
+            </article>
+          `,
+          )
+          .join("");
+      }
+    </script>
+  </body>
+</html>

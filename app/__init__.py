@@ -1,0 +1,1 @@
+"""mainu Web application package."""
