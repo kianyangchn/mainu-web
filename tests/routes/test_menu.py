@@ -15,7 +15,7 @@ client = TestClient(app)
 def reset_services(monkeypatch):
     menu_routes._share_service.reset()
 
-    async def fake_generate_menu_template(images, filenames):
+    async def fake_generate_menu_template(images, filenames, content_types=None):
         return MenuTemplate(
             sections=[
                 MenuSection(

@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import base64
 import json
-from typing import List, Sequence
+from typing import Iterable, List, Sequence
 
 from openai import AsyncOpenAI, OpenAIError
 
@@ -43,15 +42,19 @@ class LLMMenuService:
         return self._client
 
     async def generate_menu_template(
-        self, images: Sequence[bytes], filenames: Sequence[str] | None = None
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None = None,
+        content_types: Sequence[str] | None = None,
     ) -> MenuTemplate:
         """Invoke the multimodal LLM and coerce the response into a template."""
 
         if not images:
             raise ValueError("At least one image is required")
 
-        json_schema = MenuTemplate.model_json_schema()
-        request_content = _build_request_content(images, filenames)
+        file_ids = await self._upload_images(images, filenames, content_types)
+        schema_text = json.dumps(MenuTemplate.model_json_schema())
+        request_content = _build_request_content(file_ids, filenames, schema_text)
 
         try:
             response = await self.client.responses.create(
@@ -59,46 +62,90 @@ class LLMMenuService:
                 input=[
                     {
                         "role": "system",
-                        "content": [{"type": "text", "text": _SYSTEM_PROMPT}],
+                        "content": [
+                            {"type": "input_text", "text": _SYSTEM_PROMPT},
+                        ],
                     },
                     {
                         "role": "user",
                         "content": request_content,
                     },
                 ],
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {"name": "menu_template", "schema": json_schema},
-                },
                 temperature=0.2,
             )
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
+        finally:
+            await self._delete_files(file_ids)
 
         payload = _extract_json_payload(response)
         return MenuTemplate.model_validate(payload)
 
+    async def _upload_images(
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None,
+        content_types: Sequence[str] | None,
+    ) -> List[str]:
+        """Upload images to the Files API and return file IDs."""
+
+        file_ids: List[str] = []
+        for index, raw in enumerate(images):
+            name = (
+                filenames[index]
+                if filenames and index < len(filenames)
+                else f"menu-page-{index + 1}.jpg"
+            )
+            content_type = (
+                content_types[index]
+                if content_types and index < len(content_types)
+                else "image/jpeg"
+            )
+            upload = await self.client.files.create(
+                file=(name, raw, content_type),
+                purpose="vision",
+            )
+            file_ids.append(upload.id)
+        return file_ids
+
+    async def _delete_files(self, file_ids: Iterable[str]) -> None:
+        for file_id in file_ids:
+            try:
+                await self.client.files.delete(file_id)
+            except OpenAIError:  # pragma: no cover - best effort cleanup
+                pass
+
 
 def _build_request_content(
-    images: Sequence[bytes], filenames: Sequence[str] | None
+    file_ids: Sequence[str],
+    filenames: Sequence[str] | None,
+    schema_text: str,
 ) -> List[dict]:
-    """Construct multimodal content with base64-encoded images."""
+    """Construct multimodal content referencing uploaded file IDs."""
 
-    content: List[dict] = [{"type": "text", "text": _USER_INSTRUCTIONS}]
-    for index, raw in enumerate(images):
+    content: List[dict] = [
+        {"type": "input_text", "text": _USER_INSTRUCTIONS},
+        {
+            "type": "input_text",
+            "text": (
+                "Return a JSON object matching this schema: "
+                f"{schema_text}. Do not include extra text."
+            ),
+        },
+    ]
+    for index, file_id in enumerate(file_ids):
         name = (
             filenames[index]
             if filenames and index < len(filenames)
             else f"page-{index + 1}"
         )
-        encoded = base64.b64encode(raw).decode("utf-8")
         content.append(
             {
                 "type": "input_text",
                 "text": f"Image source: {name}",
             }
         )
-        content.append({"type": "input_image", "image_base64": encoded})
+        content.append({"type": "input_image", "image_file": {"file_id": file_id}})
     return content
 
 

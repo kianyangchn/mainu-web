@@ -36,6 +36,7 @@ async def process_menu(
 
     contents: List[bytes] = []
     filenames: List[str] = []
+    content_types: List[str] = []
     for upload in files:
         if upload.content_type not in {"image/jpeg", "image/png", "image/heic"}:
             raise HTTPException(status_code=400, detail="Unsupported file type")
@@ -44,8 +45,11 @@ async def process_menu(
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         contents.append(raw)
         filenames.append(upload.filename or "menu-page")
+        content_types.append(upload.content_type)
 
-    template = await menu_service.generate_menu_template(contents, filenames)
+    template = await menu_service.generate_menu_template(
+        contents, filenames, content_types
+    )
     share_service.purge_expired()
     token = share_service.create_template(template)
     share_url = str(request.url_for("get_shared_menu", token=token))

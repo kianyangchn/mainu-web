@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     openai_api_key: Optional[str] = None
-    openai_model: str = "gpt-4o-mini"
+    openai_model: str = "gpt-5-nano"
     share_token_ttl_minutes: int = 1440  # 24 hours per PRD
 
 
