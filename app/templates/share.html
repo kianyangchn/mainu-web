@@ -7,79 +7,118 @@
     <style>
       body {
         margin: 0;
-        font-family: "Inter", system-ui, sans-serif;
-        background: #0f172a;
-        color: #f8fafc;
-        padding: 24px;
+        font-family: "Inter", "Nunito", system-ui, sans-serif;
+        background: linear-gradient(180deg, #f9fbff 0%, #fff4ec 55%, #fef6ff 100%);
+        color: #1f2937;
+        padding: 28px 20px 40px;
       }
 
       main {
-        max-width: 520px;
+        max-width: 560px;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 18px;
       }
 
       header {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 10px;
+        text-align: center;
+        padding: 20px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 40px rgba(63, 63, 131, 0.12);
       }
 
-      section {
-        background: rgba(15, 23, 42, 0.4);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 16px;
-        padding: 16px;
+      header a {
+        align-self: center;
+        text-decoration: none;
+        color: #4338ca;
+        font-weight: 600;
       }
 
       h1 {
-        font-size: clamp(1.6rem, 5vw, 2.2rem);
+        font-size: clamp(1.8rem, 5vw, 2.4rem);
         margin: 0;
       }
 
+      header p {
+        margin: 0;
+        opacity: 0.65;
+      }
+
+      section {
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 22px;
+        padding: 20px 22px 22px;
+        box-shadow: 0 14px 30px rgba(46, 64, 116, 0.1);
+        border: 1px solid rgba(79, 70, 229, 0.08);
+      }
+
       h2 {
-        margin: 16px 0 8px;
+        margin: 0 0 12px;
+        font-size: 1.2rem;
       }
 
       ul {
         list-style: none;
         padding: 0;
+        margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin: 0;
+        gap: 12px;
       }
 
       li {
-        padding: 12px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px solid rgba(148, 163, 184, 0.25);
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(248, 250, 255, 0.75);
+        border: 1px dashed rgba(148, 163, 184, 0.4);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .dish-title {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         gap: 12px;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      .dish-price {
+        color: #0f766e;
       }
 
       .original {
-        font-size: 0.85rem;
-        opacity: 0.8;
+        font-size: 0.88rem;
+        color: rgba(55, 65, 81, 0.65);
       }
 
+      .description {
+        margin: 0;
+        font-size: 0.94rem;
+        line-height: 1.45;
+        color: rgba(31, 41, 55, 0.92);
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.82rem;
+        opacity: 0.6;
+        margin-top: 12px;
+      }
     </style>
   </head>
   <body>
     <main>
       <header>
-        <a href="/" style="color: inherit; opacity: 0.7">← Back to mainu</a>
+        <a href="/">← Back to menu upload</a>
         <h1>Shared menu</h1>
-        <p>This menu link remains active for 24 hours.</p>
+        <p>Take a minute to read through dishes, then let the planner know what looks delicious.</p>
       </header>
 
       {% if menu.sections %}
@@ -91,11 +130,11 @@
           <li>
             <div class="dish-title">
               <span>{{ dish.translated_name }}</span>
-              <span>{{ dish.price or "" }}</span>
+              <span class="dish-price">{{ dish.price or "" }}</span>
             </div>
             <div class="original">{{ dish.original_name }}</div>
             {% if dish.description %}
-            <p>{{ dish.description }}</p>
+            <p class="description">{{ dish.description }}</p>
             {% endif %}
           </li>
           {% endfor %}
@@ -105,6 +144,8 @@
       {% else %}
       <section><p>No dishes found for this menu.</p></section>
       {% endif %}
+
+      <footer>mainu • Bringing happy meals to every adventure</footer>
     </main>
   </body>
 </html>

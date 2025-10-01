@@ -6,259 +6,668 @@
     <title>{{ title }}</title>
     <style>
       :root {
-        color-scheme: light dark;
-        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background-color: #0f172a;
+        color-scheme: light;
+        font-family: "Inter", "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background-color: #f8fbff;
       }
 
       body {
         margin: 0;
-        padding: 24px;
-        background: linear-gradient(180deg, #0f172a 0%, #151f3b 100%);
-        color: #f8fafc;
+        min-height: 100vh;
+        background: linear-gradient(180deg, #e1f0ff 0%, #fdf5f5 45%, #fff5e6 100%);
+        color: #0f172a;
       }
 
-      .shell {
-        max-width: 480px;
+      .viewport {
+        max-width: 520px;
         margin: 0 auto;
+        padding: 32px 24px 48px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 24px;
       }
 
-      h1 {
-        font-size: clamp(1.8rem, 5vw, 2.4rem);
-        margin: 0;
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         text-align: center;
       }
 
-      p {
+      .brand h1 {
         margin: 0;
-        text-align: center;
-        opacity: 0.9;
+        font-size: clamp(2rem, 5vw, 2.6rem);
+        font-weight: 700;
       }
 
-      .cta {
+      .brand p {
+        margin: 0;
+        opacity: 0.7;
+        font-size: 1.05rem;
+      }
+
+      .stamp {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 4px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.1);
+        color: #0f766e;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 12px 40px rgba(31, 54, 110, 0.12);
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
+        backdrop-filter: blur(8px);
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .card p {
+        margin: 0;
+        opacity: 0.75;
+        line-height: 1.5;
       }
 
       form {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        padding: 16px;
-        border-radius: 16px;
-        background: rgba(15, 23, 42, 0.45);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        backdrop-filter: blur(12px);
+        gap: 16px;
       }
 
       label {
         font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         text-align: left;
       }
 
       input[type="file"],
-      input[type="text"],
+      select,
       input[type="search"],
-      input[type="number"],
-      input[type="tel"] {
-        padding: 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(226, 232, 240, 0.4);
-        background: rgba(15, 23, 42, 0.3);
+      input[type="text"] {
+        appearance: none;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-size: 1rem;
+        background: rgba(243, 246, 255, 0.9);
         color: inherit;
+      }
+
+      input[type="file"] {
+        padding: 20px;
+        border-style: dashed;
+        border-width: 2px;
+        border-color: rgba(65, 105, 225, 0.4);
+        background: rgba(224, 242, 254, 0.4);
       }
 
       button {
         border: none;
-        border-radius: 999px;
+        border-radius: 18px;
         padding: 16px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        background: #38bdf8;
-        color: #0f172a;
-        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        background: linear-gradient(135deg, #4f46e5 0%, #22d3ee 100%);
+        color: #ffffff;
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.4);
       }
 
       button.secondary {
         background: transparent;
-        color: #e2e8f0;
-        border: 1px solid rgba(226, 232, 240, 0.3);
+        color: #1f2937;
+        border: 1px solid rgba(15, 23, 42, 0.12);
         box-shadow: none;
       }
 
-      h2 {
-        margin: 24px 0 0;
-        font-size: 1.25rem;
-        text-align: left;
+      .screen {
+        display: none;
       }
 
-      h3 {
-        margin: 16px 0 8px;
+      .screen[data-active="true"] {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
       }
 
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+      .travel-illustration {
+        position: relative;
+        height: 140px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%,
+            rgba(241, 246, 255, 0.65) 100%);
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .travel-illustration::before,
+      .travel-illustration::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+      }
+
+      .travel-illustration::before {
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 203, 112, 0.75),
+            rgba(255, 203, 112, 0));
+        top: -120px;
+        left: -80px;
+      }
+
+      .travel-illustration::after {
+        width: 280px;
+        height: 280px;
+        background: radial-gradient(circle at 50% 50%, rgba(94, 234, 212, 0.8),
+            rgba(94, 234, 212, 0));
+        bottom: -140px;
+        right: -60px;
+      }
+
+      .plane {
+        position: absolute;
+        top: 55%;
+        left: -80px;
+        width: 72px;
+        height: 28px;
+        background: linear-gradient(90deg, #1d4ed8, #22d3ee);
+        border-radius: 18px 18px 4px 4px;
+        animation: flyAcross 4s infinite cubic-bezier(0.65, 0, 0.35, 1);
+        box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+      }
+
+      .plane::before {
+        content: "";
+        position: absolute;
+        top: 11px;
+        left: 10px;
+        width: 50px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 4px;
+      }
+
+      .plane::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: -22px;
+        width: 40px;
+        height: 5px;
+        background: rgba(37, 99, 235, 0.3);
+        border-radius: 3px;
+        transform: rotate(-10deg);
+      }
+
+      @keyframes flyAcross {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        60% {
+          transform: translate(360px, -30px) rotate(3deg);
+        }
+        100% {
+          transform: translate(520px, 10px) rotate(-4deg);
+        }
+      }
+
+      .loading-text {
         display: flex;
         flex-direction: column;
         gap: 8px;
+        text-align: center;
       }
 
-      li {
-        padding: 12px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.35);
-        border: 1px solid rgba(148, 163, 184, 0.2);
+      .loading-text h2 {
+        margin: 0;
+        font-size: 1.5rem;
       }
 
-      .meta {
-        font-size: 0.85rem;
-        opacity: 0.8;
-      }
-
-      .original {
-        font-size: 0.85rem;
+      .loading-text p {
+        margin: 0;
         opacity: 0.7;
       }
 
+      .loading-dots span {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin: 0 4px;
+        border-radius: 50%;
+        background: rgba(79, 70, 229, 0.6);
+        animation: pulse 1.2s infinite ease-in-out alternate;
+      }
+
+      .loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes pulse {
+        from {
+          opacity: 0.4;
+          transform: translateY(0px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(-4px);
+        }
+      }
+
+      .pill {
+        align-self: flex-start;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(79, 70, 229, 0.12);
+        color: #4338ca;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      .menu-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      details {
+        border-radius: 20px;
+        background: rgba(248, 250, 255, 0.85);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        padding: 16px 20px;
+      }
+
+      summary {
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .dish-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .dish-card {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed rgba(148, 163, 184, 0.4);
+      }
+
+      .dish-card:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .dish-card strong {
+        font-size: 1.05rem;
+      }
+
+      .price {
+        font-weight: 600;
+        color: #0f766e;
+        font-size: 0.95rem;
+      }
+
+      .original {
+        grid-column: 1 / -1;
+        font-size: 0.85rem;
+        color: rgba(15, 23, 42, 0.55);
+      }
+
+      .description {
+        grid-column: 1 / -1;
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+
+      .share-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(99, 102, 241, 0.12);
+        color: #3730a3;
+        text-decoration: none;
+        word-break: break-all;
+        font-weight: 600;
+      }
+
+      .share-link::after {
+        content: "↗";
+        font-size: 0.9rem;
+      }
+
+      .error-banner {
+        display: none;
+        background: rgba(248, 113, 113, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        color: #b91c1c;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-weight: 600;
+      }
+
+      .error-banner[data-visible="true"] {
+        display: block;
+      }
+
       footer {
-        font-size: 0.75rem;
         text-align: center;
+        font-size: 0.85rem;
         opacity: 0.6;
+      }
+
+      @media (min-width: 768px) {
+        .viewport {
+          max-width: 680px;
+          padding: 48px 32px 64px;
+        }
+
+        form {
+          gap: 18px;
+        }
+
+        .menu-grid {
+          gap: 20px;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="shell">
-      <h1>{{ title }}</h1>
-      <p>{{ subtitle }}</p>
-      <section class="cta">
-        <form id="upload-form">
-          <label for="menu-files">Capture or upload menu photos</label>
-          <input
-            id="menu-files"
-            type="file"
-            name="files"
-            accept="image/*"
-            multiple
-            capture="environment"
-            required
-          />
-          <label for="output-language">Output language (optional)</label>
-          <select id="output-language" name="output_language">
-            <option value="">Use browser preference</option>
-            <option value="English">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="it">Italiano</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-            <option value="zh-CN">简体中文</option>
-            <option value="zh-TW">繁體中文</option>
-          </select>
-          <button type="submit">Process menu</button>
-        </form>
-        <form id="share-form" action="" method="get">
-          <label for="share-token">Open a shared menu</label>
-          <input
-            id="share-token"
-            name="token"
-            placeholder="Enter share code"
-            pattern="[A-Za-z0-9_-]{6,}"
-          />
-          <button type="submit" class="secondary">Open</button>
-        </form>
+    <main class="viewport">
+      <div class="brand">
+        <span class="stamp">Family trip translator</span>
+        <h1>Dinner plans, anywhere in the world</h1>
+        <p>Upload tonight’s menu and let mainu turn it into a friendly feast for your crew.</p>
+      </div>
+
+      <div class="error-banner" id="error-banner" role="status"></div>
+
+      <section class="screen" data-screen="upload" data-active="true">
+        <article class="card">
+          <div class="travel-illustration">
+            <div class="plane" aria-hidden="true"></div>
+          </div>
+          <div>
+            <h2>Step 1 · Bring the menu aboard</h2>
+            <p>Select one or more photos of the menu. We’ll keep them private and only use
+              them to translate for your table.</p>
+          </div>
+          <form id="upload-form">
+            <label for="menu-files">
+              Menu photos
+              <input
+                id="menu-files"
+                type="file"
+                name="files"
+                accept="image/*"
+                multiple
+                capture="environment"
+                required
+              />
+            </label>
+            <label for="output-language">
+              Share the menu in
+              <select id="output-language" name="output_language">
+                <option value="">Use my browser language</option>
+                <option value="English">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="it">Italiano</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="zh-CN">简体中文</option>
+                <option value="zh-TW">繁體中文</option>
+              </select>
+            </label>
+            <button type="submit">Start menu magic</button>
+          </form>
+          <form id="share-form" action="" method="get">
+            <label for="share-token">
+              Have a share code already?
+              <input
+                id="share-token"
+                name="token"
+                placeholder="Enter code from your travel buddy"
+                pattern="[A-Za-z0-9_-]{6,}"
+              />
+            </label>
+            <button type="submit" class="secondary">Open shared menu</button>
+          </form>
+        </article>
       </section>
-      <section id="results" hidden>
-        <h2>Ready to share</h2>
-        <p id="detected-language" class="meta" hidden></p>
-        <p><strong>Share link:</strong> <a id="share-link" href="#"></a></p>
-        <div id="menu-preview"></div>
+
+      <section class="screen" data-screen="loading">
+        <article class="card">
+          <div class="pill">Step 2 · Translating in the cloud</div>
+          <div class="travel-illustration" aria-hidden="true">
+            <div class="plane"></div>
+          </div>
+          <div class="loading-text">
+            <h2>Hang tight while we prepare your menu</h2>
+            <p>We’re reading every page, translating with context, and getting dishes ready to
+              browse.</p>
+            <div class="loading-dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <p style="text-align: center; opacity: 0.65; font-size: 0.85rem;">
+            Processing times vary based on image quality and restaurant size. Grab a drink and
+            we’ll ping you right back!
+          </p>
+        </article>
       </section>
-      <footer>Built for on-the-go menu translation • mainu web MVP</footer>
+
+      <section class="screen" data-screen="results">
+        <article class="card">
+          <div class="pill">Step 3 · Explore together</div>
+          <div>
+            <h2>Your translated menu is ready</h2>
+            <p>Share the link with relatives or travel buddies so everyone can pick a favourite.</p>
+          </div>
+          <div class="actions">
+            <div>
+              <strong>Share link</strong>
+              <a id="share-url" class="share-link" href="#" target="_blank" rel="noopener"></a>
+            </div>
+            <p id="detected-language" class="pill" hidden></p>
+            <button type="button" class="secondary" id="process-again">Upload another menu</button>
+          </div>
+          <div>
+            <h3 style="margin: 12px 0 8px;">Menu preview</h3>
+            <div id="menu-preview" class="menu-grid"></div>
+          </div>
+        </article>
+      </section>
+
+      <footer>Built for family adventures • mainu web MVP</footer>
     </main>
     <script>
+      const screens = {
+        upload: document.querySelector('[data-screen="upload"]'),
+        loading: document.querySelector('[data-screen="loading"]'),
+        results: document.querySelector('[data-screen="results"]'),
+      };
       const uploadForm = document.getElementById("upload-form");
       const shareForm = document.getElementById("share-form");
-      const resultsPanel = document.getElementById("results");
-      const shareLink = document.getElementById("share-link");
       const menuPreview = document.getElementById("menu-preview");
+      const shareUrl = document.getElementById("share-url");
       const detectedLanguage = document.getElementById("detected-language");
+      const processAgainButton = document.getElementById("process-again");
+      const errorBanner = document.getElementById("error-banner");
+
+      function showScreen(name) {
+        Object.entries(screens).forEach(([key, node]) => {
+          node.dataset.active = key === name ? "true" : "false";
+        });
+      }
+
+      function showError(message) {
+        errorBanner.textContent = message;
+        errorBanner.dataset.visible = "true";
+      }
+
+      function clearError() {
+        errorBanner.textContent = "";
+        errorBanner.dataset.visible = "false";
+      }
 
       uploadForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const files = document.getElementById("menu-files").files;
-        const outputLanguageSelect = document.getElementById("output-language");
-        if (!files.length) return;
-        const data = new FormData();
-        Array.from(files).forEach((file) => data.append("files", file));
-        if (outputLanguageSelect && outputLanguageSelect.value) {
-          data.append("output_language", outputLanguageSelect.value);
-        }
-
-        const response = await fetch("/menu/process", {
-          method: "POST",
-          body: data,
-        });
-
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({ detail: "Unknown error" }));
-          alert(error.detail || "Failed to process menu");
+        clearError();
+        const fileInput = document.getElementById("menu-files");
+        const files = fileInput.files;
+        if (!files || !files.length) {
+          showError("Add at least one menu photo to continue.");
           return;
         }
 
-        const payload = await response.json();
-        shareLink.href = payload.share_url;
-        shareLink.textContent = payload.share_url;
-        if (payload.detected_language) {
-          detectedLanguage.textContent = `Detected language (debug): ${payload.detected_language}`;
-          detectedLanguage.hidden = false;
-        } else {
-          detectedLanguage.hidden = true;
+        const data = new FormData();
+        Array.from(files).forEach((file) => data.append("files", file));
+        const outputLanguage = document.getElementById("output-language").value;
+        if (outputLanguage) {
+          data.append("output_language", outputLanguage);
         }
-        menuPreview.innerHTML = renderMenu(payload.template);
-        resultsPanel.hidden = false;
+
+        showScreen("loading");
+
+        try {
+          const response = await fetch("/menu/process", {
+            method: "POST",
+            body: data,
+          });
+
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({ detail: "Unknown error" }));
+            throw new Error(error.detail || "We couldn't translate that menu just now.");
+          }
+
+          const payload = await response.json();
+          renderResults(payload);
+          showScreen("results");
+        } catch (error) {
+          console.error(error);
+          showScreen("upload");
+          showError(error.message || "We couldn't translate that menu just now.");
+        }
       });
 
       shareForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const token = document.getElementById("share-token").value.trim();
-        if (!token) return;
+        if (!token) {
+          showError("Enter a share code to open a menu.");
+          return;
+        }
         window.location.href = `/share/${token}`;
       });
 
-      function renderMenu(template) {
-        return template.sections
+      processAgainButton.addEventListener("click", () => {
+        uploadForm.reset();
+        clearError();
+        showScreen("upload");
+        menuPreview.innerHTML = "";
+        shareUrl.textContent = "";
+        detectedLanguage.hidden = true;
+      });
+
+      function renderResults(payload) {
+        shareUrl.textContent = payload.share_url;
+        shareUrl.href = payload.share_url || "#";
+        shareUrl.setAttribute("aria-label", `Share link ${payload.share_url}`);
+
+        const languageText = payload.detected_language
+          ? `We prepared this menu in ${payload.detected_language}`
+          : "We matched your browser language";
+        detectedLanguage.textContent = languageText;
+        detectedLanguage.hidden = false;
+
+        if (!payload.template || !payload.template.sections?.length) {
+          menuPreview.innerHTML = `<p style="opacity:0.7;">We couldn't find dishes in this menu. Try clearer photos or upload again.</p>`;
+          return;
+        }
+
+        menuPreview.innerHTML = payload.template.sections
+          .map((section, index) => renderSection(section, index === 0))
+          .join("");
+      }
+
+      function renderSection(section, openByDefault) {
+        const dishes = section.dishes
           .map(
-            (section) => `
-            <article>
-              <h3>${section.title}</h3>
-              <ul>
-                ${section.dishes
-                  .map(
-                    (dish) => `
-                      <li>
-                        <strong>${dish.translated_name}</strong>
-                        <div class="original">${dish.original_name}</div>
-                        <div class="meta">${dish.price || ""}</div>
-                        <p>${dish.description || ""}</p>
-                      </li>
-                    `,
-                  )
-                  .join("")}
-              </ul>
-            </article>
-          `,
+            (dish) => `
+              <li class="dish-card">
+                <strong>${dish.translated_name}</strong>
+                <span class="price">${dish.price || ""}</span>
+                <span class="original">${dish.original_name}</span>
+                <p class="description">${dish.description || ""}</p>
+              </li>`
           )
           .join("");
+
+        return `
+          <details ${openByDefault ? "open" : ""}>
+            <summary>
+              <span>${section.title}</span>
+              <span aria-hidden="true">➜</span>
+            </summary>
+            <ul class="dish-list">${dishes}</ul>
+          </details>`;
       }
     </script>
   </body>
