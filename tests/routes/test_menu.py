@@ -14,8 +14,18 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def reset_services(monkeypatch):
     menu_routes._share_service.reset()
+    call_state = {}
 
-    async def fake_generate_menu_template(images, filenames, content_types=None):
+    async def fake_generate_menu_template(
+        images,
+        filenames,
+        content_types=None,
+        *,
+        input_language=None,
+        output_language=None,
+    ):
+        call_state["input_language"] = input_language
+        call_state["output_language"] = output_language
         return MenuTemplate(
             sections=[
                 MenuSection(
@@ -35,14 +45,16 @@ def reset_services(monkeypatch):
     monkeypatch.setattr(
         menu_routes._menu_service, "generate_menu_template", fake_generate_menu_template
     )
+    menu_routes._test_call_state = call_state
     yield
     menu_routes._share_service.reset()
+    menu_routes._test_call_state = {}
 
 
 def test_home_page_renders_template():
     response = client.get("/")
     assert response.status_code == 200
-    assert "Capture or upload menu photos" in response.text
+    assert "Upload menu photos" in response.text
 
 
 def test_process_menu_rejects_invalid_type():
@@ -67,6 +79,17 @@ def test_process_menu_returns_share_token():
     )
     assert payload["share_token"]
     assert payload["share_url"].endswith(payload["share_token"])
+
+
+def test_process_menu_forwards_language_selection():
+    response = client.post(
+        "/menu/process",
+        data={"output_language": "French", "input_language": "Japanese"},
+        files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+    )
+    assert response.status_code == 200
+    assert menu_routes._test_call_state["output_language"] == "French"
+    assert menu_routes._test_call_state["input_language"] == "Japanese"
 
 
 def test_get_shared_menu_returns_template():

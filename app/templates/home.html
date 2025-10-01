@@ -9,232 +9,730 @@
         color-scheme: light dark;
         font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
-        background-color: #0f172a;
       }
 
       body {
         margin: 0;
-        padding: 24px;
-        background: linear-gradient(180deg, #0f172a 0%, #151f3b 100%);
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #0ea5e9 0%, #0f172a 55%, #020617 100%);
         color: #f8fafc;
+        display: flex;
+        justify-content: center;
+        padding: 24px 16px 64px;
       }
 
-      .shell {
-        max-width: 480px;
-        margin: 0 auto;
+      .app-shell {
+        width: min(900px, 100%);
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 24px;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 24px;
+        padding: clamp(20px, 4vw, 40px);
+        box-shadow: 0 40px 80px rgba(15, 118, 190, 0.25);
+        backdrop-filter: blur(14px);
       }
 
-      h1 {
-        font-size: clamp(1.8rem, 5vw, 2.4rem);
-        margin: 0;
+      .app-header {
         text-align: center;
-      }
-
-      p {
-        margin: 0;
-        text-align: center;
-        opacity: 0.9;
-      }
-
-      .cta {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        padding: 16px;
-        border-radius: 16px;
-        background: rgba(15, 23, 42, 0.45);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        backdrop-filter: blur(12px);
-      }
-
-      label {
-        font-weight: 600;
-        text-align: left;
-      }
-
-      input[type="file"],
-      input[type="text"],
-      input[type="search"],
-      input[type="number"],
-      input[type="tel"] {
-        padding: 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(226, 232, 240, 0.4);
-        background: rgba(15, 23, 42, 0.3);
-        color: inherit;
-      }
-
-      button {
-        border: none;
-        border-radius: 999px;
-        padding: 16px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        background: #38bdf8;
-        color: #0f172a;
-        box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
-      }
-
-      button.secondary {
-        background: transparent;
-        color: #e2e8f0;
-        border: 1px solid rgba(226, 232, 240, 0.3);
-        box-shadow: none;
-      }
-
-      h2 {
-        margin: 24px 0 0;
-        font-size: 1.25rem;
-        text-align: left;
-      }
-
-      h3 {
-        margin: 16px 0 8px;
-      }
-
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
 
-      li {
-        padding: 12px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.35);
-        border: 1px solid rgba(148, 163, 184, 0.2);
+      .app-header h1 {
+        font-size: clamp(2rem, 6vw, 2.8rem);
+        margin: 0;
+        letter-spacing: 0.02em;
       }
 
-      .meta {
-        font-size: 0.85rem;
-        opacity: 0.8;
+      .app-header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 1rem;
       }
 
-      .original {
-        font-size: 0.85rem;
+      .view {
+        display: none;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .view.active {
+        display: flex;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 20px;
+        padding: clamp(18px, 4vw, 28px);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        letter-spacing: 0.01em;
+      }
+
+      .card p {
+        margin: 0;
+        opacity: 0.75;
+        font-size: 0.95rem;
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input[type="file"],
+      input[type="text"],
+      select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.65);
+        color: inherit;
+        padding: 14px;
+        font-size: 1rem;
+      }
+
+      input[type="file"] {
+        padding: 18px;
+        border: 1px dashed rgba(94, 234, 212, 0.6);
+        text-align: center;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 16px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: linear-gradient(135deg, #22d3ee, #38bdf8);
+        color: #082f49;
+        box-shadow: 0 20px 40px rgba(56, 189, 248, 0.4);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 26px 60px rgba(34, 211, 238, 0.35);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: #e2e8f0;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        box-shadow: none;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .actions button {
+        flex: 1 1 200px;
+      }
+
+      .loading-illustration {
+        display: grid;
+        place-items: center;
+        padding: 48px 0;
+      }
+
+      .loader {
+        position: relative;
+        width: 160px;
+        height: 160px;
+      }
+
+      .loader::before,
+      .loader::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 6px solid transparent;
+      }
+
+      .loader::before {
+        border-top-color: rgba(56, 189, 248, 0.85);
+        border-right-color: rgba(14, 165, 233, 0.85);
+        animation: spin 1.4s linear infinite;
+      }
+
+      .loader::after {
+        inset: 24px;
+        border-left-color: rgba(244, 114, 182, 0.8);
+        border-bottom-color: rgba(59, 130, 246, 0.8);
+        animation: reverse-spin 1.1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes reverse-spin {
+        to {
+          transform: rotate(-360deg);
+        }
+      }
+
+      .pulse {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #38bdf8;
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(0.8);
+          opacity: 0.4;
+        }
+        50% {
+          transform: scale(1.3);
+          opacity: 1;
+        }
+      }
+
+      .status-text {
+        text-align: center;
+        font-size: 1.05rem;
+        opacity: 0.85;
+        line-height: 1.6;
+      }
+
+      .menu-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .menu-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .menu-share {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .share-link {
+        flex: 1 1 260px;
+        border-radius: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.6);
+        padding: 16px;
+        font-size: 0.95rem;
+        word-break: break-word;
+      }
+
+      .menu-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .menu-section {
+        background: rgba(15, 23, 42, 0.65);
+        border: 1px solid rgba(94, 234, 212, 0.25);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: inset 0 0 0 1px rgba(15, 118, 190, 0.12);
+      }
+
+      .menu-section h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        letter-spacing: 0.01em;
+      }
+
+      .dish {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(8, 47, 73, 0.45);
+        border: 1px solid rgba(125, 211, 252, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .dish-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .dish-name {
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+
+      .dish-price {
+        font-size: 0.95rem;
+        opacity: 0.75;
+      }
+
+      .dish-original {
+        font-size: 0.9rem;
         opacity: 0.7;
       }
 
-      footer {
-        font-size: 0.75rem;
-        text-align: center;
-        opacity: 0.6;
+      .dish-description {
+        margin: 0;
+        font-size: 0.95rem;
+        opacity: 0.85;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(34, 211, 238, 0.12);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: rgba(165, 243, 252, 0.9);
+      }
+
+      .error-banner {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        background: rgba(248, 113, 113, 0.18);
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        color: #fecaca;
+        padding: 12px 16px;
+        border-radius: 14px;
+        font-size: 0.95rem;
+      }
+
+      .error-banner.visible {
+        display: flex;
+      }
+
+      @media (min-width: 720px) {
+        .menu-grid {
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
       }
     </style>
   </head>
   <body>
-    <main class="shell">
-      <h1>{{ title }}</h1>
-      <p>{{ subtitle }}</p>
-      <section class="cta">
-        <form id="upload-form">
-          <label for="menu-files">Capture or upload menu photos</label>
-          <input
-            id="menu-files"
-            type="file"
-            name="files"
-            accept="image/*"
-            multiple
-            capture="environment"
-            required
-          />
-          <button type="submit">Process menu</button>
-        </form>
-        <form id="share-form" action="" method="get">
-          <label for="share-token">Open a shared menu</label>
-          <input
-            id="share-token"
-            name="token"
-            placeholder="Enter share code"
-            pattern="[A-Za-z0-9_-]{6,}"
-          />
-          <button type="submit" class="secondary">Open</button>
-        </form>
+    <main class="app-shell">
+      <header class="app-header">
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </header>
+
+      <div id="error-banner" class="error-banner" role="alert"></div>
+
+      <section class="view active" data-view="upload">
+        <article class="card">
+          <div>
+            <h2>1 · Upload menu photos</h2>
+            <p>Capture multiple pages, then pick your output language before processing.</p>
+          </div>
+          <form id="upload-form" class="field-group">
+            <label for="menu-files">Menu images</label>
+            <input
+              id="menu-files"
+              type="file"
+              name="files"
+              accept="image/*"
+              multiple
+              capture="environment"
+              required
+            />
+            <div class="field-group">
+              <label for="output-language">Translate into</label>
+              <select id="output-language" name="output_language" required>
+                <option value="English" selected>English</option>
+                <option value="Mandarin Chinese">Mandarin Chinese (中文)</option>
+                <option value="Hindi">Hindi (हिन्दी)</option>
+                <option value="Spanish">Spanish (Español)</option>
+                <option value="French">French (Français)</option>
+                <option value="Modern Standard Arabic">Modern Standard Arabic (العربية)</option>
+                <option value="Bengali">Bengali (বাংলা)</option>
+                <option value="Portuguese">Portuguese (Português)</option>
+                <option value="Russian">Russian (Русский)</option>
+                <option value="Indonesian">Indonesian (Bahasa Indonesia)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="input-language">Original language (optional)</label>
+              <input
+                id="input-language"
+                name="input_language"
+                placeholder="Let us detect automatically"
+                autocomplete="off"
+              />
+            </div>
+            <div class="actions">
+              <button type="submit">Process menu</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <div>
+            <h2>Open a shared menu</h2>
+            <p>Review a menu that someone already translated.</p>
+          </div>
+          <form id="share-form" class="field-group" action="" method="get">
+            <label for="share-token">Share code</label>
+            <input
+              id="share-token"
+              name="token"
+              placeholder="Enter share code"
+              pattern="[A-Za-z0-9_-]{6,}"
+            />
+            <div class="actions">
+              <button type="submit" class="secondary">Open</button>
+            </div>
+          </form>
+        </article>
       </section>
-      <section id="results" hidden>
-        <h2>Ready to share</h2>
-        <p><strong>Share link:</strong> <a id="share-link" href="#"></a></p>
-        <div id="menu-preview"></div>
+
+      <section class="view" data-view="loading">
+        <article class="card">
+          <div class="loading-illustration">
+            <div class="loader"></div>
+          </div>
+          <p class="status-text">
+            Translating your menu with our multimodal AI.<br />
+            Hang tight—this usually takes under a minute.
+          </p>
+          <div class="loading-illustration">
+            <div class="pulse"></div>
+          </div>
+        </article>
       </section>
-      <footer>Built for on-the-go menu translation • mainu web MVP</footer>
+
+      <section class="view" data-view="results">
+        <article class="card">
+          <div class="menu-summary">
+            <div class="menu-header">
+              <div class="badge" id="results-language">Language: English</div>
+              <h2 id="results-title">Menu ready to explore</h2>
+              <p id="results-subtitle">Share the link with friends or scan dishes together.</p>
+            </div>
+            <div class="menu-share">
+              <div id="share-link" class="share-link"></div>
+              <button id="copy-link" type="button" class="secondary">Copy link</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="menu-grid" id="menu-preview"></div>
+        </article>
+
+        <div class="actions">
+          <button id="process-another" type="button" class="secondary">Process another menu</button>
+          <button id="open-share" type="button" disabled>Open share page</button>
+        </div>
+      </section>
     </main>
     <script>
+      const LANGUAGE_COPY = {
+        English: {
+          badge: "Language: English",
+          readyTitle: "Menu ready to explore",
+          readySubtitle: "Share the link with friends or scan dishes together.",
+          copyLink: "Copy link",
+          copySuccess: "Copied!",
+          processAnother: "Process another menu",
+          openShare: "Open share page",
+        },
+        "Mandarin Chinese": {
+          badge: "语言：中文（普通话）",
+          readyTitle: "菜单已准备好",
+          readySubtitle: "与朋友分享链接，或一起浏览菜品。",
+          copyLink: "复制链接",
+          copySuccess: "已复制！",
+          processAnother: "再次处理菜单",
+          openShare: "打开分享页面",
+        },
+        Hindi: {
+          badge: "भाषा: हिंदी",
+          readyTitle: "मेनू अन्वेषण के लिए तैयार है",
+          readySubtitle: "लिंक मित्रों के साथ साझा करें या व्यंजन एक साथ देखें।",
+          copyLink: "लिंक कॉपी करें",
+          copySuccess: "कॉपी हो गया!",
+          processAnother: "एक और मेनू प्रोसेस करें",
+          openShare: "शेयर पेज खोलें",
+        },
+        Spanish: {
+          badge: "Idioma: Español",
+          readyTitle: "Menú listo para explorar",
+          readySubtitle: "Comparte el enlace con tus amigos o exploren los platos juntos.",
+          copyLink: "Copiar enlace",
+          copySuccess: "¡Copiado!",
+          processAnother: "Procesar otro menú",
+          openShare: "Abrir página compartida",
+        },
+        French: {
+          badge: "Langue : Français",
+          readyTitle: "Menu prêt à explorer",
+          readySubtitle: "Partagez le lien avec vos amis ou parcourez les plats ensemble.",
+          copyLink: "Copier le lien",
+          copySuccess: "Copié !",
+          processAnother: "Traiter un autre menu",
+          openShare: "Ouvrir la page partagée",
+        },
+        "Modern Standard Arabic": {
+          badge: "اللغة: العربية",
+          readyTitle: "القائمة جاهزة للاستكشاف",
+          readySubtitle: "شارك الرابط مع أصدقائك أو استكشفوا الأطباق معًا.",
+          copyLink: "انسخ الرابط",
+          copySuccess: "تم النسخ!",
+          processAnother: "معالجة قائمة أخرى",
+          openShare: "فتح صفحة المشاركة",
+        },
+        Bengali: {
+          badge: "ভাষা: বাংলা",
+          readyTitle: "মেনু অন্বেষণের জন্য প্রস্তুত",
+          readySubtitle: "বন্ধুদের সাথে লিঙ্কটি শেয়ার করুন অথবা একসঙ্গে পদগুলো দেখুন।",
+          copyLink: "লিংক কপি করুন",
+          copySuccess: "কপি হয়েছে!",
+          processAnother: "আরেকটি মেনু প্রক্রিয়া করুন",
+          openShare: "শেয়ার পৃষ্ঠা খুলুন",
+        },
+        Portuguese: {
+          badge: "Idioma: Português",
+          readyTitle: "Menu pronto para explorar",
+          readySubtitle: "Compartilhe o link com os amigos ou descubram os pratos juntos.",
+          copyLink: "Copiar link",
+          copySuccess: "Copiado!",
+          processAnother: "Processar outro menu",
+          openShare: "Abrir página compartilhada",
+        },
+        Russian: {
+          badge: "Язык: Русский",
+          readyTitle: "Меню готово к изучению",
+          readySubtitle: "Поделитесь ссылкой с друзьями или изучайте блюда вместе.",
+          copyLink: "Скопировать ссылку",
+          copySuccess: "Скопировано!",
+          processAnother: "Обработать ещё одно меню",
+          openShare: "Открыть страницу обмена",
+        },
+        Indonesian: {
+          badge: "Bahasa: Indonesia",
+          readyTitle: "Menu siap dijelajahi",
+          readySubtitle: "Bagikan tautan dengan teman atau jelajahi hidangan bersama.",
+          copyLink: "Salin tautan",
+          copySuccess: "Tersalin!",
+          processAnother: "Proses menu lainnya",
+          openShare: "Buka halaman berbagi",
+        },
+      };
+
+      const views = {
+        upload: document.querySelector('[data-view="upload"]'),
+        loading: document.querySelector('[data-view="loading"]'),
+        results: document.querySelector('[data-view="results"]'),
+      };
+
       const uploadForm = document.getElementById("upload-form");
       const shareForm = document.getElementById("share-form");
-      const resultsPanel = document.getElementById("results");
+      const resultsLanguage = document.getElementById("results-language");
+      const resultsTitle = document.getElementById("results-title");
+      const resultsSubtitle = document.getElementById("results-subtitle");
       const shareLink = document.getElementById("share-link");
       const menuPreview = document.getElementById("menu-preview");
+      const copyLinkButton = document.getElementById("copy-link");
+      const processAnotherButton = document.getElementById("process-another");
+      const openShareLink = document.getElementById("open-share");
+      const errorBanner = document.getElementById("error-banner");
+
+      let currentShareUrl = "";
+      let lastOutputLanguage = "English";
+      let currentLanguageCopy = LANGUAGE_COPY.English;
+
+      function applyLanguageCopy(language) {
+        const strings = LANGUAGE_COPY[language] || LANGUAGE_COPY.English;
+        currentLanguageCopy = strings;
+        resultsLanguage.textContent = strings.badge;
+        resultsTitle.textContent = strings.readyTitle;
+        resultsSubtitle.textContent = strings.readySubtitle;
+        copyLinkButton.textContent = strings.copyLink;
+        copyLinkButton.dataset.copyText = strings.copyLink;
+        copyLinkButton.dataset.successText = strings.copySuccess;
+        processAnotherButton.textContent = strings.processAnother;
+        openShareLink.textContent = strings.openShare;
+      }
+
+      applyLanguageCopy("English");
+
+      function showView(name) {
+        Object.entries(views).forEach(([key, el]) => {
+          el.classList.toggle("active", key === name);
+        });
+      }
+
+      function showError(message) {
+        errorBanner.textContent = message;
+        errorBanner.classList.add("visible");
+        setTimeout(() => {
+          errorBanner.classList.remove("visible");
+        }, 6000);
+      }
+
+      function renderMenu(template) {
+        if (!template.sections || !template.sections.length) {
+          return '<p>No dishes found in this menu.</p>';
+        }
+
+        return template.sections
+          .map((section) => {
+            const dishes = section.dishes
+              .map((dish) => {
+                const price = dish.price ? `<span class="dish-price">${dish.price}</span>` : "";
+                const description = dish.description
+                  ? `<p class="dish-description">${dish.description}</p>`
+                  : "";
+
+                return `
+                  <div class="dish">
+                    <div class="dish-header">
+                      <div class="dish-name">${dish.translated_name}</div>
+                      ${price}
+                    </div>
+                    <div class="dish-original">${dish.original_name}</div>
+                    ${description}
+                  </div>
+                `;
+              })
+              .join("");
+
+            return `
+              <section class="menu-section">
+                <h3>${section.title}</h3>
+                ${dishes}
+              </section>
+            `;
+          })
+          .join("");
+      }
 
       uploadForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const files = document.getElementById("menu-files").files;
-        if (!files.length) return;
-        const data = new FormData();
-        Array.from(files).forEach((file) => data.append("files", file));
-
-        const response = await fetch("/menu/process", {
-          method: "POST",
-          body: data,
-        });
-
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({ detail: "Unknown error" }));
-          alert(error.detail || "Failed to process menu");
+        const fileInput = document.getElementById("menu-files");
+        if (!fileInput.files.length) {
+          showError("Please add at least one menu photo.");
           return;
         }
 
-        const payload = await response.json();
-        shareLink.href = payload.share_url;
-        shareLink.textContent = payload.share_url;
-        menuPreview.innerHTML = renderMenu(payload.template);
-        resultsPanel.hidden = false;
+        const data = new FormData();
+        Array.from(fileInput.files).forEach((file) => data.append("files", file));
+
+        const outputLanguage = document.getElementById("output-language").value;
+        const inputLanguage = document.getElementById("input-language").value.trim();
+        data.append("output_language", outputLanguage);
+        if (inputLanguage) {
+          data.append("input_language", inputLanguage);
+        }
+
+        lastOutputLanguage = outputLanguage || "English";
+
+        showView("loading");
+
+        try {
+          const response = await fetch("/menu/process", {
+            method: "POST",
+            body: data,
+          });
+
+          if (!response.ok) {
+            const error = await response
+              .json()
+              .catch(() => ({ detail: "Unable to process menu." }));
+            throw new Error(error.detail || "Unable to process menu.");
+          }
+
+          const payload = await response.json();
+          const viewerUrl = new URL(`/share/${payload.share_token}`, window.location.origin).href;
+          currentShareUrl = viewerUrl;
+          applyLanguageCopy(lastOutputLanguage);
+          shareLink.innerHTML = `<a href="${viewerUrl}" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">${viewerUrl}</a>`;
+
+          menuPreview.innerHTML = renderMenu(payload.template);
+          openShareLink.disabled = false;
+
+          showView("results");
+        } catch (error) {
+          showError(error.message || "Failed to process menu.");
+          showView("upload");
+        }
       });
 
       shareForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const token = document.getElementById("share-token").value.trim();
-        if (!token) return;
-        window.location.href = `/share/${token}`;
+        if (!token) {
+          showError("Enter a share code to continue.");
+        } else {
+          window.location.href = `/share/${token}`;
+        }
       });
 
-      function renderMenu(template) {
-        return template.sections
-          .map(
-            (section) => `
-            <article>
-              <h3>${section.title}</h3>
-              <ul>
-                ${section.dishes
-                  .map(
-                    (dish) => `
-                      <li>
-                        <strong>${dish.translated_name}</strong>
-                        <div class="original">${dish.original_name}</div>
-                        <div class="meta">${dish.price || ""}</div>
-                        <p>${dish.description || ""}</p>
-                      </li>
-                    `,
-                  )
-                  .join("")}
-              </ul>
-            </article>
-          `,
-          )
-          .join("");
-      }
+      copyLinkButton.addEventListener("click", async () => {
+        if (!currentShareUrl) return;
+        try {
+          await navigator.clipboard.writeText(currentShareUrl);
+          copyLinkButton.textContent = copyLinkButton.dataset.successText || "Copied!";
+          setTimeout(() => {
+            copyLinkButton.textContent = copyLinkButton.dataset.copyText || "Copy link";
+          }, 2000);
+        } catch (error) {
+          showError("Copy failed. You can long-press and copy manually.");
+        }
+      });
+
+      processAnotherButton.addEventListener("click", () => {
+        uploadForm.reset();
+        menuPreview.innerHTML = "";
+        shareLink.innerHTML = "";
+        openShareLink.disabled = true;
+        currentShareUrl = "";
+        applyLanguageCopy("English");
+        showView("upload");
+      });
+
+      openShareLink.addEventListener("click", () => {
+        if (!currentShareUrl) {
+          showError("Process a menu first to open the share page.");
+          return;
+        }
+        window.location.href = currentShareUrl;
+      });
     </script>
   </body>
 </html>

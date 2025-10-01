@@ -40,6 +40,9 @@ class LLMMenuService:
         images: Sequence[bytes],
         filenames: Sequence[str] | None = None,
         content_types: Sequence[str] | None = None,
+        *,
+        input_language: str | None = None,
+        output_language: str | None = None,
     ) -> MenuTemplate:
         """Invoke the multimodal LLM and coerce the response into a template."""
 
@@ -48,9 +51,9 @@ class LLMMenuService:
 
         file_ids = await self._upload_images(images, filenames, content_types)
         schema_text = json.dumps(build_response_object_schema())
-        user_prompt = build_user_prompt(
-            settings.input_language, settings.output_language
-        )
+        language_in = input_language or settings.input_language
+        language_out = output_language or settings.output_language
+        user_prompt = build_user_prompt(language_in, language_out)
         request_content = _build_request_content(
             file_ids, filenames, user_prompt, schema_text
         )
@@ -74,7 +77,7 @@ class LLMMenuService:
             await self._delete_files(file_ids)
 
         payload = _extract_json_payload(response)
-        return _build_menu_template(payload)
+        return _build_menu_template(payload, original_language=language_in)
 
     async def _upload_images(
         self,
@@ -159,7 +162,11 @@ def _extract_json_payload(response: object) -> dict:
     return json.loads(output_text)
 
 
-def _build_menu_template(payload: dict) -> MenuTemplate:
+def _build_menu_template(
+    payload: dict,
+    *,
+    original_language: str | None = None,
+) -> MenuTemplate:
     """Convert the raw payload into the MenuTemplate structure."""
 
     if not isinstance(payload, dict) or "items" not in payload:
@@ -192,7 +199,10 @@ def _build_menu_template(payload: dict) -> MenuTemplate:
         MenuSection(title=title, dishes=dishes) for title, dishes in sections.items()
     ]
 
-    return MenuTemplate(sections=section_models)
+    return MenuTemplate(
+        sections=section_models,
+        original_language=original_language,
+    )
 
 
 def _format_price(value: object) -> str | None:

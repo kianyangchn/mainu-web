@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import List
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 
 from app.schemas import MenuProcessingResponse, MenuTemplate
 from app.services.llm import LLMMenuService
@@ -28,6 +28,8 @@ def get_share_service() -> ShareService:
 async def process_menu(
     request: Request,
     files: List[UploadFile] = File(...),
+    input_language: str | None = Form(None),
+    output_language: str = Form("English"),
     menu_service: LLMMenuService = Depends(get_menu_service),
     share_service: ShareService = Depends(get_share_service),
 ) -> MenuProcessingResponse:
@@ -47,8 +49,15 @@ async def process_menu(
         filenames.append(upload.filename or "menu-page")
         content_types.append(upload.content_type)
 
+    chosen_input_language = (input_language or "").strip() or None
+    chosen_output_language = (output_language or "English").strip() or "English"
+
     template = await menu_service.generate_menu_template(
-        contents, filenames, content_types
+        contents,
+        filenames,
+        content_types,
+        input_language=chosen_input_language,
+        output_language=chosen_output_language,
     )
     share_service.purge_expired()
     token = share_service.create_template(template)
