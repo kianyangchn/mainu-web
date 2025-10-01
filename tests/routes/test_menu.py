@@ -22,13 +22,10 @@ def reset_services(monkeypatch):
                     title="Chef's Picks",
                     dishes=[
                         MenuDish(
-                            name="Mapo Tofu",
+                            original_name="Mapo Tofu",
                             translated_name="Spicy Mapo Tofu",
                             description="Classic Sichuan tofu",
-                            price="$12",
-                            allergens=["soy"],
-                            spice_level="high",
-                            recommendations=["Jasmine rice"],
+                            price="12",
                         )
                     ],
                 )
@@ -81,7 +78,7 @@ def test_get_shared_menu_returns_template():
 
     shared = client.get(f"/menu/share/{token}")
     assert shared.status_code == 200
-    assert shared.json()["sections"][0]["dishes"][0]["name"] == "Mapo Tofu"
+    assert shared.json()["sections"][0]["dishes"][0]["original_name"] == "Mapo Tofu"
 
 
 def test_share_view_renders_html():

@@ -10,13 +10,12 @@ from pydantic import BaseModel, Field
 class MenuDish(BaseModel):
     """Dish-level metadata returned by the LLM."""
 
-    name: str = Field(description="Name as seen on the original menu")
+    original_name: str = Field(description="Name as seen on the original menu")
     translated_name: str = Field(description="Localized name surfaced to diners")
-    description: str | None = None
-    price: str | None = None
-    allergens: List[str] = Field(default_factory=list)
-    spice_level: str | None = None
-    recommendations: List[str] = Field(default_factory=list)
+    description: str = Field(
+        description="Short dish explanation in the output language"
+    )
+    price: str | None = Field(default=None, description="Price extracted from the menu")
 
 
 class MenuSection(BaseModel):

@@ -72,20 +72,6 @@
         opacity: 0.8;
       }
 
-      .badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 8px;
-      }
-
-      .badge {
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: rgba(56, 189, 248, 0.2);
-        border: 1px solid rgba(56, 189, 248, 0.4);
-        font-size: 0.75rem;
-      }
     </style>
   </head>
   <body>
@@ -107,21 +93,10 @@
               <span>{{ dish.translated_name }}</span>
               <span>{{ dish.price or "" }}</span>
             </div>
-            <div class="original">{{ dish.name }}</div>
+            <div class="original">{{ dish.original_name }}</div>
             {% if dish.description %}
             <p>{{ dish.description }}</p>
             {% endif %}
-            <div class="badges">
-              {% for allergen in dish.allergens %}
-              <span class="badge">Allergen: {{ allergen }}</span>
-              {% endfor %}
-              {% if dish.spice_level %}
-              <span class="badge">Spice: {{ dish.spice_level }}</span>
-              {% endif %}
-              {% for rec in dish.recommendations %}
-              <span class="badge">Pair: {{ rec }}</span>
-              {% endfor %}
-            </div>
           </li>
           {% endfor %}
         </ul>

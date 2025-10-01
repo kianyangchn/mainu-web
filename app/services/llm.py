@@ -3,25 +3,19 @@
 from __future__ import annotations
 
 import json
+from collections import defaultdict
 from typing import Iterable, List, Sequence
 
 from openai import AsyncOpenAI, OpenAIError
 
 from app.config import settings
-from app.schemas import MenuTemplate
-
-_SYSTEM_PROMPT = (
-    "You are mainu, an assistant that reads multi-page restaurant menus and returns "
-    "structured JSON ready for translation and sharing. Output must strictly match "
-    "the provided JSON schema and preserve original dish names alongside translated "
-    "names. Highlight allergens, spice indicators, and recommended pairings when "
-    "present."
-)
-
-_USER_INSTRUCTIONS = (
-    "Analyze the following menu images captured by a traveler. Extract sections and "
-    "dishes, provide translated names, descriptions, allergens, spice levels, price "
-    "strings, and recommended pairings when discoverable. Return only JSON—no prose."
+from app.schemas import MenuDish, MenuSection, MenuTemplate
+from app.services.prompt import (
+    SYSTEM_INSTRUCTIONS,
+    build_reasoning_config,
+    build_response_object_schema,
+    build_text_config,
+    build_user_prompt,
 )
 
 
@@ -53,25 +47,26 @@ class LLMMenuService:
             raise ValueError("At least one image is required")
 
         file_ids = await self._upload_images(images, filenames, content_types)
-        schema_text = json.dumps(MenuTemplate.model_json_schema())
-        request_content = _build_request_content(file_ids, filenames, schema_text)
+        schema_text = json.dumps(build_response_object_schema())
+        user_prompt = build_user_prompt(
+            settings.input_language, settings.output_language
+        )
+        request_content = _build_request_content(
+            file_ids, filenames, user_prompt, schema_text
+        )
 
         try:
             response = await self.client.responses.create(
                 model=settings.openai_model,
+                instructions=SYSTEM_INSTRUCTIONS,
                 input=[
-                    {
-                        "role": "system",
-                        "content": [
-                            {"type": "input_text", "text": _SYSTEM_PROMPT},
-                        ],
-                    },
                     {
                         "role": "user",
                         "content": request_content,
-                    },
+                    }
                 ],
-                temperature=0.2,
+                text=build_text_config(),
+                reasoning=build_reasoning_config(),
             )
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
@@ -79,7 +74,7 @@ class LLMMenuService:
             await self._delete_files(file_ids)
 
         payload = _extract_json_payload(response)
-        return MenuTemplate.model_validate(payload)
+        return _build_menu_template(payload)
 
     async def _upload_images(
         self,
@@ -119,12 +114,13 @@ class LLMMenuService:
 def _build_request_content(
     file_ids: Sequence[str],
     filenames: Sequence[str] | None,
+    user_prompt: str,
     schema_text: str,
 ) -> List[dict]:
     """Construct multimodal content referencing uploaded file IDs."""
 
     content: List[dict] = [
-        {"type": "input_text", "text": _USER_INSTRUCTIONS},
+        {"type": "input_text", "text": user_prompt},
         {
             "type": "input_text",
             "text": (
@@ -145,23 +141,69 @@ def _build_request_content(
                 "text": f"Image source: {name}",
             }
         )
-        content.append({"type": "input_image", "image_file": {"file_id": file_id}})
+        content.append({"type": "input_image", "file_id": file_id})
     return content
 
 
 def _extract_json_payload(response: object) -> dict:
     """Traverse the responses API payload to pull JSON content."""
 
-    # The OpenAI Responses API returns a structured object. We access text segments
-    # directly to avoid additional dependencies on their dataclasses.
     try:
-        for item in response.output:  # type: ignore[attr-defined]
-            for content in item.content:  # type: ignore[attr-defined]
-                if getattr(content, "type", None) == "output_text":
-                    return json.loads(content.text)  # type: ignore[attr-defined]
-                if getattr(content, "type", None) == "text":
-                    return json.loads(content.text)  # type: ignore[attr-defined]
+        output_text = response.output_text  # type: ignore[attr-defined]
     except AttributeError as exc:  # pragma: no cover - defensive guard
-        raise RuntimeError("Unexpected response format from OpenAI") from exc
+        raise RuntimeError("OpenAI response missing output_text") from exc
 
-    raise RuntimeError("No JSON payload returned from OpenAI")
+    if not output_text:
+        raise RuntimeError("OpenAI response returned empty output_text")
+
+    return json.loads(output_text)
+
+
+def _build_menu_template(payload: dict) -> MenuTemplate:
+    """Convert the raw payload into the MenuTemplate structure."""
+
+    if not isinstance(payload, dict) or "items" not in payload:
+        raise RuntimeError("OpenAI response missing 'items' payload")
+
+    sections: defaultdict[str, List[MenuDish]] = defaultdict(list)
+    for item in payload.get("items", []):
+        if not isinstance(item, dict):
+            continue
+
+        section = str(item.get("section") or "Menu")
+        original_name = str(item.get("original_name") or "").strip()
+        translated_name = str(item.get("translated_name") or "").strip()
+        description = str(item.get("description") or "").strip()
+        price = _format_price(item.get("price"))
+
+        if not original_name or not translated_name or not description:
+            continue
+
+        sections[section].append(
+            MenuDish(
+                original_name=original_name,
+                translated_name=translated_name,
+                description=description,
+                price=price,
+            )
+        )
+
+    section_models = [
+        MenuSection(title=title, dishes=dishes) for title, dishes in sections.items()
+    ]
+
+    return MenuTemplate(sections=section_models)
+
+
+def _format_price(value: object) -> str | None:
+    """Format numeric prices into display-friendly strings."""
+
+    if value in (None, ""):
+        return None
+    if isinstance(value, (int, float)):
+        if isinstance(value, int) or (
+            hasattr(value, "is_integer") and value.is_integer()
+        ):
+            return f"{int(value)}"
+        return f"{value:.2f}"
+    return str(value)
