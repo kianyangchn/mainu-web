@@ -5,20 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Shared menu • mainu Web</title>
     <style>
+      :root {
+        color-scheme: light;
+        font-family: "Inter", "Nunito", system-ui, sans-serif;
+        background-color: #f9fbff;
+      }
+
       body {
         margin: 0;
-        font-family: "Inter", "Nunito", system-ui, sans-serif;
         background: linear-gradient(180deg, #f9fbff 0%, #fff4ec 55%, #fef6ff 100%);
         color: #1f2937;
         padding: 28px 20px 40px;
       }
 
       main {
-        max-width: 560px;
+        max-width: 640px;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 20px;
       }
 
       header {
@@ -49,60 +54,329 @@
         opacity: 0.65;
       }
 
-      section {
+      .card {
         background: rgba(255, 255, 255, 0.94);
-        border-radius: 22px;
-        padding: 20px 22px 22px;
-        box-shadow: 0 14px 30px rgba(46, 64, 116, 0.1);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 14px 34px rgba(46, 64, 116, 0.12);
         border: 1px solid rgba(79, 70, 229, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
       }
 
-      h2 {
-        margin: 0 0 12px;
-        font-size: 1.2rem;
+      .pill {
+        align-self: flex-start;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(79, 70, 229, 0.12);
+        color: #4338ca;
+        font-weight: 600;
+        font-size: 0.85rem;
       }
 
-      ul {
+      .menu-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .menu-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      details {
+        border-radius: 20px;
+        background: rgba(248, 250, 255, 0.85);
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        padding: 18px 20px;
+      }
+
+      summary {
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .dish-list {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .dish-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 20px 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.78));
+        border-radius: 24px;
+        border: 2px solid transparent;
+        box-shadow: 0 16px 30px rgba(79, 70, 229, 0.08);
+        transition: transform 0.18s ease, border-color 0.18s ease;
+      }
+
+      .dish-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(79, 70, 229, 0.25);
+      }
+
+      .dish-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .dish-title {
+        font-size: 1.08rem;
+        font-weight: 600;
+      }
+
+      .original {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.85rem;
+        color: rgba(15, 23, 42, 0.55);
+      }
+
+      .price {
+        font-weight: 600;
+        color: #0f766e;
+        font-size: 0.95rem;
+      }
+
+      .description {
+        margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.45;
+        color: rgba(15, 23, 42, 0.78);
+      }
+
+      .dish-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: none;
+        color: #1f2937;
+        font-size: 1.6rem;
+        font-weight: 600;
+        border: none;
+        box-shadow: none;
+        cursor: pointer;
+        line-height: 1;
+        transition: transform 0.15s ease, color 0.15s ease;
+      }
+
+      .add-button:hover,
+      .add-button:focus-visible {
+        color: #111827;
+        transform: translateY(-1px);
+      }
+
+      .quantity-controls {
+        display: none;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .quantity-controls[data-active="true"] {
+        display: inline-flex;
+      }
+
+      .quantity-controls button {
+        border: none;
+        background: none;
+        box-shadow: none;
+        color: #1f2937;
+        font-size: 1.4rem;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .quantity-controls button:hover,
+      .quantity-controls button:focus-visible {
+        color: #111827;
+      }
+
+      .quantity-display {
+        min-width: 22px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.05rem;
+      }
+
+      button {
+        border: none;
+        border-radius: 18px;
+        padding: 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: linear-gradient(135deg, #4f46e5 0%, #22d3ee 100%);
+        color: #ffffff;
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.4);
+      }
+
+      button.secondary {
+        background: transparent;
+        color: #1f2937;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        box-shadow: none;
+      }
+
+      .cart-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(248, 250, 255, 0.85);
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid rgba(79, 70, 229, 0.12);
+      }
+
+      .cart-panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+      }
+
+      .cart-empty {
+        margin: 0;
+        opacity: 0.6;
+        font-size: 0.9rem;
+      }
+
+      .cart-items {
         list-style: none;
         padding: 0;
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
       }
 
-      li {
-        padding: 14px 16px;
-        border-radius: 18px;
+      .cart-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+        padding: 12px;
+        border-radius: 14px;
         background: rgba(248, 250, 255, 0.75);
-        border: 1px dashed rgba(148, 163, 184, 0.4);
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
       }
 
-      .dish-title {
+      .cart-item-controls {
+        grid-column: 1 / -1;
         display: flex;
         justify-content: space-between;
-        gap: 12px;
-        font-weight: 700;
-        font-size: 1rem;
+        align-items: center;
       }
 
-      .dish-price {
+      .cart-total {
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .cart-total span:last-child {
         color: #0f766e;
       }
 
-      .original {
-        font-size: 0.88rem;
-        color: rgba(55, 65, 81, 0.65);
+      .cart-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
 
-      .description {
+      .icon-button {
+        border: none;
+        background: transparent;
+        color: #1f2937;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0;
+        display: grid;
+        place-items: center;
+      }
+
+      .error-banner {
+        display: none;
+        background: rgba(248, 113, 113, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        color: #b91c1c;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-weight: 600;
+      }
+
+      .error-banner[data-visible="true"] {
+        display: block;
+      }
+
+      .order-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 255, 0.75));
+        border: 2px solid transparent;
+        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.08);
+        transition: transform 0.18s ease, border-color 0.18s ease;
+      }
+
+      .order-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(79, 70, 229, 0.2);
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .order-header h2 {
         margin: 0;
-        font-size: 0.94rem;
-        line-height: 1.45;
-        color: rgba(31, 41, 55, 0.92);
+        font-size: 1.3rem;
+      }
+
+      .order-note {
+        background: rgba(248, 250, 255, 0.9);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        padding: 18px 20px;
+        font-size: 1.12rem;
+        line-height: 1.6;
+        color: #111827;
+        white-space: pre-wrap;
       }
 
       footer {
@@ -110,6 +384,23 @@
         font-size: 0.82rem;
         opacity: 0.6;
         margin-top: 12px;
+      }
+
+      @media (min-width: 768px) {
+        .menu-layout {
+          flex-direction: row;
+          align-items: flex-start;
+        }
+
+        .menu-grid {
+          flex: 1.8;
+        }
+
+        .cart-panel {
+          flex: 1;
+          position: sticky;
+          top: 28px;
+        }
       }
     </style>
   </head>
@@ -121,31 +412,327 @@
         <p>Take a minute to read through dishes, then let the planner know what looks delicious.</p>
       </header>
 
-      {% if menu.sections %}
-      {% for section in menu.sections %}
-      <section>
-        <h2>{{ section.title }}</h2>
-        <ul>
-          {% for dish in section.dishes %}
-          <li>
-            <div class="dish-title">
-              <span>{{ dish.translated_name }}</span>
-              <span class="dish-price">{{ dish.price or "" }}</span>
+      <div class="error-banner" id="error-banner" role="status"></div>
+
+      <section class="card">
+        <div class="pill">Browse & add to the table</div>
+        <div class="menu-layout">
+          <div class="menu-grid" id="menu-preview"></div>
+          <aside class="cart-panel" id="cart-panel">
+            <header>
+              <span>Table picks</span>
+              <span id="cart-count">0 dishes</span>
+            </header>
+            <p class="cart-empty" id="cart-empty">Tap a dish to add it to your order.</p>
+            <ul class="cart-items" id="cart-items"></ul>
+            <div class="cart-total" id="cart-total" hidden>
+              <span>Total dishes</span>
+              <span id="cart-total-count">0</span>
             </div>
-            <div class="original">{{ dish.original_name }}</div>
-            {% if dish.description %}
-            <p class="description">{{ dish.description }}</p>
-            {% endif %}
-          </li>
-          {% endfor %}
-        </ul>
+            <div class="cart-buttons">
+              <button type="button" id="generate-order">Create waiter note</button>
+              <button type="button" class="secondary" id="clear-cart">Clear selections</button>
+            </div>
+          </aside>
+        </div>
       </section>
-      {% endfor %}
-      {% else %}
-      <section><p>No dishes found for this menu.</p></section>
-      {% endif %}
+
+      <section class="card order-card" id="order-card" hidden>
+        <div class="order-header">
+          <h2>Waiter note</h2>
+        </div>
+        <div class="order-note" id="order-note"></div>
+        <div class="cart-buttons">
+          <button type="button" id="copy-order">Copy note</button>
+          <button type="button" class="secondary" id="back-to-menu">Back to menu</button>
+        </div>
+      </section>
 
       <footer>mainu • Bringing happy meals to every adventure</footer>
     </main>
+
+    <script>
+      const menuData = {{ menu.model_dump() | tojson }};
+      const menuPreview = document.getElementById("menu-preview");
+      const errorBanner = document.getElementById("error-banner");
+      const cartCount = document.getElementById("cart-count");
+      const cartEmpty = document.getElementById("cart-empty");
+      const cartItems = document.getElementById("cart-items");
+      const cartTotal = document.getElementById("cart-total");
+      const cartTotalCount = document.getElementById("cart-total-count");
+      const generateOrderButton = document.getElementById("generate-order");
+      const clearCartButton = document.getElementById("clear-cart");
+      const orderCard = document.getElementById("order-card");
+      const orderNote = document.getElementById("order-note");
+      const copyOrderButton = document.getElementById("copy-order");
+      const backToMenuButton = document.getElementById("back-to-menu");
+
+      const cart = new Map();
+
+      renderMenu(menuData?.sections || []);
+      updateCartUI();
+
+      menuPreview.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+        const dishCard = target.closest(".dish-card");
+        if (!dishCard) {
+          return;
+        }
+
+        if (target.dataset.action === "add") {
+          setDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "increment") {
+          adjustDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "decrement") {
+          adjustDishQuantity(dishCard, -1);
+        }
+      });
+
+      cartItems.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+        const cartItem = target.closest(".cart-item");
+        if (!cartItem) {
+          return;
+        }
+        const key = cartItem.dataset.key;
+        if (!key) {
+          return;
+        }
+        const dishCard = menuPreview.querySelector(`.dish-card[data-key="${cssEscape(key)}"]`);
+        if (!dishCard) {
+          return;
+        }
+
+        if (target.dataset.action === "increment-cart") {
+          adjustDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "decrement-cart") {
+          adjustDishQuantity(dishCard, -1);
+        } else if (target.dataset.action === "remove-cart") {
+          setDishQuantity(dishCard, 0);
+        }
+      });
+
+      generateOrderButton.addEventListener("click", () => {
+        if (!cart.size) {
+          showError("Add dishes before creating the waiter note.");
+          return;
+        }
+        orderNote.textContent = buildOrderSummary();
+        orderCard.hidden = false;
+        copyOrderButton.textContent = "Copy note";
+        copyOrderButton.disabled = false;
+      });
+
+      clearCartButton.addEventListener("click", () => {
+        cart.clear();
+        updateCartUI();
+        menuPreview.querySelectorAll(".dish-card").forEach((card) => updateDishCardUI(card, 0));
+        orderCard.hidden = true;
+      });
+
+      copyOrderButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(orderNote.textContent);
+          copyOrderButton.textContent = "Copied!";
+          copyOrderButton.disabled = true;
+          setTimeout(() => {
+            copyOrderButton.textContent = "Copy note";
+            copyOrderButton.disabled = false;
+          }, 2000);
+        } catch (error) {
+          console.error(error);
+          showError("Copy isn’t available on this device. Show the screen instead.");
+        }
+      });
+
+      backToMenuButton.addEventListener("click", () => {
+        orderCard.hidden = true;
+      });
+
+      function renderMenu(sections) {
+        if (!sections.length) {
+          menuPreview.innerHTML = `<p style="opacity:0.7;">We couldn't find dishes in this menu. Try clearer photos or ask the planner to refresh.</p>`;
+          return;
+        }
+
+        menuPreview.innerHTML = sections
+          .map((section, index) => renderSection(section, index === 0))
+          .join("");
+      }
+
+      function renderSection(section, openByDefault) {
+        const dishes = (section.dishes || [])
+          .map((dish) => {
+            const key = buildKey(section.title, dish.original_name);
+            const description = dish.description ? `<p class=\"description\">${escapeHtml(dish.description)}</p>` : "";
+            return `
+              <li class="dish-card" data-section="${escapeAttr(section.title)}" data-original="${escapeAttr(dish.original_name)}" data-translated="${escapeAttr(dish.translated_name)}" data-price="${escapeAttr(dish.price || "")}" data-key="${escapeAttr(key)}">
+                <div class="dish-top">
+                  <div>
+                    <span class="dish-title">${escapeHtml(dish.translated_name)}</span>
+                    <span class="original">${escapeHtml(dish.original_name)}</span>
+                  </div>
+                  <span class="price">${escapeHtml(dish.price || "")}</span>
+                </div>
+                ${description}
+                <div class="dish-actions">
+                  <button type="button" class="add-button" data-action="add" aria-label="Add ${escapeAttr(dish.translated_name)}">+</button>
+                  <div class="quantity-controls" data-active="false">
+                    <button type="button" data-action="decrement" aria-label="Remove one ${escapeAttr(dish.translated_name)}">−</button>
+                    <span class="quantity-display">0</span>
+                    <button type="button" data-action="increment" aria-label="Add one ${escapeAttr(dish.translated_name)}">+</button>
+                  </div>
+                </div>
+              </li>`;
+          })
+          .join("");
+
+        return `
+          <details ${openByDefault ? "open" : ""}>
+            <summary>
+              <span>${escapeHtml(section.title)}</span>
+              <span aria-hidden="true">➜</span>
+            </summary>
+            <ul class="dish-list">${dishes}</ul>
+          </details>`;
+      }
+
+      function setDishQuantity(dishCard, quantity) {
+        const data = extractDishData(dishCard);
+        if (quantity <= 0) {
+          cart.delete(data.key);
+          updateDishCardUI(dishCard, 0);
+        } else {
+          cart.set(data.key, { ...data, quantity });
+          updateDishCardUI(dishCard, quantity);
+        }
+        updateCartUI();
+      }
+
+      function adjustDishQuantity(dishCard, delta) {
+        const current = Number(dishCard.dataset.quantity || "0");
+        const next = Math.max(0, current + delta);
+        setDishQuantity(dishCard, next);
+      }
+
+      function updateDishCardUI(dishCard, quantity) {
+        dishCard.dataset.quantity = String(quantity);
+        const addButton = dishCard.querySelector(".add-button");
+        const controls = dishCard.querySelector(".quantity-controls");
+        const qtyDisplay = dishCard.querySelector(".quantity-display");
+        if (!addButton || !controls || !qtyDisplay) {
+          return;
+        }
+        if (quantity > 0) {
+          addButton.style.display = "none";
+          controls.dataset.active = "true";
+        } else {
+          addButton.style.display = "inline-flex";
+          controls.dataset.active = "false";
+        }
+        qtyDisplay.textContent = String(quantity);
+      }
+
+      function updateCartUI() {
+        const items = Array.from(cart.values());
+        const total = items.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
+
+        if (!items.length) {
+          cartEmpty.hidden = false;
+          cartItems.innerHTML = "";
+          cartTotal.hidden = true;
+          generateOrderButton.disabled = true;
+          clearCartButton.disabled = true;
+          return;
+        }
+
+        cartEmpty.hidden = true;
+        generateOrderButton.disabled = false;
+        clearCartButton.disabled = false;
+        cartItems.innerHTML = items
+          .map(
+            (item) => `
+              <li class="cart-item" data-key="${escapeAttr(item.key)}">
+                <div>
+                  <strong>${escapeHtml(item.translatedName)}</strong>
+                  <div class="original">${escapeHtml(item.originalName)}</div>
+                </div>
+                <div class="price">${escapeHtml(item.price || "")}</div>
+                <div class="cart-item-controls">
+                  <div class="quantity-controls" data-active="true">
+                    <button type="button" data-action="decrement-cart" aria-label="Remove one">−</button>
+                    <span class="quantity-display">${item.quantity}</span>
+                    <button type="button" data-action="increment-cart" aria-label="Add one">+</button>
+                  </div>
+                  <button type="button" class="icon-button" data-action="remove-cart" aria-label="Remove dish">🗑️</button>
+                </div>
+              </li>`
+          )
+          .join("");
+
+        cartTotal.hidden = false;
+        cartTotalCount.textContent = String(total);
+      }
+
+      function buildOrderSummary() {
+        const lines = [];
+        cart.forEach((item) => {
+          lines.push(`${item.quantity} × ${item.originalName}`);
+        });
+        return lines.join("\n");
+      }
+
+      function extractDishData(dishCard) {
+        const key = dishCard.dataset.key || "";
+        const sectionTitle = dishCard.dataset.section || "";
+        const originalName = dishCard.dataset.original || "";
+        const translatedName = dishCard.dataset.translated || "";
+        const price = dishCard.dataset.price || "";
+        return { key, sectionTitle, originalName, translatedName, price };
+      }
+
+      function buildKey(sectionTitle, originalName) {
+        return `${encodeURIComponent(sectionTitle)}::${encodeURIComponent(originalName)}`;
+      }
+
+      function showError(message) {
+        errorBanner.textContent = message;
+        errorBanner.dataset.visible = "true";
+        setTimeout(() => {
+          errorBanner.dataset.visible = "false";
+        }, 3000);
+      }
+
+      function escapeHtml(text) {
+        return String(text ?? "").replace(/[&<>\"']/g, (char) => {
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          };
+          return map[char] || char;
+        });
+      }
+
+      function escapeAttr(text) {
+        return escapeHtml(text);
+      }
+
+      function cssEscape(value) {
+        if (window.CSS && CSS.escape) {
+          return CSS.escape(value);
+        }
+        return value.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
+      }
+    </script>
   </body>
 </html>

@@ -329,20 +329,40 @@
       }
 
       .dish-card {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 6px 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px dashed rgba(148, 163, 184, 0.4);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 20px 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.78));
+        border-radius: 24px;
+        border: 2px solid transparent;
+        box-shadow: 0 16px 30px rgba(79, 70, 229, 0.08);
+        transition: transform 0.18s ease, border-color 0.18s ease;
       }
 
-      .dish-card:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+      .dish-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(79, 70, 229, 0.25);
       }
 
-      .dish-card strong {
-        font-size: 1.05rem;
+      .dish-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .dish-title {
+        font-size: 1.08rem;
+        font-weight: 600;
+      }
+
+      .original {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.85rem;
+        color: rgba(15, 23, 42, 0.55);
       }
 
       .price {
@@ -351,16 +371,72 @@
         font-size: 0.95rem;
       }
 
-      .original {
-        grid-column: 1 / -1;
-        font-size: 0.85rem;
-        color: rgba(15, 23, 42, 0.55);
-      }
-
       .description {
-        grid-column: 1 / -1;
+        margin: 0;
         font-size: 0.92rem;
         line-height: 1.45;
+        color: rgba(15, 23, 42, 0.78);
+      }
+
+      .dish-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .add-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: none;
+        color: #1f2937;
+        font-size: 1.6rem;
+        font-weight: 600;
+        border: none;
+        box-shadow: none;
+        cursor: pointer;
+        line-height: 1;
+        transition: transform 0.15s ease, color 0.15s ease;
+      }
+
+      .add-button:hover,
+      .add-button:focus-visible {
+        color: #111827;
+        transform: translateY(-1px);
+      }
+
+      .quantity-controls {
+        display: none;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .quantity-controls[data-active="true"] {
+        display: inline-flex;
+      }
+
+      .quantity-controls button {
+        border: none;
+        background: none;
+        box-shadow: none;
+        color: #1f2937;
+        font-size: 1.4rem;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .quantity-controls button:hover,
+      .quantity-controls button:focus-visible {
+        color: #111827;
+      }
+
+      .quantity-display {
+        min-width: 22px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.05rem;
       }
 
       .actions {
@@ -389,6 +465,129 @@
       .share-link::after {
         content: "↗";
         font-size: 0.9rem;
+      }
+
+      .menu-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .cart-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: rgba(248, 250, 255, 0.85);
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid rgba(79, 70, 229, 0.12);
+      }
+
+      .cart-panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+      }
+
+      .cart-empty {
+        margin: 0;
+        opacity: 0.6;
+        font-size: 0.9rem;
+      }
+
+      .cart-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .cart-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(248, 250, 255, 0.75);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .cart-item-controls {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .cart-total {
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .cart-total span:last-child {
+        color: #0f766e;
+      }
+
+      .cart-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .icon-button {
+        border: none;
+        background: transparent;
+        color: #1f2937;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0;
+        display: grid;
+        place-items: center;
+      }
+
+      .order-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 255, 0.75));
+        border: 2px solid transparent;
+        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.08);
+        transition: transform 0.18s ease, border-color 0.18s ease;
+      }
+
+      .order-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(79, 70, 229, 0.2);
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .order-header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .order-note {
+        background: rgba(248, 250, 255, 0.9);
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        padding: 18px 20px;
+        font-size: 1.12rem;
+        line-height: 1.6;
+        color: #111827;
+        white-space: pre-wrap;
+      }
+
+      .order-note-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
       .error-banner {
@@ -423,6 +622,21 @@
 
         .menu-grid {
           gap: 20px;
+        }
+
+        .menu-layout {
+          flex-direction: row;
+          align-items: flex-start;
+        }
+
+        .menu-grid {
+          flex: 1.8;
+        }
+
+        .cart-panel {
+          flex: 1;
+          position: sticky;
+          top: 32px;
         }
       }
     </style>
@@ -528,9 +742,37 @@
             <p id="detected-language" class="pill" hidden></p>
             <button type="button" class="secondary" id="process-again">Upload another menu</button>
           </div>
-          <div>
-            <h3 style="margin: 12px 0 8px;">Menu preview</h3>
-            <div id="menu-preview" class="menu-grid"></div>
+          <div class="menu-layout">
+            <div class="menu-grid" id="menu-preview"></div>
+            <aside class="cart-panel" id="cart-panel">
+              <header>
+                <span>Table picks</span>
+                <span id="cart-count">0 dishes</span>
+              </header>
+              <p class="cart-empty" id="cart-empty">Tap a dish to add it to your order.</p>
+              <ul class="cart-items" id="cart-items"></ul>
+              <div class="cart-total" id="cart-total" hidden>
+                <span>Total dishes</span>
+                <span id="cart-total-count">0</span>
+              </div>
+              <div class="cart-buttons">
+                <button type="button" id="generate-order">Create waiter note</button>
+                <button type="button" class="secondary" id="clear-cart">Clear selections</button>
+              </div>
+            </aside>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen" data-screen="order">
+        <article class="card order-card">
+          <div class="order-header">
+            <h2>Waiter note</h2>
+          </div>
+          <div class="order-note" id="order-note"></div>
+          <div class="order-note-actions">
+            <button type="button" id="copy-order">Copy note</button>
+            <button type="button" class="secondary" id="back-to-results">Back to menu</button>
           </div>
         </article>
       </section>
@@ -542,6 +784,7 @@
         upload: document.querySelector('[data-screen="upload"]'),
         loading: document.querySelector('[data-screen="loading"]'),
         results: document.querySelector('[data-screen="results"]'),
+        order: document.querySelector('[data-screen="order"]'),
       };
       const uploadForm = document.getElementById("upload-form");
       const shareForm = document.getElementById("share-form");
@@ -550,6 +793,19 @@
       const detectedLanguage = document.getElementById("detected-language");
       const processAgainButton = document.getElementById("process-again");
       const errorBanner = document.getElementById("error-banner");
+      const cartCount = document.getElementById("cart-count");
+      const cartEmpty = document.getElementById("cart-empty");
+      const cartItems = document.getElementById("cart-items");
+      const cartTotal = document.getElementById("cart-total");
+      const cartTotalCount = document.getElementById("cart-total-count");
+      const generateOrderButton = document.getElementById("generate-order");
+      const clearCartButton = document.getElementById("clear-cart");
+      const orderNote = document.getElementById("order-note");
+      const copyOrderButton = document.getElementById("copy-order");
+      const backToResultsButton = document.getElementById("back-to-results");
+
+      let menuData = null;
+      const cart = new Map();
 
       function showScreen(name) {
         Object.entries(screens).forEach(([key, node]) => {
@@ -619,11 +875,94 @@
 
       processAgainButton.addEventListener("click", () => {
         uploadForm.reset();
+        clearSelections();
         clearError();
-        showScreen("upload");
-        menuPreview.innerHTML = "";
         shareUrl.textContent = "";
+        shareUrl.href = "#";
         detectedLanguage.hidden = true;
+        menuPreview.innerHTML = "";
+        showScreen("upload");
+      });
+
+      generateOrderButton.addEventListener("click", () => {
+        if (!cart.size) {
+          showError("Add dishes to your table before creating an order.");
+          return;
+        }
+        const note = buildOrderSummary();
+        orderNote.textContent = note;
+        copyOrderButton.textContent = "Copy note";
+        copyOrderButton.disabled = false;
+        showScreen("order");
+      });
+
+      clearCartButton.addEventListener("click", () => {
+        clearSelections();
+      });
+
+      copyOrderButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(orderNote.textContent);
+          copyOrderButton.textContent = "Copied!";
+          copyOrderButton.disabled = true;
+          setTimeout(() => {
+            copyOrderButton.textContent = "Copy note";
+            copyOrderButton.disabled = false;
+          }, 2000);
+        } catch (err) {
+          console.error(err);
+          showError("Copy isn’t available on this device. Show the screen instead.");
+        }
+      });
+
+      backToResultsButton.addEventListener("click", () => {
+        showScreen("results");
+      });
+
+      menuPreview.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+        const dishCard = target.closest(".dish-card");
+        if (!dishCard) {
+          return;
+        }
+
+        if (target.dataset.action === "add") {
+          setDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "increment") {
+          adjustDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "decrement") {
+          adjustDishQuantity(dishCard, -1);
+        }
+      });
+
+      cartItems.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+        const cartItem = target.closest(".cart-item");
+        if (!cartItem) {
+          return;
+        }
+        const key = cartItem.dataset.key;
+        if (!key) {
+          return;
+        }
+        const dishCard = menuPreview.querySelector(`.dish-card[data-key="${cssEscape(key)}"]`);
+        if (!dishCard) {
+          return;
+        }
+
+        if (target.dataset.action === "increment-cart") {
+          adjustDishQuantity(dishCard, 1);
+        } else if (target.dataset.action === "decrement-cart") {
+          adjustDishQuantity(dishCard, -1);
+        } else if (target.dataset.action === "remove-cart") {
+          setDishQuantity(dishCard, 0);
+        }
       });
 
       function renderResults(payload) {
@@ -638,10 +977,14 @@
         detectedLanguage.hidden = false;
 
         if (!payload.template || !payload.template.sections?.length) {
+          menuData = null;
           menuPreview.innerHTML = `<p style="opacity:0.7;">We couldn't find dishes in this menu. Try clearer photos or upload again.</p>`;
+          clearSelections();
           return;
         }
 
+        menuData = payload.template;
+        clearSelections();
         menuPreview.innerHTML = payload.template.sections
           .map((section, index) => renderSection(section, index === 0))
           .join("");
@@ -649,25 +992,178 @@
 
       function renderSection(section, openByDefault) {
         const dishes = section.dishes
-          .map(
-            (dish) => `
-              <li class="dish-card">
-                <strong>${dish.translated_name}</strong>
-                <span class="price">${dish.price || ""}</span>
-                <span class="original">${dish.original_name}</span>
-                <p class="description">${dish.description || ""}</p>
-              </li>`
-          )
+          .map((dish) => {
+            const key = buildKey(section.title, dish.original_name);
+            const description = dish.description ? `<p class=\"description\">${escapeHtml(dish.description)}</p>` : "";
+            return `
+              <li class="dish-card" data-section="${escapeAttr(section.title)}" data-original="${escapeAttr(dish.original_name)}" data-translated="${escapeAttr(dish.translated_name)}" data-price="${escapeAttr(dish.price || "")}" data-key="${escapeAttr(key)}">
+                <div class="dish-top">
+                  <div>
+                    <span class="dish-title">${escapeHtml(dish.translated_name)}</span>
+                    <span class="original">${escapeHtml(dish.original_name)}</span>
+                  </div>
+                  <span class="price">${escapeHtml(dish.price || "")}</span>
+                </div>
+                ${description}
+                <div class="dish-actions">
+                  <button type="button" class="add-button" data-action="add" aria-label="Add ${escapeAttr(dish.translated_name)}">+</button>
+                  <div class="quantity-controls" data-active="false">
+                    <button type="button" data-action="decrement" aria-label="Remove one ${escapeAttr(dish.translated_name)}">−</button>
+                    <span class="quantity-display">0</span>
+                    <button type="button" data-action="increment" aria-label="Add one ${escapeAttr(dish.translated_name)}">+</button>
+                  </div>
+                </div>
+              </li>`;
+          })
           .join("");
 
         return `
           <details ${openByDefault ? "open" : ""}>
             <summary>
-              <span>${section.title}</span>
+              <span>${escapeHtml(section.title)}</span>
               <span aria-hidden="true">➜</span>
             </summary>
             <ul class="dish-list">${dishes}</ul>
           </details>`;
+      }
+
+      function setDishQuantity(dishCard, quantity) {
+        const { key, sectionTitle, originalName, translatedName, price } = extractDishData(dishCard);
+        if (!menuData) {
+          return;
+        }
+        if (quantity <= 0) {
+          cart.delete(key);
+          updateDishCardUI(dishCard, 0);
+        } else {
+          cart.set(key, {
+            key,
+            sectionTitle,
+            originalName,
+            translatedName,
+            price,
+            quantity,
+          });
+          updateDishCardUI(dishCard, quantity);
+        }
+        updateCartUI();
+      }
+
+      function adjustDishQuantity(dishCard, delta) {
+        const current = Number(dishCard.dataset.quantity || "0");
+        const next = Math.max(0, current + delta);
+        setDishQuantity(dishCard, next);
+      }
+
+      function updateDishCardUI(dishCard, quantity) {
+        dishCard.dataset.quantity = String(quantity);
+        const addButton = dishCard.querySelector(".add-button");
+        const controls = dishCard.querySelector(".quantity-controls");
+        const qtyDisplay = dishCard.querySelector(".quantity-display");
+        if (!addButton || !controls || !qtyDisplay) {
+          return;
+        }
+        if (quantity > 0) {
+          addButton.style.display = "none";
+          controls.dataset.active = "true";
+        } else {
+          addButton.style.display = "inline-flex";
+          controls.dataset.active = "false";
+        }
+        qtyDisplay.textContent = String(quantity);
+      }
+
+      function updateCartUI() {
+        const items = Array.from(cart.values());
+        const total = items.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
+
+        if (!items.length) {
+          cartEmpty.hidden = false;
+          cartItems.innerHTML = "";
+          cartTotal.hidden = true;
+          generateOrderButton.disabled = true;
+          clearCartButton.disabled = true;
+          return;
+        }
+
+        cartEmpty.hidden = true;
+        generateOrderButton.disabled = false;
+        clearCartButton.disabled = false;
+        cartItems.innerHTML = items
+          .map(
+            (item) => `
+              <li class="cart-item" data-key="${escapeAttr(item.key)}">
+                <div>
+                  <strong>${escapeHtml(item.translatedName)}</strong>
+                  <div class="original">${escapeHtml(item.originalName)}</div>
+                </div>
+                <div class="price">${escapeHtml(item.price || "")}</div>
+                <div class="cart-item-controls">
+                  <div class="quantity-controls" data-active="true">
+                    <button type="button" data-action="decrement-cart" aria-label="Remove one">−</button>
+                    <span class="quantity-display">${item.quantity}</span>
+                    <button type="button" data-action="increment-cart" aria-label="Add one">+</button>
+                  </div>
+                  <button type="button" class="icon-button" data-action="remove-cart" aria-label="Remove dish">🗑️</button>
+                </div>
+              </li>`
+          )
+          .join("");
+
+        cartTotal.hidden = false;
+        cartTotalCount.textContent = String(total);
+      }
+
+      function clearSelections() {
+        cart.clear();
+        updateCartUI();
+        menuPreview.querySelectorAll(".dish-card").forEach((card) => updateDishCardUI(card, 0));
+      }
+
+      function extractDishData(dishCard) {
+        const key = dishCard.dataset.key || "";
+        const sectionTitle = dishCard.dataset.section || "";
+        const originalName = dishCard.dataset.original || "";
+        const translatedName = dishCard.dataset.translated || "";
+        const price = dishCard.dataset.price || "";
+        return { key, sectionTitle, originalName, translatedName, price };
+      }
+
+      function buildKey(sectionTitle, originalName) {
+        return `${encodeURIComponent(sectionTitle)}::${encodeURIComponent(originalName)}`;
+      }
+
+      function buildOrderSummary() {
+        const lines = [];
+        cart.forEach((item) => {
+          lines.push(`${item.quantity} × ${item.originalName}`);
+        });
+        return lines.join("\n");
+      }
+
+      function escapeHtml(text) {
+        return String(text ?? "").replace(/[&<>\"']/g, (char) => {
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          };
+          return map[char] || char;
+        });
+      }
+
+      function escapeAttr(text) {
+        return escapeHtml(text);
+      }
+
+      function cssEscape(value) {
+        if (window.CSS && CSS.escape) {
+          return CSS.escape(value);
+        }
+        return value.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
       }
     </script>
   </body>
