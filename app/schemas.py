@@ -39,3 +39,7 @@ class MenuProcessingResponse(BaseModel):
     template: MenuTemplate
     share_token: str
     share_url: str | None = None
+    detected_language: str | None = Field(
+        default=None,
+        description="Temporary debug field exposing the derived output language. Remove before GA.",
+    )
