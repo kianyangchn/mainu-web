@@ -2,15 +2,27 @@
 
 from __future__ import annotations
 
+import logging
 from typing import List
 
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+)
 
+from app.config import settings
 from app.schemas import MenuProcessingResponse, MenuTemplate
 from app.services.llm import LLMMenuService
 from app.services.share import ShareService
 
 router = APIRouter(prefix="/menu", tags=["menu"])
+
+logger = logging.getLogger(__name__)
 
 _menu_service = LLMMenuService()
 _share_service = ShareService()
@@ -28,6 +40,9 @@ def get_share_service() -> ShareService:
 async def process_menu(
     request: Request,
     files: List[UploadFile] = File(...),
+    requested_output_language: str | None = Form(
+        default=None, alias="output_language"
+    ),
     menu_service: LLMMenuService = Depends(get_menu_service),
     share_service: ShareService = Depends(get_share_service),
 ) -> MenuProcessingResponse:
@@ -47,15 +62,24 @@ async def process_menu(
         filenames.append(upload.filename or "menu-page")
         content_types.append(upload.content_type)
 
+    output_language = requested_output_language or _detect_language(request)
+    logger.debug("Processing menu with output language: %s", output_language)
     template = await menu_service.generate_menu_template(
-        contents, filenames, content_types
+        contents,
+        filenames,
+        content_types,
+        input_language=settings.input_language,
+        output_language=output_language,
     )
     share_service.purge_expired()
     token = share_service.create_template(template)
     share_url = str(request.url_for("get_shared_menu", token=token))
 
     return MenuProcessingResponse(
-        template=template, share_token=token, share_url=share_url
+        template=template,
+        share_token=token,
+        share_url=share_url,
+        detected_language=output_language,  # TODO: remove once locale debugging is complete.
     )
 
 
@@ -69,3 +93,13 @@ async def get_shared_menu(
     if template is None:
         raise HTTPException(status_code=404, detail="Share link expired or invalid")
     return template
+
+
+def _detect_language(request: Request) -> str:
+    """Return the client's preferred language using the Accept-Language header."""
+    header = request.headers.get("accept-language", "")
+    if header:
+        primary = header.split(",")[0].strip()
+        if primary:
+            return primary
+    return settings.default_output_language

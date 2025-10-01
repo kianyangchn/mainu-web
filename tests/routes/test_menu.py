@@ -14,8 +14,17 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def reset_services(monkeypatch):
     menu_routes._share_service.reset()
+    menu_routes._expected_output_language = "zh-CN"
 
-    async def fake_generate_menu_template(images, filenames, content_types=None):
+    async def fake_generate_menu_template(
+        images,
+        filenames,
+        content_types=None,
+        *,
+        input_language=None,
+        output_language=None,
+    ):
+        assert output_language == menu_routes._expected_output_language
         return MenuTemplate(
             sections=[
                 MenuSection(
@@ -37,6 +46,7 @@ def reset_services(monkeypatch):
     )
     yield
     menu_routes._share_service.reset()
+    delattr(menu_routes, "_expected_output_language")
 
 
 def test_home_page_renders_template():
@@ -58,6 +68,7 @@ def test_process_menu_returns_share_token():
     response = client.post(
         "/menu/process",
         files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
     )
     assert response.status_code == 200
     payload = response.json()
@@ -67,12 +78,14 @@ def test_process_menu_returns_share_token():
     )
     assert payload["share_token"]
     assert payload["share_url"].endswith(payload["share_token"])
+    assert payload["detected_language"] == "zh-CN"
 
 
 def test_get_shared_menu_returns_template():
     response = client.post(
         "/menu/process",
         files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
     )
     token = response.json()["share_token"]
 
@@ -85,9 +98,24 @@ def test_share_view_renders_html():
     response = client.post(
         "/menu/process",
         files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
     )
     token = response.json()["share_token"]
 
     viewer = client.get(f"/share/{token}")
     assert viewer.status_code == 200
     assert "Spicy Mapo Tofu" in viewer.text
+
+
+def test_process_menu_respects_manual_language_selection():
+    menu_routes._expected_output_language = "fr"
+    response = client.post(
+        "/menu/process",
+        files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        data={"output_language": "fr"},
+        headers={"accept-language": "zh-CN"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["detected_language"] == "fr"

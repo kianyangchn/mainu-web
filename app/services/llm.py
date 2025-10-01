@@ -40,6 +40,9 @@ class LLMMenuService:
         images: Sequence[bytes],
         filenames: Sequence[str] | None = None,
         content_types: Sequence[str] | None = None,
+        *,
+        input_language: str | None = None,
+        output_language: str | None = None,
     ) -> MenuTemplate:
         """Invoke the multimodal LLM and coerce the response into a template."""
 
@@ -49,7 +52,8 @@ class LLMMenuService:
         file_ids = await self._upload_images(images, filenames, content_types)
         schema_text = json.dumps(build_response_object_schema())
         user_prompt = build_user_prompt(
-            settings.input_language, settings.output_language
+            input_language or settings.input_language,
+            output_language or settings.default_output_language,
         )
         request_content = _build_request_content(
             file_ids, filenames, user_prompt, schema_text

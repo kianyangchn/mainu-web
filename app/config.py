@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     openai_model: str = "gpt-5-nano"
     input_language: Optional[str] = None
-    output_language: str = "English"
+    default_output_language: str = "English"
     share_token_ttl_minutes: int = 1440  # 24 hours per PRD
 
 

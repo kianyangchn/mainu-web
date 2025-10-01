@@ -151,6 +151,19 @@
             capture="environment"
             required
           />
+          <label for="output-language">Output language (optional)</label>
+          <select id="output-language" name="output_language">
+            <option value="">Use browser preference</option>
+            <option value="English">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="zh-CN">简体中文</option>
+            <option value="zh-TW">繁體中文</option>
+          </select>
           <button type="submit">Process menu</button>
         </form>
         <form id="share-form" action="" method="get">
@@ -166,6 +179,7 @@
       </section>
       <section id="results" hidden>
         <h2>Ready to share</h2>
+        <p id="detected-language" class="meta" hidden></p>
         <p><strong>Share link:</strong> <a id="share-link" href="#"></a></p>
         <div id="menu-preview"></div>
       </section>
@@ -177,13 +191,18 @@
       const resultsPanel = document.getElementById("results");
       const shareLink = document.getElementById("share-link");
       const menuPreview = document.getElementById("menu-preview");
+      const detectedLanguage = document.getElementById("detected-language");
 
       uploadForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const files = document.getElementById("menu-files").files;
+        const outputLanguageSelect = document.getElementById("output-language");
         if (!files.length) return;
         const data = new FormData();
         Array.from(files).forEach((file) => data.append("files", file));
+        if (outputLanguageSelect && outputLanguageSelect.value) {
+          data.append("output_language", outputLanguageSelect.value);
+        }
 
         const response = await fetch("/menu/process", {
           method: "POST",
@@ -199,6 +218,12 @@
         const payload = await response.json();
         shareLink.href = payload.share_url;
         shareLink.textContent = payload.share_url;
+        if (payload.detected_language) {
+          detectedLanguage.textContent = `Detected language (debug): ${payload.detected_language}`;
+          detectedLanguage.hidden = false;
+        } else {
+          detectedLanguage.hidden = true;
+        }
         menuPreview.innerHTML = renderMenu(payload.template);
         resultsPanel.hidden = false;
       });
