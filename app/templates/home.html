@@ -552,6 +552,13 @@
         gap: 20px;
       }
 
+      .menu-results-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+      }
+
       .section-nav {
         position: sticky;
         top: 16px;
@@ -559,7 +566,9 @@
         display: flex;
         gap: 10px;
         overflow-x: auto;
-        padding: 6px 4px;
+        width: 100%;
+        justify-content: flex-start;
+        padding: 8px 8px;
         background: rgba(247, 249, 255, 0.82);
         border-radius: 14px;
         border: 1px solid rgba(29, 91, 219, 0.08);
@@ -715,80 +724,76 @@
         outline: 2px solid rgba(47, 123, 255, 0.4);
       }
 
-      .cart-panel {
-        position: sticky;
-        top: 16px;
+      .menu-actions {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+        background: rgba(15, 27, 57, 0.92);
+        color: #f8fafc;
+        display: none;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .menu-actions-summary {
         display: flex;
-        flex-direction: column;
-        gap: 14px;
-        background: var(--glass-card);
-        border: 1px solid rgba(29, 91, 219, 0.12);
-        border-radius: 18px;
-        padding: 20px;
-      }
-
-      .cart-panel header {
-        display: flex;
-        justify-content: space-between;
-        font-weight: 700;
-      }
-
-      .cart-empty {
-        margin: 0;
-        color: var(--text-muted);
-      }
-
-      .cart-items {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .cart-item {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px 12px;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(29, 91, 219, 0.08);
-      }
-
-      .cart-item:last-child {
-        border-bottom: none;
-      }
-
-      .cart-item-controls {
-        display: inline-flex;
         align-items: center;
         gap: 12px;
-      }
-
-      .icon-button {
+        min-width: 200px;
+        padding: 0;
         border: none;
         background: none;
-        font-size: 0.95rem;
+        color: inherit;
         cursor: pointer;
       }
 
-      .cart-total {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(29, 91, 219, 0.12);
+      .menu-actions-summary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
       }
 
-      .cart-total-line {
-        display: flex;
-        justify-content: space-between;
+      .menu-actions-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(248, 250, 252, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
       }
 
-      .cart-buttons {
+      .menu-actions-summary-text {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 2px;
+        text-align: left;
+      }
+
+      .menu-actions-summary-text strong {
+        font-weight: 600;
+      }
+
+      .menu-actions-summary-text span {
+        font-size: 0.88rem;
+        color: rgba(248, 250, 252, 0.75);
+      }
+
+      .menu-actions-buttons {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .menu-actions-buttons button {
+        min-width: 140px;
       }
 
       .order-card {
@@ -833,11 +838,78 @@
         color: var(--text-muted);
       }
 
+      dialog.cart-dialog {
+        border: none;
+        border-radius: 18px;
+        max-width: 420px;
+        padding: 0;
+        box-shadow: var(--shadow-card);
+      }
+
+      .cart-dialog-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+      }
+
+      .cart-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .cart-dialog-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .cart-dialog-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .cart-dialog-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .cart-dialog-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .cart-dialog-item strong {
+        display: block;
+        font-weight: 600;
+      }
+
+      .cart-dialog-item span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .dialog-close {
+        align-self: flex-end;
+        border: none;
+        background: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 0;
+      }
+
       @media (min-width: 900px) {
-        .menu-results-layout {
-          display: grid;
-          grid-template-columns: 1fr 320px;
-          gap: 24px;
+        .menu-actions {
+          padding: 18px 48px calc(18px + env(safe-area-inset-bottom));
         }
       }
     </style>
@@ -944,28 +1016,6 @@
               </article>
             </div>
           </div>
-          <aside class="cart-panel" id="cart-panel">
-            <header>
-              <span>Table picks</span>
-              <span id="cart-count">0 dishes</span>
-            </header>
-            <p class="cart-empty" id="cart-empty">Tap a dish to add it to tonight’s order.</p>
-            <ul class="cart-items" id="cart-items"></ul>
-            <div class="cart-total" id="cart-total" hidden>
-              <div class="cart-total-line">
-                <span>Total dishes</span>
-                <span class="cart-total-count" id="cart-total-count">0</span>
-              </div>
-              <div class="cart-total-line" id="cart-total-price-row" hidden>
-                <span>Total price</span>
-                <span class="cart-total-price" id="cart-total-price"></span>
-              </div>
-            </div>
-            <div class="cart-buttons">
-              <button type="button" class="primary" id="generate-order">Create waiter note</button>
-              <button type="button" class="secondary" id="clear-cart">Clear selections</button>
-            </div>
-          </aside>
         </div>
       </section>
 
@@ -989,6 +1039,20 @@
       <button type="button" class="primary" id="translate-button" disabled>Transfer menu</button>
     </div>
 
+    <div class="menu-actions" id="menu-actions" aria-hidden="true">
+      <button type="button" class="menu-actions-summary" id="cart-summary-button" disabled>
+        <span class="menu-actions-icon" aria-hidden="true">🛒</span>
+        <span class="menu-actions-summary-text">
+          <strong id="menu-summary-count">No dishes selected</strong>
+          <span id="menu-summary-price"></span>
+        </span>
+      </button>
+      <div class="menu-actions-buttons">
+        <button type="button" class="primary" id="generate-order" disabled>Create waiter note</button>
+        <button type="button" class="secondary" id="clear-cart" disabled>Clear selections</button>
+      </div>
+    </div>
+
     <dialog class="tips-dialog" id="tips-dialog" aria-modal="true">
       <form method="dialog" style="display:flex;flex-direction:column;gap:16px;">
         <div>
@@ -1001,6 +1065,17 @@
           </ul>
         </div>
         <button value="cancel" class="primary">Got it</button>
+      </form>
+    </dialog>
+
+    <dialog class="cart-dialog" id="cart-dialog" aria-modal="true">
+      <form method="dialog" class="cart-dialog-content">
+        <header class="cart-dialog-header">
+          <h2>Table picks</h2>
+          <button type="button" id="close-cart-dialog" aria-label="Close" class="dialog-close">Close</button>
+        </header>
+        <p id="cart-dialog-empty" style="margin:0; color: var(--text-muted);">Select dishes to see them here.</p>
+        <ul class="cart-dialog-list" id="cart-dialog-list"></ul>
       </form>
     </dialog>
 
@@ -1055,18 +1130,19 @@
       const sectionsContainer = document.getElementById("sections");
       const emptyState = document.getElementById("empty-state");
 
-      const cartCount = document.getElementById("cart-count");
-      const cartEmpty = document.getElementById("cart-empty");
-      const cartItems = document.getElementById("cart-items");
-      const cartTotal = document.getElementById("cart-total");
-      const cartTotalCount = document.getElementById("cart-total-count");
-      const cartTotalPriceRow = document.getElementById("cart-total-price-row");
-      const cartTotalPrice = document.getElementById("cart-total-price");
+      const menuActions = document.getElementById("menu-actions");
+      const cartSummaryButton = document.getElementById("cart-summary-button");
+      const menuSummaryCount = document.getElementById("menu-summary-count");
+      const menuSummaryPrice = document.getElementById("menu-summary-price");
       const generateOrderButton = document.getElementById("generate-order");
       const clearCartButton = document.getElementById("clear-cart");
       const orderNote = document.getElementById("order-note");
       const copyOrderButton = document.getElementById("copy-order");
       const backToMenuButton = document.getElementById("back-to-menu");
+      const cartDialog = document.getElementById("cart-dialog");
+      const cartDialogList = document.getElementById("cart-dialog-list");
+      const cartDialogEmpty = document.getElementById("cart-dialog-empty");
+      const closeCartDialogButton = document.getElementById("close-cart-dialog");
 
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
@@ -1117,6 +1193,11 @@
         captureActions.hidden = !showCapture;
         captureActions.style.display = showCapture ? "flex" : "none";
         captureActions.setAttribute("aria-hidden", showCapture ? "false" : "true");
+
+        const showMenu = name === "menu";
+        menuActions.hidden = !showMenu;
+        menuActions.style.display = showMenu ? "flex" : "none";
+        menuActions.setAttribute("aria-hidden", showMenu ? "false" : "true");
       }
 
       function setWarning(message) {
@@ -1576,20 +1657,20 @@
       function updateCartUI() {
         const items = Array.from(cart.values());
         const total = items.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
-
         if (!items.length) {
-          cartEmpty.hidden = false;
-          cartItems.innerHTML = "";
-          cartTotal.hidden = true;
+          cartSummaryButton.disabled = true;
+          menuSummaryCount.textContent = "No dishes selected";
+          menuSummaryPrice.textContent = "";
           generateOrderButton.disabled = true;
           clearCartButton.disabled = true;
-          cartTotalPriceRow.hidden = true;
-          cartTotalPrice.textContent = "";
+          if (cartDialog?.open) {
+            renderCartDialog();
+          }
           return;
         }
 
-        cartEmpty.hidden = true;
+        cartSummaryButton.disabled = false;
+        menuSummaryCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
         generateOrderButton.disabled = false;
         clearCartButton.disabled = false;
         let totalPriceValue = 0;
@@ -1618,40 +1699,47 @@
           currencySymbol = "";
         }
 
-        cartItems.innerHTML = items
-          .map(
-            (item) => `
-              <li class="cart-item" data-key="${escapeAttr(item.key)}">
+        if (hasPrice && totalPriceValue > 0) {
+          const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
+          menuSummaryPrice.textContent = `Total ${formatted}`;
+        } else {
+          menuSummaryPrice.textContent = "";
+        }
+
+        if (cartDialog?.open) {
+          renderCartDialog();
+        }
+      }
+
+      function renderCartDialog() {
+        if (!cartDialog || !cartDialogList || !cartDialogEmpty) {
+          return;
+        }
+        const items = Array.from(cart.values());
+        if (!items.length) {
+          cartDialogEmpty.hidden = false;
+          cartDialogList.innerHTML = "";
+          return;
+        }
+        cartDialogEmpty.hidden = true;
+        cartDialogList.innerHTML = items
+          .map((item) => {
+            const priceHtml = item.priceDisplay
+              ? `<span>${escapeHtml(item.priceDisplay)}</span>`
+              : "";
+            return `
+              <li class="cart-dialog-item">
                 <div>
                   <strong>${escapeHtml(item.translatedName)}</strong>
-                  <div class="original">${escapeHtml(item.originalName)}</div>
+                  <span>${escapeHtml(item.sectionTitle)}</span>
                 </div>
-                <div class="price">${escapeHtml(item.priceDisplay || "")}</div>
-                <div class="cart-item-controls">
-                  <div class="quantity-controls" data-active="true">
-                    <button type="button" data-action="decrement-cart" aria-label="Remove one">−</button>
-                    <span class="quantity-display">${item.quantity}</span>
-                    <button type="button" data-action="increment-cart" aria-label="Add one">+</button>
-                  </div>
-                  <button type="button" class="icon-button" data-action="remove-cart" aria-label="Remove dish">🗑️</button>
+                <div style="text-align:right; white-space:nowrap; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+                  <span>${item.quantity}×</span>
+                  ${priceHtml}
                 </div>
-              </li>`
-          )
+              </li>`;
+          })
           .join("");
-
-        cartTotal.hidden = false;
-        cartTotalCount.textContent = String(total);
-        if (hasPrice && totalPriceValue > 0) {
-          cartTotalPriceRow.hidden = false;
-          cartTotalPrice.textContent = formatTotalPrice(
-            totalPriceValue,
-            currencySymbol,
-            currencyPosition,
-          );
-        } else {
-          cartTotalPriceRow.hidden = true;
-          cartTotalPrice.textContent = "";
-        }
       }
 
       function clearSelections() {
@@ -1675,6 +1763,9 @@
         sectionNav.innerHTML = "";
         detectedLanguagePill.hidden = true;
         shareCountdown.hidden = true;
+        menuActions.hidden = true;
+        menuActions.style.display = "none";
+        menuActions.setAttribute("aria-hidden", "true");
         clearSelections();
       }
 
@@ -1754,6 +1845,18 @@
         window.open(state.share.url, "_blank", "noopener");
       });
 
+      cartSummaryButton.addEventListener("click", () => {
+        if (!cart.size) {
+          return;
+        }
+        renderCartDialog();
+        cartDialog.showModal();
+      });
+
+      closeCartDialogButton.addEventListener("click", () => {
+        cartDialog.close();
+      });
+
       startNewMenuButton.addEventListener("click", () => {
         resetMenuView();
         resetCapture();
@@ -1806,32 +1909,6 @@
           adjustDishQuantity(dishCard, 1);
         } else if (action === "decrement") {
           adjustDishQuantity(dishCard, -1);
-        }
-      });
-
-      cartItems.addEventListener("click", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
-        const cartItem = target.closest(".cart-item");
-        if (!cartItem) {
-          return;
-        }
-        const key = cartItem.dataset.key;
-        if (!key) {
-          return;
-        }
-        const dishCard = sectionsContainer.querySelector(`.dish-card[data-key="${CSS.escape(key)}"]`);
-        if (!dishCard) {
-          return;
-        }
-        if (target.dataset.action === "increment-cart") {
-          adjustDishQuantity(dishCard, 1);
-        } else if (target.dataset.action === "decrement-cart") {
-          adjustDishQuantity(dishCard, -1);
-        } else if (target.dataset.action === "remove-cart") {
-          setDishQuantity(dishCard, 0);
         }
       });
 
