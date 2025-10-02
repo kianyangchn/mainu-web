@@ -73,12 +73,17 @@ async def process_menu(
     )
     share_service.purge_expired()
     token = share_service.create_template(template)
+    record = share_service.describe(token)
+    if record is None:
+        raise RuntimeError("Share token expired unexpectedly")
     share_url = str(request.url_for("get_shared_menu", token=token))
 
     return MenuProcessingResponse(
         template=template,
         share_token=token,
         share_url=share_url,
+        share_expires_at=record.expires_at,
+        share_expires_in_seconds=record.ttl_seconds,
         detected_language=output_language,  # TODO: remove once locale debugging is complete.
     )
 

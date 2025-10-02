@@ -2,11 +2,29 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Tuple
 
 from app.config import settings
 from app.schemas import MenuTemplate
+
+
+@dataclass(frozen=True)
+class ShareRecord:
+    """Metadata about a stored share token."""
+
+    token: str
+    template: MenuTemplate
+    created_at: datetime
+    expires_at: datetime
+
+    @property
+    def ttl_seconds(self) -> int:
+        """Return remaining lifetime in whole seconds."""
+
+        remaining = (self.expires_at - datetime.now(tz=timezone.utc)).total_seconds()
+        return int(remaining) if remaining > 0 else 0
 
 
 class ShareService:
@@ -28,17 +46,31 @@ class ShareService:
         self.store_template(token, template)
         return token
 
-    def fetch_template(self, token: str) -> MenuTemplate | None:
-        """Retrieve a template, expiring stale entries."""
+    def describe(self, token: str) -> ShareRecord | None:
+        """Return metadata for a token when it is still valid."""
 
         record = self._templates.get(token)
         if not record:
             return None
         template, created_at = record
-        if datetime.now(tz=timezone.utc) - created_at > self._ttl:
+        expires_at = created_at + self._ttl
+        if datetime.now(tz=timezone.utc) > expires_at:
             self._templates.pop(token, None)
             return None
-        return template
+        return ShareRecord(
+            token=token,
+            template=template,
+            created_at=created_at,
+            expires_at=expires_at,
+        )
+
+    def fetch_template(self, token: str) -> MenuTemplate | None:
+        """Retrieve a template, expiring stale entries."""
+
+        share_record = self.describe(token)
+        if share_record is None:
+            return None
+        return share_record.template
 
     def purge_expired(self) -> None:
         """Remove expired templates eagerly."""

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel, Field
@@ -39,6 +40,12 @@ class MenuProcessingResponse(BaseModel):
     template: MenuTemplate
     share_token: str
     share_url: str | None = None
+    share_expires_at: datetime = Field(
+        description="Absolute expiry timestamp for the share link in UTC."
+    )
+    share_expires_in_seconds: int = Field(
+        description="Seconds remaining before the share link expires."
+    )
     detected_language: str | None = Field(
         default=None,
         description="Temporary debug field exposing the derived output language. Remove before GA.",
