@@ -41,17 +41,20 @@
         align-self: center;
         text-decoration: none;
         color: #4338ca;
-        font-weight: 600;
+        font-weight: 500;
       }
 
       h1 {
         font-size: clamp(1.8rem, 5vw, 2.4rem);
         margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.01em;
       }
 
       header p {
         margin: 0;
-        opacity: 0.65;
+        opacity: 0.68;
+        font-weight: 400;
       }
 
       .card {
@@ -69,10 +72,10 @@
         align-self: flex-start;
         padding: 8px 14px;
         border-radius: 999px;
-        background: rgba(79, 70, 229, 0.12);
+        background: rgba(79, 70, 229, 0.08);
         color: #4338ca;
-        font-weight: 600;
-        font-size: 0.85rem;
+        font-weight: 500;
+        font-size: 0.84rem;
       }
 
       .menu-layout {
@@ -95,8 +98,8 @@
       }
 
       summary {
-        font-weight: 600;
-        font-size: 1.1rem;
+        font-weight: 500;
+        font-size: 1.08rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -229,28 +232,42 @@
       }
 
       button {
-        border: none;
+        border: 1px solid rgba(15, 23, 42, 0.12);
         border-radius: 18px;
         padding: 16px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        background: linear-gradient(135deg, #4f46e5 0%, #22d3ee 100%);
-        color: #ffffff;
-        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        background: rgba(248, 250, 255, 0.9);
+        color: #1f2937;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
       }
 
       button:hover,
       button:focus-visible {
         transform: translateY(-1px);
-        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.4);
+        border-color: rgba(15, 23, 42, 0.22);
+        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.1);
+      }
+
+      button.primary {
+        background: rgba(224, 242, 254, 0.8);
+        border-color: rgba(14, 165, 233, 0.35);
+        color: #0c4a6e;
+      }
+
+      button.primary:hover,
+      button.primary:focus-visible {
+        border-color: rgba(14, 165, 233, 0.55);
+        box-shadow: 0 12px 24px rgba(14, 165, 233, 0.2);
+        transform: translateY(-2px);
       }
 
       button.secondary {
         background: transparent;
         color: #1f2937;
-        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-color: rgba(15, 23, 42, 0.16);
         box-shadow: none;
       }
 
@@ -304,14 +321,26 @@
       }
 
       .cart-total {
-        font-weight: 700;
-        font-size: 0.95rem;
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.95rem;
       }
 
-      .cart-total span:last-child {
+      .cart-total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .cart-total-count {
+        font-weight: 600;
         color: #0f766e;
+      }
+
+      .cart-total-price {
+        font-weight: 600;
+        color: #0f172a;
       }
 
       .cart-buttons {
@@ -426,11 +455,17 @@
             <p class="cart-empty" id="cart-empty">Tap a dish to add it to your order.</p>
             <ul class="cart-items" id="cart-items"></ul>
             <div class="cart-total" id="cart-total" hidden>
-              <span>Total dishes</span>
-              <span id="cart-total-count">0</span>
+              <div class="cart-total-line">
+                <span>Total dishes</span>
+                <span class="cart-total-count" id="cart-total-count">0</span>
+              </div>
+              <div class="cart-total-line" id="cart-total-price-row" hidden>
+                <span>Total price</span>
+                <span class="cart-total-price" id="cart-total-price">0</span>
+              </div>
             </div>
             <div class="cart-buttons">
-              <button type="button" id="generate-order">Create waiter note</button>
+              <button type="button" id="generate-order" class="primary">Create waiter note</button>
               <button type="button" class="secondary" id="clear-cart">Clear selections</button>
             </div>
           </aside>
@@ -443,7 +478,7 @@
         </div>
         <div class="order-note" id="order-note"></div>
         <div class="cart-buttons">
-          <button type="button" id="copy-order">Copy note</button>
+          <button type="button" id="copy-order" class="primary">Copy note</button>
           <button type="button" class="secondary" id="back-to-menu">Back to menu</button>
         </div>
       </section>
@@ -460,6 +495,8 @@
       const cartItems = document.getElementById("cart-items");
       const cartTotal = document.getElementById("cart-total");
       const cartTotalCount = document.getElementById("cart-total-count");
+      const cartTotalPriceRow = document.getElementById("cart-total-price-row");
+      const cartTotalPrice = document.getElementById("cart-total-price");
       const generateOrderButton = document.getElementById("generate-order");
       const clearCartButton = document.getElementById("clear-cart");
       const orderCard = document.getElementById("order-card");
@@ -534,6 +571,11 @@
         updateCartUI();
         menuPreview.querySelectorAll(".dish-card").forEach((card) => updateDishCardUI(card, 0));
         orderCard.hidden = true;
+        cartCount.textContent = "0 dishes";
+        cartTotalPriceRow.hidden = true;
+        cartTotalPrice.textContent = "";
+        cartTotalCount.textContent = "0";
+        cartTotal.hidden = true;
       });
 
       copyOrderButton.addEventListener("click", async () => {
@@ -650,21 +692,45 @@
           cartTotal.hidden = true;
           generateOrderButton.disabled = true;
           clearCartButton.disabled = true;
+          cartTotalPriceRow.hidden = true;
+          cartTotalPrice.textContent = "";
           return;
         }
 
         cartEmpty.hidden = true;
         generateOrderButton.disabled = false;
         clearCartButton.disabled = false;
-        cartItems.innerHTML = items
-          .map(
-            (item) => `
+
+        let totalPriceValue = 0;
+        let hasPrice = false;
+        let currencySymbol = null;
+        let currencyPosition = "prefix";
+        let currenciesConsistent = true;
+
+        const listHtml = items
+          .map((item) => {
+            if (item.priceValue != null) {
+              hasPrice = true;
+              totalPriceValue += item.priceValue * item.quantity;
+              if (currencySymbol === null && item.priceCurrencySymbol) {
+                currencySymbol = item.priceCurrencySymbol;
+                currencyPosition = item.priceCurrencyPosition;
+              } else if (
+                item.priceCurrencySymbol &&
+                (item.priceCurrencySymbol !== currencySymbol ||
+                  item.priceCurrencyPosition !== currencyPosition)
+              ) {
+                currenciesConsistent = false;
+              }
+            }
+
+            return `
               <li class="cart-item" data-key="${escapeAttr(item.key)}">
                 <div>
                   <strong>${escapeHtml(item.translatedName)}</strong>
                   <div class="original">${escapeHtml(item.originalName)}</div>
                 </div>
-                <div class="price">${escapeHtml(item.price || "")}</div>
+                <div class="price">${escapeHtml(item.priceDisplay || "")}</div>
                 <div class="cart-item-controls">
                   <div class="quantity-controls" data-active="true">
                     <button type="button" data-action="decrement-cart" aria-label="Remove one">−</button>
@@ -673,12 +739,30 @@
                   </div>
                   <button type="button" class="icon-button" data-action="remove-cart" aria-label="Remove dish">🗑️</button>
                 </div>
-              </li>`
-          )
+              </li>`;
+          })
           .join("");
+
+        if (!currenciesConsistent) {
+          currencySymbol = "";
+        }
+
+        cartItems.innerHTML = listHtml;
 
         cartTotal.hidden = false;
         cartTotalCount.textContent = String(total);
+
+        if (hasPrice && totalPriceValue > 0) {
+          cartTotalPriceRow.hidden = false;
+          cartTotalPrice.textContent = formatTotalPrice(
+            totalPriceValue,
+            currencySymbol,
+            currencyPosition,
+          );
+        } else {
+          cartTotalPriceRow.hidden = true;
+          cartTotalPrice.textContent = "";
+        }
       }
 
       function buildOrderSummary() {
@@ -694,8 +778,18 @@
         const sectionTitle = dishCard.dataset.section || "";
         const originalName = dishCard.dataset.original || "";
         const translatedName = dishCard.dataset.translated || "";
-        const price = dishCard.dataset.price || "";
-        return { key, sectionTitle, originalName, translatedName, price };
+        const priceDisplay = dishCard.dataset.price || "";
+        const parsedPrice = parsePrice(priceDisplay);
+        return {
+          key,
+          sectionTitle,
+          originalName,
+          translatedName,
+          priceDisplay,
+          priceValue: parsedPrice.value,
+          priceCurrencySymbol: parsedPrice.symbol,
+          priceCurrencyPosition: parsedPrice.position,
+        };
       }
 
       function buildKey(sectionTitle, originalName) {
@@ -732,6 +826,52 @@
           return CSS.escape(value);
         }
         return value.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
+      }
+
+      function parsePrice(raw) {
+        if (!raw) {
+          return { value: null, symbol: "", position: "prefix" };
+        }
+        const trimmed = String(raw).trim();
+        if (!trimmed) {
+          return { value: null, symbol: "", position: "prefix" };
+        }
+        const match = trimmed.match(/[0-9]+(?:[.,][0-9]{1,2})?/);
+        if (!match) {
+          return { value: null, symbol: "", position: "prefix" };
+        }
+        const numberPart = match[0].replace(/,/g, ".");
+        const value = Number.parseFloat(numberPart);
+        if (Number.isNaN(value)) {
+          return { value: null, symbol: "", position: "prefix" };
+        }
+        const startIndex = match.index ?? trimmed.indexOf(match[0]);
+        let symbol = "";
+        let position = "prefix";
+        if (startIndex > 0) {
+          symbol = trimmed.slice(0, startIndex).trim();
+        }
+        const endIndex = startIndex + match[0].length;
+        if (!symbol && endIndex < trimmed.length) {
+          symbol = trimmed.slice(endIndex).trim();
+          position = "suffix";
+        }
+        if (symbol.length > 4) {
+          symbol = symbol.slice(0, 4);
+        }
+        return { value, symbol, position };
+      }
+
+      function formatTotalPrice(value, symbol, position) {
+        const hasFraction = Math.abs(value - Math.round(value)) > 0.001;
+        const formatted = value.toLocaleString(undefined, {
+          minimumFractionDigits: hasFraction ? 2 : 0,
+          maximumFractionDigits: 2,
+        });
+        if (symbol) {
+          return position === "suffix" ? `${formatted}${symbol}` : `${symbol}${formatted}`;
+        }
+        return formatted;
       }
     </script>
   </body>
