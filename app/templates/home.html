@@ -729,12 +729,12 @@
         left: 0;
         right: 0;
         bottom: 0;
-        padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
         background: rgba(15, 27, 57, 0.92);
         color: #f8fafc;
         display: none;
         align-items: center;
-        gap: 16px;
+        gap: 12px;
         flex-wrap: wrap;
         backdrop-filter: blur(8px);
         border-top: 1px solid rgba(148, 163, 184, 0.16);
@@ -743,8 +743,8 @@
       .menu-actions-summary {
         display: flex;
         align-items: center;
-        gap: 12px;
-        min-width: 200px;
+        gap: 8px;
+        min-width: 0;
         padding: 0;
         border: none;
         background: none;
@@ -758,14 +758,14 @@
       }
 
       .menu-actions-icon {
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: rgba(248, 250, 252, 0.12);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.15rem;
+        font-size: 1rem;
       }
 
       .menu-actions-summary-text {
@@ -793,7 +793,8 @@
       }
 
       .menu-actions-buttons button {
-        min-width: 140px;
+        min-width: 120px;
+        padding: 12px 16px;
       }
 
       .order-card {
@@ -841,7 +842,9 @@
       dialog.cart-dialog {
         border: none;
         border-radius: 18px;
-        max-width: 420px;
+        width: min(520px, calc(100vw - 32px));
+        max-width: 560px;
+        max-height: 85vh;
         padding: 0;
         box-shadow: var(--shadow-card);
       }
@@ -851,6 +854,8 @@
         flex-direction: column;
         gap: 16px;
         padding: 24px;
+        max-height: inherit;
+        overflow-y: auto;
       }
 
       .cart-dialog-header {
@@ -907,9 +912,28 @@
         padding: 8px 0;
       }
 
+      @media (max-width: 640px) {
+        .menu-actions-buttons {
+          flex: 1 1 100%;
+          justify-content: stretch;
+        }
+        .menu-actions-buttons button {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+
       @media (min-width: 900px) {
         .menu-actions {
           padding: 18px 48px calc(18px + env(safe-area-inset-bottom));
+          gap: 16px;
+        }
+        .menu-actions-summary {
+          gap: 12px;
+          min-width: 200px;
+        }
+        .menu-actions-buttons button {
+          min-width: 150px;
         }
       }
     </style>
