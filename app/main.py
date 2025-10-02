@@ -40,15 +40,28 @@ async def share_view(request: Request, token: str):
 
     share_service = get_share_service()
     share_service.purge_expired()
-    template: MenuTemplate | None = share_service.fetch_template(token)
-    if template is None:
-        raise HTTPException(status_code=404, detail="Share link expired or invalid")
+    record = share_service.describe(token)
+    if record is None:
+        return templates.TemplateResponse(
+            request,
+            "share.html",
+            {
+                "menu": None,
+                "token": token,
+                "is_expired": True,
+            },
+            status_code=410,
+        )
 
     return templates.TemplateResponse(
         request,
         "share.html",
         {
-            "menu": template,
+            "menu": record.template,
             "token": token,
+            "created_at": record.created_at,
+            "expires_at": record.expires_at,
+            "expires_in_seconds": record.ttl_seconds,
+            "is_expired": False,
         },
     )

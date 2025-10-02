@@ -7,872 +7,413 @@
     <style>
       :root {
         color-scheme: light;
-        font-family: "Inter", "Nunito", system-ui, sans-serif;
-        background-color: #f9fbff;
+        font-family: "Inter", "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        --bg-gradient: linear-gradient(180deg, #f2f6ff 0%, #fff1e8 55%, #fef6ff 100%);
+        --bg-card: rgba(255, 255, 255, 0.95);
+        --glass: rgba(255, 255, 255, 0.82);
+        --primary: #2f7bff;
+        --primary-dark: #1d5bdb;
+        --accent: #ff8360;
+        --text-strong: #1f2937;
+        --text-muted: #5f6a84;
+        --shadow-card: 0 18px 44px rgba(31, 54, 110, 0.14);
+        --radius-card: 18px;
+        --radius-pill: 999px;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
-        background: linear-gradient(180deg, #f9fbff 0%, #fff4ec 55%, #fef6ff 100%);
-        color: #1f2937;
-        padding: 28px 20px 40px;
+        min-height: 100vh;
+        background: var(--bg-gradient);
+        color: var(--text-strong);
+        padding: 32px 20px 80px;
       }
 
       main {
-        max-width: 640px;
+        max-width: 660px;
         margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      header {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-        padding: 20px;
-        border-radius: 24px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 18px 40px rgba(63, 63, 131, 0.12);
-      }
-
-      header a {
-        align-self: center;
-        text-decoration: none;
-        color: #4338ca;
-        font-weight: 500;
-      }
-
-      h1 {
-        font-size: clamp(1.8rem, 5vw, 2.4rem);
-        margin: 0;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-      }
-
-      header p {
-        margin: 0;
-        opacity: 0.68;
-        font-weight: 400;
-      }
-
-      .card {
-        background: rgba(255, 255, 255, 0.94);
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 14px 34px rgba(46, 64, 116, 0.12);
-        border: 1px solid rgba(79, 70, 229, 0.08);
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
-
-      .pill {
-        align-self: flex-start;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: rgba(79, 70, 229, 0.08);
-        color: #4338ca;
-        font-weight: 500;
-        font-size: 0.84rem;
-      }
-
-      .menu-layout {
         display: flex;
         flex-direction: column;
         gap: 24px;
       }
 
-      .menu-grid {
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 26px 24px;
+        border-radius: var(--radius-card);
+        background: var(--bg-card);
+        box-shadow: var(--shadow-card);
+        text-align: center;
+      }
+
+      .hero-pill {
+        display: inline-flex;
+        justify-content: center;
+        align-self: center;
+        padding: 8px 16px;
+        border-radius: var(--radius-pill);
+        background: rgba(47, 123, 255, 0.12);
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.88rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 4.4vw, 2.4rem);
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+
+      .hero-metadata {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: var(--radius-pill);
+        background: rgba(47, 123, 255, 0.1);
+        color: var(--primary-dark);
+        font-weight: 600;
+        font-size: 0.86rem;
+      }
+
+      .pill[data-variant="countdown"] {
+        background: rgba(255, 131, 96, 0.14);
+        color: var(--accent);
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      button {
+        appearance: none;
+        border-radius: 14px;
+        border: 1px solid rgba(31, 54, 110, 0.12);
+        background: rgba(247, 249, 255, 0.9);
+        padding: 14px 18px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-strong);
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      button.primary {
+        background: linear-gradient(135deg, var(--primary), #1d5bdb);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 16px 34px rgba(47, 123, 255, 0.26);
+      }
+
+      button.primary:hover,
+      button.secondary:hover,
+      button.primary:focus-visible,
+      button.secondary:focus-visible {
+        transform: translateY(-1px);
+      }
+
+      button.secondary {
+        background: rgba(47, 123, 255, 0.08);
+        color: var(--primary-dark);
+        border-color: rgba(47, 123, 255, 0.18);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .menu-card {
+        background: var(--bg-card);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 24px 24px 28px;
+      }
+
+      .section-list {
         display: flex;
         flex-direction: column;
         gap: 18px;
       }
 
-      details {
-        border-radius: 20px;
-        background: rgba(248, 250, 255, 0.85);
-        border: 1px solid rgba(15, 23, 42, 0.06);
+      details.section {
+        border-radius: 16px;
+        background: rgba(247, 249, 255, 0.82);
+        border: 1px solid rgba(31, 54, 110, 0.12);
         padding: 18px 20px;
       }
 
-      summary {
-        font-weight: 500;
-        font-size: 1.08rem;
+      summary.section-header {
+        list-style: none;
         display: flex;
         justify-content: space-between;
         align-items: center;
         cursor: pointer;
-        list-style: none;
+        font-weight: 600;
+        font-size: 1.1rem;
       }
 
-      summary::-webkit-details-marker {
+      summary.section-header::-webkit-details-marker {
         display: none;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        background: rgba(47, 123, 255, 0.12);
+        color: var(--primary-dark);
+        font-size: 0.8rem;
+        font-weight: 600;
       }
 
       .dish-list {
         list-style: none;
-        padding: 0;
         margin: 18px 0 0;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .dish-card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        padding: 20px 18px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.78));
-        border-radius: 24px;
-        border: 2px solid transparent;
-        box-shadow: 0 16px 30px rgba(79, 70, 229, 0.08);
-        transition: transform 0.18s ease, border-color 0.18s ease;
-      }
-
-      .dish-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(79, 70, 229, 0.25);
-      }
-
-      .dish-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .dish-title {
-        font-size: 1.08rem;
-        font-weight: 600;
-      }
-
-      .original {
-        display: block;
-        margin-top: 4px;
-        font-size: 0.85rem;
-        color: rgba(15, 23, 42, 0.55);
-      }
-
-      .price {
-        font-weight: 600;
-        color: #0f766e;
-        font-size: 0.95rem;
-      }
-
-      .description {
-        margin: 0;
-        font-size: 0.92rem;
-        line-height: 1.45;
-        color: rgba(15, 23, 42, 0.78);
-      }
-
-      .dish-actions {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .add-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
         padding: 0;
-        background: none;
-        color: #1f2937;
-        font-size: 1.6rem;
-        font-weight: 600;
-        border: none;
-        box-shadow: none;
-        cursor: pointer;
-        line-height: 1;
-        transition: transform 0.15s ease, color 0.15s ease;
-      }
-
-      .add-button:hover,
-      .add-button:focus-visible {
-        color: #111827;
-        transform: translateY(-1px);
-      }
-
-      .quantity-controls {
-        display: none;
-        align-items: center;
+        display: flex;
+        flex-direction: column;
         gap: 16px;
       }
 
-      .quantity-controls[data-active="true"] {
-        display: inline-flex;
+      .dish-card {
+        border-radius: 16px;
+        padding: 18px 18px 20px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.8));
+        border: 1px solid rgba(47, 123, 255, 0.14);
+        box-shadow: 0 16px 28px rgba(47, 123, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
-      .quantity-controls button {
-        border: none;
-        background: none;
-        box-shadow: none;
-        color: #1f2937;
-        font-size: 1.4rem;
-        cursor: pointer;
-        padding: 0;
+      .dish-headline {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
       }
 
-      .quantity-controls button:hover,
-      .quantity-controls button:focus-visible {
-        color: #111827;
+      .dish-name {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
-      .quantity-display {
-        min-width: 22px;
-        text-align: center;
+      .translated-name {
         font-weight: 600;
         font-size: 1.05rem;
       }
 
-      button {
-        border: 1px solid rgba(15, 23, 42, 0.12);
-        border-radius: 18px;
-        padding: 16px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        background: rgba(248, 250, 255, 0.9);
-        color: #1f2937;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-      }
-
-      button:hover,
-      button:focus-visible {
-        transform: translateY(-1px);
-        border-color: rgba(15, 23, 42, 0.22);
-        box-shadow: 0 12px 22px rgba(15, 23, 42, 0.1);
-      }
-
-      button.primary {
-        background: rgba(224, 242, 254, 0.8);
-        border-color: rgba(14, 165, 233, 0.35);
-        color: #0c4a6e;
-      }
-
-      button.primary:hover,
-      button.primary:focus-visible {
-        border-color: rgba(14, 165, 233, 0.55);
-        box-shadow: 0 12px 24px rgba(14, 165, 233, 0.2);
-        transform: translateY(-2px);
-      }
-
-      button.secondary {
-        background: transparent;
-        color: #1f2937;
-        border-color: rgba(15, 23, 42, 0.16);
-        box-shadow: none;
-      }
-
-      .cart-panel {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        background: rgba(248, 250, 255, 0.85);
-        border-radius: 20px;
-        padding: 18px;
-        border: 1px solid rgba(79, 70, 229, 0.12);
-      }
-
-      .cart-panel header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 700;
-      }
-
-      .cart-empty {
-        margin: 0;
-        opacity: 0.6;
-        font-size: 0.9rem;
-      }
-
-      .cart-items {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .cart-item {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 6px 12px;
-        padding: 12px;
-        border-radius: 14px;
-        background: rgba(248, 250, 255, 0.75);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-      }
-
-      .cart-item-controls {
-        grid-column: 1 / -1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .cart-total {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        font-size: 0.95rem;
-      }
-
-      .cart-total-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .cart-total-count {
-        font-weight: 600;
-        color: #0f766e;
-      }
-
-      .cart-total-price {
-        font-weight: 600;
-        color: #0f172a;
-      }
-
-      .cart-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .icon-button {
-        border: none;
-        background: transparent;
-        color: #1f2937;
-        font-size: 1.1rem;
-        cursor: pointer;
-        padding: 0;
-        display: grid;
-        place-items: center;
-      }
-
-      .error-banner {
-        display: none;
-        background: rgba(248, 113, 113, 0.15);
-        border: 1px solid rgba(239, 68, 68, 0.35);
-        color: #b91c1c;
-        padding: 12px 16px;
-        border-radius: 16px;
-        font-weight: 600;
-      }
-
-      .error-banner[data-visible="true"] {
-        display: block;
-      }
-
-      .order-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 255, 0.75));
-        border: 2px solid transparent;
-        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.08);
-        transition: transform 0.18s ease, border-color 0.18s ease;
-      }
-
-      .order-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(79, 70, 229, 0.2);
-      }
-
-      .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .order-header h2 {
-        margin: 0;
-        font-size: 1.3rem;
-      }
-
-      .order-note {
-        background: rgba(248, 250, 255, 0.9);
-        border-radius: 18px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        padding: 18px 20px;
-        font-size: 1.12rem;
-        line-height: 1.6;
-        color: #111827;
-        white-space: pre-wrap;
-      }
-
-      footer {
-        text-align: center;
+      .original-name {
+        display: inline-flex;
+        align-self: flex-start;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        background: rgba(47, 123, 255, 0.12);
+        color: var(--primary-dark);
         font-size: 0.82rem;
-        opacity: 0.6;
-        margin-top: 12px;
+        font-weight: 600;
       }
 
-      @media (min-width: 768px) {
-        .menu-layout {
-          flex-direction: row;
-          align-items: flex-start;
-        }
+      .price {
+        font-weight: 600;
+        color: var(--primary-dark);
+      }
 
-        .menu-grid {
-          flex: 1.8;
-        }
+      .dish-description {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
 
-        .cart-panel {
-          flex: 1;
-          position: sticky;
-          top: 28px;
+      .footer-card {
+        background: var(--glass);
+        border-radius: var(--radius-card);
+        padding: 22px 24px;
+        text-align: center;
+        border: 1px solid rgba(31, 54, 110, 0.08);
+      }
+
+      .footer-card p {
+        margin: 4px 0 0;
+        color: var(--text-muted);
+      }
+
+      .expired-card {
+        max-width: 520px;
+        margin: 60px auto;
+        background: var(--bg-card);
+        border-radius: var(--radius-card);
+        padding: 28px 26px;
+        text-align: center;
+        box-shadow: var(--shadow-card);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .expired-card h1 {
+        font-size: 1.9rem;
+      }
+
+      .expired-card p {
+        margin: 0;
+        color: var(--text-muted);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        button,
+        .dish-card,
+        .hero,
+        .menu-card {
+          transition: none;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <a href="/">← Back to menu upload</a>
-        <h1>Shared menu</h1>
-        <p>Take a minute to read through dishes, then let the planner know what looks delicious.</p>
-      </header>
-
-      <div class="error-banner" id="error-banner" role="status"></div>
-
-      <section class="card">
-        <div class="pill">Browse & add to the table</div>
-        <div class="menu-layout">
-          <div class="menu-grid" id="menu-preview"></div>
-          <aside class="cart-panel" id="cart-panel">
-            <header>
-              <span>Table picks</span>
-              <span id="cart-count">0 dishes</span>
-            </header>
-            <p class="cart-empty" id="cart-empty">Tap a dish to add it to your order.</p>
-            <ul class="cart-items" id="cart-items"></ul>
-            <div class="cart-total" id="cart-total" hidden>
-              <div class="cart-total-line">
-                <span>Total dishes</span>
-                <span class="cart-total-count" id="cart-total-count">0</span>
-              </div>
-              <div class="cart-total-line" id="cart-total-price-row" hidden>
-                <span>Total price</span>
-                <span class="cart-total-price" id="cart-total-price">0</span>
-              </div>
-            </div>
-            <div class="cart-buttons">
-              <button type="button" id="generate-order" class="primary">Create waiter note</button>
-              <button type="button" class="secondary" id="clear-cart">Clear selections</button>
-            </div>
-          </aside>
-        </div>
+    {% if is_expired %}
+      <section class="expired-card" role="status">
+        <span class="hero-pill">Trip link expired</span>
+        <h1>This menu link has ended its trip.</h1>
+        <p>Ask your host to resend the share code or start a fresh menu capture to keep planning.</p>
+        <button class="primary" type="button" onclick="window.location.href='/'">Start a new menu</button>
+        <p style="font-size: 0.85rem;">Reference: {{ token }}</p>
       </section>
+    {% else %}
+      <main>
+        <header class="hero">
+          <span class="hero-pill">Shared via mainu</span>
+          <h1>Browse the dishes together</h1>
+          <div class="hero-metadata">
+            <span class="pill">Share code · {{ token }}</span>
+            {% if menu.original_language %}
+              <span class="pill">Original language · {{ menu.original_language }}</span>
+            {% endif %}
+            <span class="pill" data-variant="countdown" id="countdown-pill" data-expires="{{ expires_at.isoformat() }}" data-remaining="{{ expires_in_seconds }}">
+              Expires soon
+            </span>
+          </div>
+          <p style="margin: 0; color: var(--text-muted);">Shared by your travel buddy – pick your favourites and compare before you arrive.</p>
+          <div class="hero-actions">
+            <button type="button" class="primary" id="copy-link">Copy link</button>
+            <button type="button" class="secondary" id="open-in-app">Open in new tab</button>
+            <button type="button" class="secondary" disabled>Language options (soon)</button>
+          </div>
+        </header>
 
-      <section class="card order-card" id="order-card" hidden>
-        <div class="order-header">
-          <h2>Waiter note</h2>
-        </div>
-        <div class="order-note" id="order-note"></div>
-        <div class="cart-buttons">
-          <button type="button" id="copy-order" class="primary">Copy note</button>
-          <button type="button" class="secondary" id="back-to-menu">Back to menu</button>
-        </div>
-      </section>
+        <article class="menu-card">
+          <div>
+            <h2 style="margin: 0 0 12px;">Menu overview</h2>
+            <p style="margin: 0; color: var(--text-muted);">Tap each section to reveal the dishes translation crafted by mainu.</p>
+          </div>
+          <div class="section-list">
+            {% for section in menu.sections %}
+              <details class="section" {% if loop.first %}open{% endif %}>
+                <summary class="section-header">
+                  <span>{{ section.title }}</span>
+                  <span class="badge">{{ section.dishes | length }} dishes</span>
+                </summary>
+                <ul class="dish-list">
+                  {% for dish in section.dishes %}
+                    <li class="dish-card">
+                      <div class="dish-headline">
+                        <div class="dish-name">
+                          <span class="translated-name">{{ dish.translated_name }}</span>
+                          <span class="original-name">{{ dish.original_name }}</span>
+                        </div>
+                        {% if dish.price %}
+                          <span class="price">{{ dish.price }}</span>
+                        {% endif %}
+                      </div>
+                      <p class="dish-description">{{ dish.description }}</p>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            {% endfor %}
+          </div>
+        </article>
 
-      <footer>mainu • Bringing happy meals to every adventure</footer>
-    </main>
+        <section class="footer-card">
+          <strong>Bon appétit!</strong>
+          <p>Need a fresh translation? Capture and share new menus anytime from the mainu home screen.</p>
+        </section>
+      </main>
 
-    <script>
-      const menuData = {{ menu.model_dump() | tojson }};
-      const menuPreview = document.getElementById("menu-preview");
-      const errorBanner = document.getElementById("error-banner");
-      const cartCount = document.getElementById("cart-count");
-      const cartEmpty = document.getElementById("cart-empty");
-      const cartItems = document.getElementById("cart-items");
-      const cartTotal = document.getElementById("cart-total");
-      const cartTotalCount = document.getElementById("cart-total-count");
-      const cartTotalPriceRow = document.getElementById("cart-total-price-row");
-      const cartTotalPrice = document.getElementById("cart-total-price");
-      const generateOrderButton = document.getElementById("generate-order");
-      const clearCartButton = document.getElementById("clear-cart");
-      const orderCard = document.getElementById("order-card");
-      const orderNote = document.getElementById("order-note");
-      const copyOrderButton = document.getElementById("copy-order");
-      const backToMenuButton = document.getElementById("back-to-menu");
+      <script>
+        const countdownPill = document.getElementById("countdown-pill");
+        const copyButton = document.getElementById("copy-link");
+        const openButton = document.getElementById("open-in-app");
+        const shareUrl = window.location.href;
 
-      const cart = new Map();
-
-      renderMenu(menuData?.sections || []);
-      updateCartUI();
-
-      menuPreview.addEventListener("click", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
-        const dishCard = target.closest(".dish-card");
-        if (!dishCard) {
-          return;
-        }
-
-        if (target.dataset.action === "add") {
-          setDishQuantity(dishCard, 1);
-        } else if (target.dataset.action === "increment") {
-          adjustDishQuantity(dishCard, 1);
-        } else if (target.dataset.action === "decrement") {
-          adjustDishQuantity(dishCard, -1);
-        }
-      });
-
-      cartItems.addEventListener("click", (event) => {
-        const target = event.target;
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
-        const cartItem = target.closest(".cart-item");
-        if (!cartItem) {
-          return;
-        }
-        const key = cartItem.dataset.key;
-        if (!key) {
-          return;
-        }
-        const dishCard = menuPreview.querySelector(`.dish-card[data-key="${cssEscape(key)}"]`);
-        if (!dishCard) {
-          return;
-        }
-
-        if (target.dataset.action === "increment-cart") {
-          adjustDishQuantity(dishCard, 1);
-        } else if (target.dataset.action === "decrement-cart") {
-          adjustDishQuantity(dishCard, -1);
-        } else if (target.dataset.action === "remove-cart") {
-          setDishQuantity(dishCard, 0);
-        }
-      });
-
-      generateOrderButton.addEventListener("click", () => {
-        if (!cart.size) {
-          showError("Add dishes before creating the waiter note.");
-          return;
-        }
-        orderNote.textContent = buildOrderSummary();
-        orderCard.hidden = false;
-        copyOrderButton.textContent = "Copy note";
-        copyOrderButton.disabled = false;
-      });
-
-      clearCartButton.addEventListener("click", () => {
-        cart.clear();
-        updateCartUI();
-        menuPreview.querySelectorAll(".dish-card").forEach((card) => updateDishCardUI(card, 0));
-        orderCard.hidden = true;
-        cartCount.textContent = "0 dishes";
-        cartTotalPriceRow.hidden = true;
-        cartTotalPrice.textContent = "";
-        cartTotalCount.textContent = "0";
-        cartTotal.hidden = true;
-      });
-
-      copyOrderButton.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(orderNote.textContent);
-          copyOrderButton.textContent = "Copied!";
-          copyOrderButton.disabled = true;
-          setTimeout(() => {
-            copyOrderButton.textContent = "Copy note";
-            copyOrderButton.disabled = false;
-          }, 2000);
-        } catch (error) {
-          console.error(error);
-          showError("Copy isn’t available on this device. Show the screen instead.");
-        }
-      });
-
-      backToMenuButton.addEventListener("click", () => {
-        orderCard.hidden = true;
-      });
-
-      function renderMenu(sections) {
-        if (!sections.length) {
-          menuPreview.innerHTML = `<p style="opacity:0.7;">We couldn't find dishes in this menu. Try clearer photos or ask the planner to refresh.</p>`;
-          return;
+        function updateCountdown() {
+          if (!countdownPill) return;
+          const expires = new Date(countdownPill.dataset.expires || "");
+          if (Number.isNaN(expires.getTime())) {
+            countdownPill.textContent = "Link active";
+            return;
+          }
+          const remaining = Math.max(0, Math.floor((expires - new Date()) / 1000));
+          if (remaining <= 0) {
+            countdownPill.textContent = "Link expired";
+            return;
+          }
+          const hours = Math.floor(remaining / 3600);
+          const minutes = Math.floor((remaining % 3600) / 60);
+          countdownPill.textContent = `Expires in ${hours}h ${minutes}m`;
         }
 
-        menuPreview.innerHTML = sections
-          .map((section, index) => renderSection(section, index === 0))
-          .join("");
-      }
-
-      function renderSection(section, openByDefault) {
-        const dishes = (section.dishes || [])
-          .map((dish) => {
-            const key = buildKey(section.title, dish.original_name);
-            const description = dish.description ? `<p class=\"description\">${escapeHtml(dish.description)}</p>` : "";
-            return `
-              <li class="dish-card" data-section="${escapeAttr(section.title)}" data-original="${escapeAttr(dish.original_name)}" data-translated="${escapeAttr(dish.translated_name)}" data-price="${escapeAttr(dish.price || "")}" data-key="${escapeAttr(key)}">
-                <div class="dish-top">
-                  <div>
-                    <span class="dish-title">${escapeHtml(dish.translated_name)}</span>
-                    <span class="original">${escapeHtml(dish.original_name)}</span>
-                  </div>
-                  <span class="price">${escapeHtml(dish.price || "")}</span>
-                </div>
-                ${description}
-                <div class="dish-actions">
-                  <button type="button" class="add-button" data-action="add" aria-label="Add ${escapeAttr(dish.translated_name)}">+</button>
-                  <div class="quantity-controls" data-active="false">
-                    <button type="button" data-action="decrement" aria-label="Remove one ${escapeAttr(dish.translated_name)}">−</button>
-                    <span class="quantity-display">0</span>
-                    <button type="button" data-action="increment" aria-label="Add one ${escapeAttr(dish.translated_name)}">+</button>
-                  </div>
-                </div>
-              </li>`;
-          })
-          .join("");
-
-        return `
-          <details ${openByDefault ? "open" : ""}>
-            <summary>
-              <span>${escapeHtml(section.title)}</span>
-              <span aria-hidden="true">➜</span>
-            </summary>
-            <ul class="dish-list">${dishes}</ul>
-          </details>`;
-      }
-
-      function setDishQuantity(dishCard, quantity) {
-        const data = extractDishData(dishCard);
-        if (quantity <= 0) {
-          cart.delete(data.key);
-          updateDishCardUI(dishCard, 0);
-        } else {
-          cart.set(data.key, { ...data, quantity });
-          updateDishCardUI(dishCard, quantity);
-        }
-        updateCartUI();
-      }
-
-      function adjustDishQuantity(dishCard, delta) {
-        const current = Number(dishCard.dataset.quantity || "0");
-        const next = Math.max(0, current + delta);
-        setDishQuantity(dishCard, next);
-      }
-
-      function updateDishCardUI(dishCard, quantity) {
-        dishCard.dataset.quantity = String(quantity);
-        const addButton = dishCard.querySelector(".add-button");
-        const controls = dishCard.querySelector(".quantity-controls");
-        const qtyDisplay = dishCard.querySelector(".quantity-display");
-        if (!addButton || !controls || !qtyDisplay) {
-          return;
-        }
-        if (quantity > 0) {
-          addButton.style.display = "none";
-          controls.dataset.active = "true";
-        } else {
-          addButton.style.display = "inline-flex";
-          controls.dataset.active = "false";
-        }
-        qtyDisplay.textContent = String(quantity);
-      }
-
-      function updateCartUI() {
-        const items = Array.from(cart.values());
-        const total = items.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
-
-        if (!items.length) {
-          cartEmpty.hidden = false;
-          cartItems.innerHTML = "";
-          cartTotal.hidden = true;
-          generateOrderButton.disabled = true;
-          clearCartButton.disabled = true;
-          cartTotalPriceRow.hidden = true;
-          cartTotalPrice.textContent = "";
-          return;
+        updateCountdown();
+        if (parseInt(countdownPill?.dataset.remaining || "0", 10) > 0) {
+          setInterval(updateCountdown, 60000);
         }
 
-        cartEmpty.hidden = true;
-        generateOrderButton.disabled = false;
-        clearCartButton.disabled = false;
-
-        let totalPriceValue = 0;
-        let hasPrice = false;
-        let currencySymbol = null;
-        let currencyPosition = "prefix";
-        let currenciesConsistent = true;
-
-        const listHtml = items
-          .map((item) => {
-            if (item.priceValue != null) {
-              hasPrice = true;
-              totalPriceValue += item.priceValue * item.quantity;
-              if (currencySymbol === null && item.priceCurrencySymbol) {
-                currencySymbol = item.priceCurrencySymbol;
-                currencyPosition = item.priceCurrencyPosition;
-              } else if (
-                item.priceCurrencySymbol &&
-                (item.priceCurrencySymbol !== currencySymbol ||
-                  item.priceCurrencyPosition !== currencyPosition)
-              ) {
-                currenciesConsistent = false;
-              }
-            }
-
-            return `
-              <li class="cart-item" data-key="${escapeAttr(item.key)}">
-                <div>
-                  <strong>${escapeHtml(item.translatedName)}</strong>
-                  <div class="original">${escapeHtml(item.originalName)}</div>
-                </div>
-                <div class="price">${escapeHtml(item.priceDisplay || "")}</div>
-                <div class="cart-item-controls">
-                  <div class="quantity-controls" data-active="true">
-                    <button type="button" data-action="decrement-cart" aria-label="Remove one">−</button>
-                    <span class="quantity-display">${item.quantity}</span>
-                    <button type="button" data-action="increment-cart" aria-label="Add one">+</button>
-                  </div>
-                  <button type="button" class="icon-button" data-action="remove-cart" aria-label="Remove dish">🗑️</button>
-                </div>
-              </li>`;
-          })
-          .join("");
-
-        if (!currenciesConsistent) {
-          currencySymbol = "";
-        }
-
-        cartItems.innerHTML = listHtml;
-
-        cartTotal.hidden = false;
-        cartTotalCount.textContent = String(total);
-
-        if (hasPrice && totalPriceValue > 0) {
-          cartTotalPriceRow.hidden = false;
-          cartTotalPrice.textContent = formatTotalPrice(
-            totalPriceValue,
-            currencySymbol,
-            currencyPosition,
-          );
-        } else {
-          cartTotalPriceRow.hidden = true;
-          cartTotalPrice.textContent = "";
-        }
-      }
-
-      function buildOrderSummary() {
-        const lines = [];
-        cart.forEach((item) => {
-          lines.push(`${item.quantity} × ${item.originalName}`);
+        copyButton?.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            copyButton.textContent = "Link copied";
+            setTimeout(() => {
+              copyButton.textContent = "Copy link";
+            }, 2000);
+          } catch (error) {
+            console.error(error);
+          }
         });
-        return lines.join("\n");
-      }
 
-      function extractDishData(dishCard) {
-        const key = dishCard.dataset.key || "";
-        const sectionTitle = dishCard.dataset.section || "";
-        const originalName = dishCard.dataset.original || "";
-        const translatedName = dishCard.dataset.translated || "";
-        const priceDisplay = dishCard.dataset.price || "";
-        const parsedPrice = parsePrice(priceDisplay);
-        return {
-          key,
-          sectionTitle,
-          originalName,
-          translatedName,
-          priceDisplay,
-          priceValue: parsedPrice.value,
-          priceCurrencySymbol: parsedPrice.symbol,
-          priceCurrencyPosition: parsedPrice.position,
-        };
-      }
-
-      function buildKey(sectionTitle, originalName) {
-        return `${encodeURIComponent(sectionTitle)}::${encodeURIComponent(originalName)}`;
-      }
-
-      function showError(message) {
-        errorBanner.textContent = message;
-        errorBanner.dataset.visible = "true";
-        setTimeout(() => {
-          errorBanner.dataset.visible = "false";
-        }, 3000);
-      }
-
-      function escapeHtml(text) {
-        return String(text ?? "").replace(/[&<>\"']/g, (char) => {
-          const map = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-          };
-          return map[char] || char;
+        openButton?.addEventListener("click", () => {
+          window.open(shareUrl, "_blank", "noopener");
         });
-      }
-
-      function escapeAttr(text) {
-        return escapeHtml(text);
-      }
-
-      function cssEscape(value) {
-        if (window.CSS && CSS.escape) {
-          return CSS.escape(value);
-        }
-        return value.replace(/([^a-zA-Z0-9_-])/g, "\\$1");
-      }
-
-      function parsePrice(raw) {
-        if (!raw) {
-          return { value: null, symbol: "", position: "prefix" };
-        }
-        const trimmed = String(raw).trim();
-        if (!trimmed) {
-          return { value: null, symbol: "", position: "prefix" };
-        }
-        const match = trimmed.match(/[0-9]+(?:[.,][0-9]{1,2})?/);
-        if (!match) {
-          return { value: null, symbol: "", position: "prefix" };
-        }
-        const numberPart = match[0].replace(/,/g, ".");
-        const value = Number.parseFloat(numberPart);
-        if (Number.isNaN(value)) {
-          return { value: null, symbol: "", position: "prefix" };
-        }
-        const startIndex = match.index ?? trimmed.indexOf(match[0]);
-        let symbol = "";
-        let position = "prefix";
-        if (startIndex > 0) {
-          symbol = trimmed.slice(0, startIndex).trim();
-        }
-        const endIndex = startIndex + match[0].length;
-        if (!symbol && endIndex < trimmed.length) {
-          symbol = trimmed.slice(endIndex).trim();
-          position = "suffix";
-        }
-        if (symbol.length > 4) {
-          symbol = symbol.slice(0, 4);
-        }
-        return { value, symbol, position };
-      }
-
-      function formatTotalPrice(value, symbol, position) {
-        const hasFraction = Math.abs(value - Math.round(value)) > 0.001;
-        const formatted = value.toLocaleString(undefined, {
-          minimumFractionDigits: hasFraction ? 2 : 0,
-          maximumFractionDigits: 2,
-        });
-        if (symbol) {
-          return position === "suffix" ? `${formatted}${symbol}` : `${symbol}${formatted}`;
-        }
-        return formatted;
-      }
-    </script>
+      </script>
+    {% endif %}
   </body>
 </html>
