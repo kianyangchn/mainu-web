@@ -18,5 +18,7 @@ Create a dedicated branch for each feature or fix (`git checkout -b feat/mobile-
 ## Product Alignment
 Reference `PRD-web.txt` before large changes. It defines the mobile-first UX strategy, single-Python-app architecture, Railway deployment model, and reliance on a multimodal LLM instead of bespoke OCR. Call out PRD impacts in design docs and PR descriptions when altering flows or infrastructure.
 
+If requirements feel unclear, ask the user before proceeding.
+
 ## Environment & Deployment Notes
 Railway is the primary deployment target. Store secrets via Railway variables, keep state in PostgreSQL/Redis add-ons, and document any cron/worker services alongside the code that depends on them. For LLM access, centralize API keys in a dedicated settings module (`app/config.py`) and avoid hard-coding endpoints inside business logic.
