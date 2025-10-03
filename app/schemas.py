@@ -40,6 +40,11 @@ class MenuProcessingResponse(BaseModel):
     template: MenuTemplate
     share_token: str
     share_url: str | None = None
+    share_api_url: str | None = None
+    share_qr: str | None = Field(
+        default=None,
+        description="PNG data URI for scanning the shared menu.",
+    )
     share_expires_at: datetime = Field(
         description="Absolute expiry timestamp for the share link in UTC."
     )

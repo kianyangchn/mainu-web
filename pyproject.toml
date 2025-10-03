@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings>=2.2",
     "httpx>=0.27",
     "openai>=1.30",
+    "segno>=1.6",
 ]
 
 [project.optional-dependencies]

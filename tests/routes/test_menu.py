@@ -78,6 +78,8 @@ def test_process_menu_returns_share_token():
     )
     assert payload["share_token"]
     assert payload["share_url"].endswith(payload["share_token"])
+    assert payload["share_api_url"].endswith(payload["share_token"])
+    assert payload["share_qr"].startswith("data:image/png;base64,")
     assert payload["share_expires_in_seconds"] > 0
     assert payload["share_expires_at"]
     assert payload["detected_language"] == "zh-CN"
@@ -120,6 +122,8 @@ def test_process_menu_respects_manual_language_selection():
 
     assert response.status_code == 200
     payload = response.json()
+    assert payload["share_api_url"].endswith(payload["share_token"])
+    assert payload["share_qr"].startswith("data:image/png;base64,")
     assert payload["share_expires_in_seconds"] > 0
     assert payload["share_expires_at"]
     assert payload["detected_language"] == "fr"
