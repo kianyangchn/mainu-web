@@ -15,6 +15,7 @@ dependencies = [
     "segno>=1.6",
     "SQLAlchemy>=2.0",
     "asyncpg>=0.29",
+    "psycopg2>=2.9.10",
 ]
 
 [project.optional-dependencies]
