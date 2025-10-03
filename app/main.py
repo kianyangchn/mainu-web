@@ -40,8 +40,8 @@ async def share_view(request: Request, token: str):
     """Render a read-only viewer for shared menus."""
 
     share_service = get_share_service()
-    share_service.purge_expired()
-    record = share_service.describe(token)
+    await share_service.purge_expired()
+    record = await share_service.describe(token)
     if record is None:
         return templates.TemplateResponse(
             request,

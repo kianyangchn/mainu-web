@@ -65,9 +65,9 @@ async def process_menu(
         input_language=settings.input_language,
         output_language=output_language,
     )
-    share_service.purge_expired()
-    token = share_service.create_template(template)
-    record = share_service.describe(token)
+    await share_service.purge_expired()
+    token = await share_service.create_template(template)
+    record = await share_service.describe(token)
     if record is None:
         raise RuntimeError("Share token expired unexpectedly")
     share_html_url = str(request.url_for("share_view", token=token))
@@ -93,8 +93,8 @@ async def get_shared_menu(
     token: str,
     share_service: ShareService = Depends(get_share_service),
 ) -> MenuTemplate:
-    share_service.purge_expired()
-    template = share_service.fetch_template(token)
+    await share_service.purge_expired()
+    template = await share_service.fetch_template(token)
     if template is None:
         raise HTTPException(status_code=404, detail="Share link expired or invalid")
     return template
