@@ -992,7 +992,7 @@
           <span>Mainu on-the-go</span>
         </button>
         <h1 class="hero-title">Make it easy to order</h1>
-        <p class="hero-tagline" id="hero-tagline">One menu, zero confusion</p>
+        <p class="hero-tagline" id="hero-tagline">Order with ease, in the language you know best!</p>
       </header>
 
       <section class="card capture-card screen" data-screen="capture">
@@ -1198,10 +1198,12 @@
       ];
 
       const taglineMessages = [
-        "Plan tonight's dinner together.",
-        "Keep everyone looped in, even on the move.",
-        "Share dishes before you reach the restaurant.",
-        "Feel confident ordering abroad.",
+        "用熟悉的语言点单更简单!",
+        "慣れた言葉で注文すれば、もっと簡単!",
+        "익숙한 언어로 주문하면 더 쉬워요!",
+        "Commander dans une langue familière, c’est plus simple !",
+        "Bestellen in einer vertrauten Sprache ist einfacher!",
+        "¡Pedir en un idioma familiar es más fácil!"
       ];
 
       let taglineIndex = 0;
@@ -1750,7 +1752,7 @@
 
         if (hasPrice && totalPriceValue > 0) {
           const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
-          menuSummaryPrice.textContent = `Total ${formatted}`;
+          menuSummaryPrice.textContent = `Total price: ${formatted}`;
         } else {
           menuSummaryPrice.textContent = "";
         }
