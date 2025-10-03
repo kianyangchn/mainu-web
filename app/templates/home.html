@@ -55,15 +55,23 @@
         text-align: center;
       }
 
-      .hero-pill {
-        display: inline-flex;
+      .hero-back {
         align-self: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: var(--primary-dark);
+        background: rgba(47, 123, 255, 0.1);
+        border: none;
         padding: 8px 16px;
         border-radius: var(--radius-pill);
-        background: rgba(47, 123, 255, 0.1);
-        color: var(--primary);
-        font-weight: 600;
-        font-size: 0.9rem;
+        cursor: pointer;
+        font-size: 0.95rem;
+      }
+
+      .hero-back span[aria-hidden="true"] {
+        font-size: 1.1rem;
       }
 
       h1.hero-title {
@@ -336,34 +344,6 @@
         gap: var(--spacing);
       }
 
-      .share-code-card {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        padding: 22px 24px;
-        border-radius: 16px;
-        background: var(--glass-card);
-        border: 1px solid rgba(29, 91, 219, 0.12);
-      }
-
-      .share-code-form {
-        display: grid;
-        gap: 12px;
-      }
-
-      .share-code-form input {
-        appearance: none;
-        border-radius: 16px;
-        border: 1px solid rgba(17, 27, 57, 0.12);
-        padding: 14px 16px;
-        font-size: 1rem;
-        background: rgba(247, 249, 255, 0.78);
-      }
-
-      .share-code-form button {
-        justify-self: start;
-      }
-
       .sticky-bar {
         position: fixed;
         left: 0;
@@ -546,6 +526,59 @@
         opacity: 0.45;
       }
 
+      .summary-share {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .summary-share .share-link-btn,
+      .summary-share .share-qr {
+        width: 100%;
+      }
+
+      .summary-share > .share-link-btn {
+        justify-content: center;
+      }
+
+      .share-qr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(29, 91, 219, 0.08);
+        border-radius: 14px;
+        padding: 12px 16px;
+      }
+
+      .share-qr img {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        background: white;
+        padding: 8px;
+      }
+
+      .share-link-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(29, 91, 219, 0.18);
+        background: rgba(29, 91, 219, 0.08);
+        color: var(--primary-dark);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.18s ease;
+      }
+
+      .share-link-btn:hover,
+      .share-link-btn:focus-visible {
+        transform: translateY(-1px);
+      }
+
       .menu-results-layout {
         display: flex;
         flex-direction: column;
@@ -685,10 +718,10 @@
       .quantity-controls {
         display: none;
         align-items: center;
-        gap: 12px;
-        border-radius: 12px;
+        gap: 4px;
+        border-radius: 10px;
         background: none;
-        padding: 4px 10px;
+        padding: 1px 6px;
         border: 1px solid rgba(47, 123, 255, 0.18);
       }
 
@@ -697,7 +730,7 @@
       }
 
       .quantity-display {
-        min-width: 22px;
+        min-width: 14px;
         text-align: center;
         font-weight: 600;
       }
@@ -714,7 +747,7 @@
       .quantity-controls button {
         border: none;
         background: none;
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: var(--primary-dark);
         cursor: pointer;
       }
@@ -941,7 +974,10 @@
   <body>
     <main class="app-shell">
       <header class="hero">
-        <span class="hero-pill">Mainu on-the-go</span>
+        <button type="button" class="hero-back" id="hero-back" hidden>
+          <span aria-hidden="true">←</span>
+          <span>Mainu on-the-go</span>
+        </button>
         <h1 class="hero-title">One menu, zero confusion</h1>
         <p class="hero-tagline" id="hero-tagline">Plan tonight's dinner together.</p>
       </header>
@@ -985,20 +1021,6 @@
             <div class="preview-empty" id="preview-empty"></div>
           </div>
         </form>
-        <div class="share-code-card">
-          <strong>Already have a menu link?</strong>
-          <form id="share-form" class="share-code-form">
-            <input
-              id="share-token"
-              name="token"
-              placeholder="Enter the 12-character share code"
-              autocomplete="off"
-              inputmode="search"
-              pattern="[A-Za-z0-9_-]{6,}"
-            />
-            <button type="submit" class="secondary">Open shared menu</button>
-          </form>
-        </div>
       </section>
 
       <section class="card processing-card screen" data-screen="processing" hidden>
@@ -1021,11 +1043,12 @@
               <span class="pill" data-variant="countdown" id="share-countdown" hidden></span>
             </div>
           </div>
-          <div class="summary-actions">
-            <button type="button" class="primary" id="copy-share-link">Copy share link</button>
-            <button type="button" class="secondary" id="open-share-link">Open share view</button>
-            <button type="button" class="secondary" id="start-new-menu">Start a new menu</button>
+        <div class="summary-share" id="summary-share">
+          <button type="button" class="share-link-btn" id="copy-share-link">Copy share link</button>
+          <div class="share-qr" id="share-qr" hidden>
+            <img id="share-qr-image" alt="QR code to open this menu" />
           </div>
+        </div>
         </article>
         <div class="menu-results-layout">
           <div class="menu-results-content">
@@ -1133,6 +1156,7 @@
       const captureStatus = document.getElementById("capture-status");
       const tipsDialog = document.getElementById("tips-dialog");
       const tipsButton = document.getElementById("tips-button");
+      const heroBackButton = document.getElementById("hero-back");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -1142,14 +1166,13 @@
       const previewEmpty = document.getElementById("preview-empty");
       const languageChoices = document.getElementById("language-choices");
       const outputLanguageInput = document.getElementById("output-language");
-      const shareForm = document.getElementById("share-form");
 
       const detectedLanguagePill = document.getElementById("detected-language-pill");
       const shareCountdown = document.getElementById("share-countdown");
       const menuTitle = document.getElementById("menu-title");
       const copyShareLink = document.getElementById("copy-share-link");
-      const openShareLink = document.getElementById("open-share-link");
-      const startNewMenuButton = document.getElementById("start-new-menu");
+      const shareQrContainer = document.getElementById("share-qr");
+      const shareQrImage = document.getElementById("share-qr-image");
       const sectionNav = document.getElementById("section-nav");
       const sectionsContainer = document.getElementById("sections");
       const emptyState = document.getElementById("empty-state");
@@ -1222,6 +1245,7 @@
         menuActions.hidden = !showMenu;
         menuActions.style.display = showMenu ? "flex" : "none";
         menuActions.setAttribute("aria-hidden", showMenu ? "false" : "true");
+        heroBackButton.hidden = showCapture;
       }
 
       function setWarning(message) {
@@ -1378,6 +1402,8 @@
         state.share = {
           token: payload.share_token,
           url: payload.share_url,
+          apiUrl: payload.share_api_url,
+          qr: payload.share_qr,
           expiresAt: new Date(payload.share_expires_at),
           ttlSeconds: payload.share_expires_in_seconds,
           detectedLanguage: payload.detected_language,
@@ -1404,7 +1430,14 @@
         }
 
         copyShareLink.dataset.url = state.share.url;
-        openShareLink.dataset.url = state.share.url;
+
+        if (state.share.qr) {
+          shareQrImage.src = state.share.qr;
+          shareQrContainer.hidden = false;
+        } else {
+          shareQrImage.removeAttribute("src");
+          shareQrContainer.hidden = true;
+        }
 
         renderSections();
         clearSelections();
@@ -1787,6 +1820,8 @@
         sectionNav.innerHTML = "";
         detectedLanguagePill.hidden = true;
         shareCountdown.hidden = true;
+        shareQrContainer.hidden = true;
+        shareQrImage.removeAttribute("src");
         menuActions.hidden = true;
         menuActions.style.display = "none";
         menuActions.setAttribute("aria-hidden", "true");
@@ -1835,16 +1870,6 @@
 
       translateButton.addEventListener("click", submitUpload);
 
-      shareForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const token = document.getElementById("share-token").value.trim();
-        if (!token) {
-          setWarning("Enter a share code to open a menu.");
-          return;
-        }
-        window.location.href = `/share/${token}`;
-      });
-
       tipsButton.addEventListener("click", () => {
         tipsDialog.showModal();
       });
@@ -1862,13 +1887,6 @@
         }
       });
 
-      openShareLink.addEventListener("click", () => {
-        if (!state.share?.url) {
-          return;
-        }
-        window.open(state.share.url, "_blank", "noopener");
-      });
-
       cartSummaryButton.addEventListener("click", () => {
         if (!cart.size) {
           return;
@@ -1881,7 +1899,7 @@
         cartDialog.close();
       });
 
-      startNewMenuButton.addEventListener("click", () => {
+      heroBackButton.addEventListener("click", () => {
         resetMenuView();
         resetCapture();
         showScreen("capture");

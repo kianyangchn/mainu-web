@@ -5,15 +5,9 @@ from __future__ import annotations
 import logging
 from typing import List
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    Request,
-    UploadFile,
-)
+import segno
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 
 from app.config import settings
 from app.schemas import MenuProcessingResponse, MenuTemplate
@@ -76,12 +70,18 @@ async def process_menu(
     record = share_service.describe(token)
     if record is None:
         raise RuntimeError("Share token expired unexpectedly")
-    share_url = str(request.url_for("get_shared_menu", token=token))
+    share_html_url = str(request.url_for("share_view", token=token))
+    share_api_url = str(request.url_for("get_shared_menu", token=token))
+
+    qr = segno.make_qr(share_html_url)
+    qr_data = qr.png_data_uri(scale=4, dark="#1d5bdb", light="#f8fafc")
 
     return MenuProcessingResponse(
         template=template,
         share_token=token,
-        share_url=share_url,
+        share_url=share_html_url,
+        share_api_url=share_api_url,
+        share_qr=qr_data,
         share_expires_at=record.expires_at,
         share_expires_in_seconds=record.ttl_seconds,
         detected_language=output_language,  # TODO: remove once locale debugging is complete.
