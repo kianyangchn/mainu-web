@@ -16,7 +16,7 @@ from app.schemas import (
     ShareMenuRequest,
     ShareMenuResponse,
 )
-from app.services.llm import LLMMenuService
+from app.services.llm import LLMMenuService, MenuGenerationResult
 from app.services.share import ShareService
 
 router = APIRouter(prefix="/menu", tags=["menu"])
@@ -62,7 +62,7 @@ async def process_menu(
 
     output_language = requested_output_language or _detect_language(request)
     logger.debug("Processing menu with output language: %s", output_language)
-    template = await menu_service.generate_menu_template(
+    generation_result: MenuGenerationResult = await menu_service.generate_menu_template(
         contents,
         filenames,
         content_types,
@@ -70,8 +70,8 @@ async def process_menu(
         output_language=output_language,
     )
     return MenuProcessingResponse(
-        template=template,
-        detected_language=output_language,  # TODO: remove once locale debugging is complete.
+        template=generation_result.template,
+        detected_language=output_language,
     )
 
 
