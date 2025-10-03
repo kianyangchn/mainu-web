@@ -52,7 +52,7 @@ def reset_services(monkeypatch):
 def test_home_page_renders_template():
     response = client.get("/")
     assert response.status_code == 200
-    assert "Bring the menu aboard" in response.text
+    assert "One menu, zero confusion" in response.text
 
 
 def test_process_menu_rejects_invalid_type():
