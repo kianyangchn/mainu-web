@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Shared menu • mainu Web</title>
+    <title>Mainu on-the-go • make it easy to order</title>
     <style>
       :root {
         color-scheme: light;
@@ -20,6 +20,7 @@
         --shadow-card: 0 18px 44px rgba(31, 54, 110, 0.14);
         --radius-card: 18px;
         --radius-pill: 999px;
+        --card-gap: 18px;
       }
 
       * {
@@ -31,52 +32,105 @@
         min-height: 100vh;
         background: var(--bg-gradient);
         color: var(--text-strong);
-        padding: 32px 20px 80px;
+        padding: 32px 20px 96px;
       }
 
-      main {
-        max-width: 660px;
+      .share-shell {
+        width: min(560px, 100%);
         margin: 0 auto;
         display: flex;
         flex-direction: column;
         gap: 24px;
       }
 
-      .hero {
+      .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-card);
+        padding: 28px 24px;
+        box-shadow: var(--shadow-card);
+        display: flex;
+        flex-direction: column;
+        gap: var(--card-gap);
+        backdrop-filter: blur(10px);
+      }
+
+      .order-card {
+        width: min(560px, 100%);
+        margin: 40px auto 60px;
+        gap: 16px;
+      }
+
+      .order-note {
+        border-radius: 14px;
+        padding: 18px;
+        background: rgba(247, 249, 255, 0.86);
+        border: 1px solid rgba(47, 123, 255, 0.12);
+        min-height: 160px;
+        white-space: pre-line;
+        font-family: "Inter", system-ui;
+      }
+
+      .share-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+      }
+
+      .share-actions .share-link-btn {
+        justify-content: center;
+      }
+
+      #dialog-copy-order {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--primary), #1d5bdb);
+        color: #fff;
+        box-shadow: 0 16px 36px rgba(47, 123, 255, 0.32);
+      }
+
+      #dialog-copy-order:not(:disabled):hover,
+      #dialog-copy-order:not(:disabled):focus-visible {
+        transform: translateY(-1px);
+      }
+
+      #dialog-back {
+        background: rgba(47, 123, 255, 0.08);
+        color: var(--primary-dark);
+        border-color: rgba(47, 123, 255, 0.18);
+      }
+
+      .share-header {
         display: flex;
         flex-direction: column;
         gap: 16px;
-        padding: 26px 24px;
-        border-radius: var(--radius-card);
-        background: var(--bg-card);
-        box-shadow: var(--shadow-card);
+        align-items: center;
         text-align: center;
       }
 
-      .hero-pill {
-        display: inline-flex;
-        justify-content: center;
+      .share-back {
         align-self: center;
-        padding: 8px 16px;
-        border-radius: var(--radius-pill);
-        background: rgba(47, 123, 255, 0.12);
-        color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        background: rgba(47, 123, 255, 0.1);
+        color: var(--primary-dark);
         font-weight: 600;
-        font-size: 0.88rem;
+        border-radius: var(--radius-pill);
+        padding: 8px 16px;
+        cursor: pointer;
       }
 
-      h1 {
+      .share-title {
         margin: 0;
-        font-size: clamp(1.8rem, 4.4vw, 2.4rem);
-        font-weight: 600;
+        font-size: clamp(1.8rem, 5vw, 2.4rem);
         letter-spacing: -0.015em;
       }
 
-      .hero-metadata {
+      .share-meta {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
         gap: 10px;
+        justify-content: center;
       }
 
       .pill {
@@ -88,132 +142,111 @@
         background: rgba(47, 123, 255, 0.1);
         color: var(--primary-dark);
         font-weight: 600;
-        font-size: 0.86rem;
+        font-size: 0.88rem;
       }
 
       .pill[data-variant="countdown"] {
-        background: rgba(255, 131, 96, 0.14);
+        background: rgba(255, 131, 96, 0.12);
         color: var(--accent);
       }
 
-      .hero-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 12px;
-        margin-top: 8px;
-      }
-
-      button {
-        appearance: none;
-        border-radius: 14px;
-        border: 1px solid rgba(31, 54, 110, 0.12);
-        background: rgba(247, 249, 255, 0.9);
-        padding: 14px 18px;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-strong);
+      .share-link-btn {
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        gap: 6px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(29, 91, 219, 0.18);
+        background: rgba(29, 91, 219, 0.08);
+        color: var(--primary-dark);
+        font-weight: 600;
+        font-size: 1rem;
         cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        transition: transform 0.18s ease;
       }
 
-      button.primary {
-        background: linear-gradient(135deg, var(--primary), #1d5bdb);
-        color: white;
-        border-color: transparent;
-        box-shadow: 0 16px 34px rgba(47, 123, 255, 0.26);
-      }
-
-      button.primary:hover,
-      button.secondary:hover,
-      button.primary:focus-visible,
-      button.secondary:focus-visible {
+      .share-link-btn:hover,
+      .share-link-btn:focus-visible {
         transform: translateY(-1px);
       }
 
-      button.secondary {
-        background: rgba(47, 123, 255, 0.08);
-        color: var(--primary-dark);
-        border-color: rgba(47, 123, 255, 0.18);
-      }
-
-      button:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
-
-      .menu-card {
-        background: var(--bg-card);
-        border-radius: var(--radius-card);
-        box-shadow: var(--shadow-card);
+      .menu-area {
         display: flex;
         flex-direction: column;
         gap: 20px;
-        padding: 24px 24px 28px;
       }
 
-      .section-list {
+      .section-nav {
+        position: sticky;
+        top: 20px;
+        z-index: 5;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 8px 8px;
+        background: rgba(247, 249, 255, 0.82);
+        border-radius: 14px;
+        border: 1px solid rgba(29, 91, 219, 0.08);
+      }
+
+      .section-nav button {
+        border-radius: var(--radius-pill);
+        padding: 10px 16px;
+        border: none;
+        background: rgba(47, 123, 255, 0.08);
+        color: var(--primary-dark);
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .section-nav button[data-active="true"] {
+        background: linear-gradient(135deg, var(--primary), #1d5bdb);
+        color: #fff;
+      }
+
+      .sections {
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 20px;
       }
 
-      details.section {
-        border-radius: 16px;
-        background: rgba(247, 249, 255, 0.82);
-        border: 1px solid rgba(31, 54, 110, 0.12);
-        padding: 18px 20px;
-      }
-
-      summary.section-header {
-        list-style: none;
+      .section-card {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1.1rem;
+        flex-direction: column;
+        gap: 14px;
       }
 
-      summary.section-header::-webkit-details-marker {
-        display: none;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-        background: rgba(47, 123, 255, 0.12);
-        color: var(--primary-dark);
-        font-size: 0.8rem;
+      .section-title {
+        margin: 0;
+        font-size: 1.22rem;
         font-weight: 600;
       }
 
       .dish-list {
-        list-style: none;
-        margin: 18px 0 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
+        display: grid;
         gap: 16px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
       }
 
       .dish-card {
-        border-radius: 16px;
-        padding: 18px 18px 20px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.8));
-        border: 1px solid rgba(47, 123, 255, 0.14);
-        box-shadow: 0 16px 28px rgba(47, 123, 255, 0.1);
+        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
+        padding: 20px 18px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.8));
+        border: 1px solid rgba(47, 123, 255, 0.14);
+        box-shadow: 0 16px 32px rgba(29, 91, 219, 0.12);
+        transition: transform 0.18s ease, border-color 0.18s ease;
+      }
+
+      .dish-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(47, 123, 255, 0.32);
       }
 
       .dish-headline {
@@ -234,17 +267,16 @@
       }
 
       .original-name {
-        display: inline-flex;
-        align-self: flex-start;
-        padding: 4px 10px;
-        border-radius: var(--radius-pill);
-        background: rgba(47, 123, 255, 0.12);
-        color: var(--primary-dark);
         font-size: 0.82rem;
+        padding: 4px 10px;
+        align-self: flex-start;
+        border-radius: var(--radius-pill);
+        background: rgba(29, 91, 219, 0.12);
+        color: var(--primary-dark);
         font-weight: 600;
       }
 
-      .price {
+      .price-tag {
         font-weight: 600;
         color: var(--primary-dark);
       }
@@ -253,166 +285,835 @@
         margin: 0;
         color: var(--text-muted);
         line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
-      .footer-card {
-        background: var(--glass);
-        border-radius: var(--radius-card);
-        padding: 22px 24px;
+      .dish-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .add-button {
+        border: none;
+        background: none;
+        color: var(--primary-dark);
+        font-size: 1.05rem;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+      }
+
+      .quantity-controls {
+        display: none;
+        align-items: center;
+        gap: 4px;
+        border-radius: 10px;
+        background: none;
+        padding: 1px 6px;
+        border: 1px solid rgba(47, 123, 255, 0.18);
+      }
+
+      .quantity-controls[data-active="true"] {
+        display: inline-flex;
+      }
+
+      .quantity-display {
+        min-width: 14px;
         text-align: center;
-        border: 1px solid rgba(31, 54, 110, 0.08);
+        font-weight: 600;
       }
 
-      .footer-card p {
-        margin: 4px 0 0;
-        color: var(--text-muted);
+      .quantity-controls button {
+        border: none;
+        background: none;
+        font-size: 0.9rem;
+        color: var(--primary-dark);
+        cursor: pointer;
       }
 
-      .expired-card {
-        max-width: 520px;
-        margin: 60px auto;
-        background: var(--bg-card);
-        border-radius: var(--radius-card);
-        padding: 28px 26px;
-        text-align: center;
-        box-shadow: var(--shadow-card);
+      .quantity-controls button:focus-visible,
+      .add-button:focus-visible {
+        outline: 2px solid rgba(47, 123, 255, 0.4);
+      }
+
+      .menu-actions {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(15, 27, 57, 0.92);
+        color: #f8fafc;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+      }
+
+      .menu-actions-summary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 0;
+        border: none;
+        background: none;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      .menu-actions-summary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .menu-actions-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(248, 250, 252, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+
+      .menu-actions-summary-text {
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 2px;
+        text-align: left;
       }
 
-      .expired-card h1 {
-        font-size: 1.9rem;
+      .menu-actions-summary-text strong {
+        font-weight: 600;
       }
 
-      .expired-card p {
-        margin: 0;
+      .menu-actions-summary-text span {
+        font-size: 0.88rem;
+        color: rgba(248, 250, 252, 0.75);
+      }
+
+      .menu-actions-buttons {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .menu-actions-buttons button {
+        min-width: 120px;
+        padding: 12px 16px;
+      }
+
+      .order-card {
+        gap: 16px;
+      }
+
+      .order-note {
+        border-radius: 14px;
+        padding: 18px;
+        background: rgba(247, 249, 255, 0.86);
+        border: 1px solid rgba(47, 123, 255, 0.12);
+        min-height: 160px;
+        white-space: pre-line;
+        font-family: "Inter", system-ui;
+      }
+
+      footer.share-footer {
+        text-align: center;
         color: var(--text-muted);
+        font-size: 0.85rem;
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        button,
-        .dish-card,
-        .hero,
-        .menu-card {
-          transition: none;
+      dialog.cart-dialog {
+        border: none;
+        border-radius: 18px;
+        width: min(520px, calc(100vw - 32px));
+        max-width: 560px;
+        max-height: 85vh;
+        padding: 0;
+        box-shadow: var(--shadow-card);
+      }
+
+      .cart-dialog-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+        max-height: inherit;
+        overflow-y: auto;
+      }
+
+      .cart-dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .cart-dialog-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .dialog-close {
+        border: none;
+        background: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        cursor: pointer;
+        padding: 8px 0;
+      }
+
+      .cart-dialog-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .cart-dialog-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      .cart-dialog-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .cart-dialog-item strong {
+        display: block;
+        font-weight: 600;
+      }
+
+      .cart-dialog-item span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 640px) {
+        .menu-actions-buttons {
+          flex: 1 1 100%;
+          justify-content: stretch;
+        }
+
+        .menu-actions-buttons button {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+
+      @media (min-width: 900px) {
+        .menu-actions {
+          padding: 18px 48px calc(18px + env(safe-area-inset-bottom));
+          gap: 16px;
+        }
+
+        .menu-actions-summary {
+          gap: 12px;
+          min-width: 200px;
+        }
+
+        .menu-actions-buttons button {
+          min-width: 150px;
         }
       }
     </style>
   </head>
   <body>
     {% if is_expired %}
-      <section class="expired-card" role="status">
-        <span class="hero-pill">Trip link expired</span>
-        <h1>This menu link has ended its trip.</h1>
-        <p>Ask your host to resend the share code or start a fresh menu capture to keep planning.</p>
-        <button class="primary" type="button" onclick="window.location.href='/'">Start a new menu</button>
-        <p style="font-size: 0.85rem;">Reference: {{ token }}</p>
+      <section class="share-shell" role="status" style="margin-top:40px;">
+        <h1 class="share-title">This menu link has ended its trip.</h1>
+        <p style="color: var(--text-muted);">Ask your host to resend the link or start a fresh menu capture.</p>
+        <button type="button" class="share-link-btn" onclick="window.location.href='/'">Start a new menu</button>
       </section>
     {% else %}
-      <main>
-        <header class="hero">
-          <span class="hero-pill">Shared via mainu</span>
-          <h1>Browse the dishes together</h1>
-          <div class="hero-metadata">
+      <main class="share-shell" id="layout-shell">
+        <header class="share-header">
+          <button type="button" class="share-back" onclick="window.location.href='/'">
+            <span aria-hidden="true">←</span>
+            <span>Mainu on-the-go</span>
+          </button>
+          <h1 class="share-title">Browse together</h1>
+          <div class="share-meta">
             <span class="pill">Share code · {{ token }}</span>
-            {% if menu.original_language %}
-              <span class="pill">Original language · {{ menu.original_language }}</span>
-            {% endif %}
-            <span class="pill" data-variant="countdown" id="countdown-pill" data-expires="{{ expires_at.isoformat() }}" data-remaining="{{ expires_in_seconds }}">
-              Expires soon
-            </span>
-          </div>
-          <p style="margin: 0; color: var(--text-muted);">Shared by your travel buddy – pick your favourites and compare before you arrive.</p>
-          <div class="hero-actions">
-            <button type="button" class="primary" id="copy-link">Copy link</button>
-            <button type="button" class="secondary" id="open-in-app">Open in new tab</button>
-            <button type="button" class="secondary" disabled>Language options (soon)</button>
+            <span class="pill" data-variant="countdown" id="share-countdown" data-expires="{{ expires_at.isoformat() }}" data-remaining="{{ expires_in_seconds }}">Expires soon</span>
           </div>
         </header>
 
-        <article class="menu-card">
-          <div>
-            <h2 style="margin: 0 0 12px;">Menu overview</h2>
-            <p style="margin: 0; color: var(--text-muted);">Tap each section to reveal the dishes translation crafted by mainu.</p>
+      <section class="menu-area" id="menu-area">
+        <nav class="section-nav" id="section-nav" aria-label="Menu sections"></nav>
+        <div class="sections" id="sections"></div>
+        <div id="empty-state" hidden>
+          <article class="menu-empty" style="text-align:center;">
+            <p style="margin:0; color: var(--text-muted);">No dishes available yet.</p>
+            </article>
           </div>
-          <div class="section-list">
-            {% for section in menu.sections %}
-              <details class="section" {% if loop.first %}open{% endif %}>
-                <summary class="section-header">
-                  <span>{{ section.title }}</span>
-                  <span class="badge">{{ section.dishes | length }} dishes</span>
-                </summary>
-                <ul class="dish-list">
-                  {% for dish in section.dishes %}
-                    <li class="dish-card">
-                      <div class="dish-headline">
-                        <div class="dish-name">
-                          <span class="translated-name">{{ dish.translated_name }}</span>
-                          <span class="original-name">{{ dish.original_name }}</span>
-                        </div>
-                        {% if dish.price %}
-                          <span class="price">{{ dish.price }}</span>
-                        {% endif %}
-                      </div>
-                      <p class="dish-description">{{ dish.description }}</p>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </details>
-            {% endfor %}
-          </div>
-        </article>
-
-        <section class="footer-card">
-          <strong>Bon appétit!</strong>
-          <p>Need a fresh translation? Capture and share new menus anytime from the mainu home screen.</p>
         </section>
       </main>
 
+      <footer class="share-footer">Bon appétit! • mainu shared menu</footer>
+
+      <div class="menu-actions" id="menu-actions" aria-hidden="true">
+        <button type="button" class="menu-actions-summary" id="cart-summary-button" disabled>
+          <span class="menu-actions-icon" aria-hidden="true">🛒</span>
+          <span class="menu-actions-summary-text">
+            <strong id="menu-summary-count">No dishes selected</strong>
+            <span id="menu-summary-price"></span>
+          </span>
+        </button>
+        <div class="menu-actions-buttons">
+          <button type="button" class="share-link-btn" id="generate-order" disabled>Create waiter note</button>
+          <button type="button" class="share-link-btn" id="clear-cart" disabled>Clear selections</button>
+        </div>
+      </div>
+
+      <dialog class="cart-dialog" id="cart-dialog" aria-modal="true">
+        <form method="dialog" class="cart-dialog-content">
+          <header class="cart-dialog-header">
+            <h2>Table picks</h2>
+            <button type="button" id="close-cart-dialog" class="dialog-close">Close</button>
+          </header>
+          <p id="cart-dialog-empty" style="margin:0; color: var(--text-muted);">Select dishes to see them here.</p>
+          <ul class="cart-dialog-list" id="cart-dialog-list"></ul>
+        </form>
+      </dialog>
+
+      <section class="card order-card" id="order-card" hidden>
+        <div>
+          <h2 style="margin: 0;">Waiter note</h2>
+          <p style="margin: 4px 0 0; color: var(--text-muted);">Share this summary with the staff so everyone’s meal is just right.</p>
+        </div>
+        <div class="order-note" id="dialog-order-note"></div>
+        <div class="share-actions" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+          <button type="button" class="share-link-btn" id="dialog-copy-order">Copy note</button>
+          <button type="button" class="share-link-btn" id="dialog-back">Back to menu</button>
+        </div>
+      </section>
+
+      <template id="dish-template">
+        <li class="dish-card">
+          <div class="dish-headline">
+            <div class="dish-name">
+              <span class="translated-name"></span>
+              <span class="original-name"></span>
+            </div>
+            <span class="price-tag"></span>
+          </div>
+          <p class="dish-description"></p>
+          <div class="dish-actions">
+            <button type="button" class="add-button" data-action="add" aria-label="Add dish">+</button>
+            <div class="quantity-controls" data-active="false">
+              <button type="button" data-action="decrement" aria-label="Remove one">−</button>
+              <span class="quantity-display">0</span>
+              <button type="button" data-action="increment" aria-label="Add one">+</button>
+            </div>
+          </div>
+        </li>
+      </template>
+
       <script>
-        const countdownPill = document.getElementById("countdown-pill");
-        const copyButton = document.getElementById("copy-link");
-        const openButton = document.getElementById("open-in-app");
-        const shareUrl = window.location.href;
+        const initialMenu = {{ menu.model_dump()|tojson|safe }};
+
+        const layoutShell = document.getElementById("layout-shell");
+        const shareFooter = document.querySelector(".share-footer");
+        const sectionNav = document.getElementById("section-nav");
+        const sectionsContainer = document.getElementById("sections");
+        const emptyState = document.getElementById("empty-state");
+        const shareCountdown = document.getElementById("share-countdown");
+        const menuArea = document.getElementById("menu-area");
+
+       const menuActions = document.getElementById("menu-actions");
+       const cartSummaryButton = document.getElementById("cart-summary-button");
+       const menuSummaryCount = document.getElementById("menu-summary-count");
+       const menuSummaryPrice = document.getElementById("menu-summary-price");
+       const generateOrderButton = document.getElementById("generate-order");
+       const clearCartButton = document.getElementById("clear-cart");
+       const orderCard = document.getElementById("order-card");
+       const orderNote = document.getElementById("dialog-order-note");
+       const copyOrderButton = document.getElementById("dialog-copy-order");
+       const backToMenuButton = document.getElementById("dialog-back");
+        const cartDialog = document.getElementById("cart-dialog");
+        const cartDialogList = document.getElementById("cart-dialog-list");
+        const cartDialogEmpty = document.getElementById("cart-dialog-empty");
+        const closeCartDialogButton = document.getElementById("close-cart-dialog");
+
+        const state = {
+          menu: initialMenu,
+          sectionObserver: null,
+          countdownTimer: null,
+        };
+
+        const cart = new Map();
+
+       function showMenuScreen() {
+          menuActions.hidden = false;
+          menuActions.style.display = "flex";
+          menuActions.setAttribute("aria-hidden", "false");
+          layoutShell.hidden = false;
+          if (shareFooter) {
+            shareFooter.hidden = false;
+            shareFooter.style.display = "block";
+          }
+          layoutShell.hidden = false;
+          layoutShell.style.display = "block";
+          orderCard.hidden = true;
+          orderCard.style.display = "none";
+        }
 
         function updateCountdown() {
-          if (!countdownPill) return;
-          const expires = new Date(countdownPill.dataset.expires || "");
+          const expires = new Date(shareCountdown.dataset.expires || "");
           if (Number.isNaN(expires.getTime())) {
-            countdownPill.textContent = "Link active";
+            shareCountdown.textContent = "Link active";
             return;
           }
           const remaining = Math.max(0, Math.floor((expires - new Date()) / 1000));
           if (remaining <= 0) {
-            countdownPill.textContent = "Link expired";
+            shareCountdown.textContent = "Link expired";
             return;
           }
           const hours = Math.floor(remaining / 3600);
           const minutes = Math.floor((remaining % 3600) / 60);
-          countdownPill.textContent = `Expires in ${hours}h ${minutes}m`;
+          shareCountdown.textContent = `Expires in ${hours}h ${minutes}m`;
         }
 
         updateCountdown();
-        if (parseInt(countdownPill?.dataset.remaining || "0", 10) > 0) {
-          setInterval(updateCountdown, 60000);
+        if (parseInt(shareCountdown.dataset.remaining || "0", 10) > 0) {
+          state.countdownTimer = setInterval(updateCountdown, 60000);
         }
 
-        copyButton?.addEventListener("click", async () => {
+        function renderSections() {
+          sectionsContainer.innerHTML = "";
+          sectionNav.innerHTML = "";
+
+          if (!state.menu || !state.menu.sections?.length) {
+            emptyState.hidden = false;
+            return;
+          }
+          emptyState.hidden = true;
+
+          if (state.sectionObserver) {
+            state.sectionObserver.disconnect();
+            state.sectionObserver = null;
+          }
+
+          const navButtons = [];
+          const setActiveNav = (targetId) => {
+            navButtons.forEach((button) => {
+              button.dataset.active = button.dataset.target === targetId ? "true" : "false";
+            });
+          };
+
+          state.menu.sections.forEach((section, index) => {
+            const anchor = `section-${index}`;
+            const navButton = document.createElement("button");
+            navButton.type = "button";
+            navButton.textContent = `${section.title}`;
+            navButton.dataset.target = anchor;
+            if (index === 0) {
+              navButton.dataset.active = "true";
+            }
+            navButton.addEventListener("click", () => {
+              setActiveNav(anchor);
+              document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            sectionNav.appendChild(navButton);
+            navButtons.push(navButton);
+
+            const sectionCard = document.createElement("section");
+            sectionCard.className = "section-card";
+            sectionCard.id = anchor;
+
+            const title = document.createElement("h3");
+            title.className = "section-title";
+            title.textContent = section.title;
+            sectionCard.appendChild(title);
+
+            const list = document.createElement("ul");
+            list.className = "dish-list";
+
+            section.dishes.forEach((dish) => {
+              const key = buildKey(section.title, dish.original_name);
+              const template = document.getElementById("dish-template");
+              if (!template) {
+                return;
+              }
+              const node = template.content.firstElementChild.cloneNode(true);
+              node.dataset.section = section.title;
+              node.dataset.original = dish.original_name;
+              node.dataset.translated = dish.translated_name;
+              node.dataset.price = dish.price || "";
+              node.dataset.key = key;
+
+              node.querySelector(".translated-name").textContent = dish.translated_name;
+              node.querySelector(".original-name").textContent = dish.original_name;
+              const priceTag = node.querySelector(".price-tag");
+              priceTag.textContent = dish.price || "";
+              priceTag.hidden = !dish.price;
+              node.querySelector(".dish-description").textContent = dish.description || "";
+              list.appendChild(node);
+            });
+
+            sectionCard.appendChild(list);
+            sectionsContainer.appendChild(sectionCard);
+          });
+
+          const sectionElements = Array.from(sectionsContainer.querySelectorAll(".section-card"));
+          if (sectionElements.length) {
+            setActiveNav(sectionElements[0].id);
+            const observer = new IntersectionObserver(
+              (entries) => {
+                const visible = entries
+                  .filter((entry) => entry.isIntersecting)
+                  .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+                if (visible) {
+                  setActiveNav(visible.target.id);
+                }
+              },
+              {
+                root: null,
+                rootMargin: "-45% 0px -45% 0px",
+                threshold: [0, 0.2, 0.6],
+              }
+            );
+            sectionElements.forEach((section) => observer.observe(section));
+            state.sectionObserver = observer;
+          }
+        }
+
+        function buildKey(sectionTitle, originalName) {
+          return `${encodeURIComponent(sectionTitle)}::${encodeURIComponent(originalName)}`;
+        }
+
+        function extractDishData(dishCard) {
+          const key = dishCard.dataset.key || "";
+          const sectionTitle = dishCard.dataset.section || "";
+          const originalName = dishCard.dataset.original || "";
+          const translatedName = dishCard.dataset.translated || "";
+          const priceDisplay = dishCard.dataset.price || "";
+          const parsedPrice = parsePrice(priceDisplay);
+          return {
+            key,
+            sectionTitle,
+            originalName,
+            translatedName,
+            priceDisplay,
+            priceValue: parsedPrice.value,
+            priceCurrencySymbol: parsedPrice.symbol,
+            priceCurrencyPosition: parsedPrice.position,
+          };
+        }
+
+        function setDishQuantity(dishCard, quantity) {
+          const {
+            key,
+            sectionTitle,
+            originalName,
+            translatedName,
+            priceDisplay,
+            priceValue,
+            priceCurrencySymbol,
+            priceCurrencyPosition,
+          } = extractDishData(dishCard);
+          if (!state.menu) {
+            return;
+          }
+          if (quantity <= 0) {
+            cart.delete(key);
+            updateDishCardUI(dishCard, 0);
+          } else {
+            cart.set(key, {
+              key,
+              sectionTitle,
+              originalName,
+              translatedName,
+              priceDisplay,
+              priceValue,
+              priceCurrencySymbol,
+              priceCurrencyPosition,
+              quantity,
+            });
+            updateDishCardUI(dishCard, quantity);
+          }
+          updateCartUI();
+        }
+
+        function adjustDishQuantity(dishCard, delta) {
+          const current = Number(dishCard.dataset.quantity || "0");
+          const next = Math.max(0, current + delta);
+          setDishQuantity(dishCard, next);
+        }
+
+        function updateDishCardUI(dishCard, quantity) {
+          dishCard.dataset.quantity = String(quantity);
+          const addButton = dishCard.querySelector(".add-button");
+          const controls = dishCard.querySelector(".quantity-controls");
+          const qtyDisplay = dishCard.querySelector(".quantity-display");
+          if (!addButton || !controls || !qtyDisplay) {
+            return;
+          }
+          if (quantity > 0) {
+            addButton.style.display = "none";
+            controls.dataset.active = "true";
+          } else {
+            addButton.style.display = "inline-flex";
+            controls.dataset.active = "false";
+          }
+          qtyDisplay.textContent = String(quantity);
+        }
+
+        function updateCartUI() {
+          const items = Array.from(cart.values());
+          const total = items.reduce((sum, item) => sum + item.quantity, 0);
+          if (!items.length) {
+            cartSummaryButton.disabled = true;
+            menuSummaryCount.textContent = "No dishes selected";
+            menuSummaryPrice.textContent = "";
+            generateOrderButton.disabled = true;
+            clearCartButton.disabled = true;
+            if (cartDialog?.open) {
+              renderCartDialog();
+            }
+            return;
+          }
+
+          cartSummaryButton.disabled = false;
+          menuSummaryCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
+          generateOrderButton.disabled = false;
+          clearCartButton.disabled = false;
+          let totalPriceValue = 0;
+          let hasPrice = false;
+          let currencySymbol = null;
+          let currencyPosition = "prefix";
+          let currenciesConsistent = true;
+
+          items.forEach((item) => {
+            if (item.priceValue != null) {
+              hasPrice = true;
+              totalPriceValue += item.priceValue * item.quantity;
+              if (currencySymbol === null && item.priceCurrencySymbol) {
+                currencySymbol = item.priceCurrencySymbol;
+                currencyPosition = item.priceCurrencyPosition;
+              } else if (
+                item.priceCurrencySymbol &&
+                (item.priceCurrencySymbol !== currencySymbol || item.priceCurrencyPosition !== currencyPosition)
+              ) {
+                currenciesConsistent = false;
+              }
+            }
+          });
+
+          if (!currenciesConsistent) {
+            currencySymbol = "";
+          }
+
+          if (hasPrice && totalPriceValue > 0) {
+            const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
+            menuSummaryPrice.textContent = `Total price: ${formatted}`;
+          } else {
+            menuSummaryPrice.textContent = "";
+          }
+
+          if (cartDialog?.open) {
+            renderCartDialog();
+          }
+        }
+
+        function renderCartDialog() {
+          if (!cartDialog || !cartDialogList || !cartDialogEmpty) {
+            return;
+          }
+          const items = Array.from(cart.values());
+          if (!items.length) {
+            cartDialogEmpty.hidden = false;
+            cartDialogList.innerHTML = "";
+            return;
+          }
+          cartDialogEmpty.hidden = true;
+          cartDialogList.innerHTML = items
+            .map((item) => {
+              const priceHtml = item.priceDisplay ? `<span>${escapeHtml(item.priceDisplay)}</span>` : "";
+              return `
+                <li class="cart-dialog-item">
+                  <div>
+                    <strong>${escapeHtml(item.translatedName)}</strong>
+                    <span>${escapeHtml(item.sectionTitle)}</span>
+                  </div>
+                  <div style="text-align:right; white-space:nowrap; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+                    <span>${item.quantity}×</span>
+                    ${priceHtml}
+                  </div>
+                </li>`;
+            })
+            .join("");
+        }
+
+        function clearSelections() {
+          cart.clear();
+          updateCartUI();
+          sectionsContainer.querySelectorAll(".dish-card").forEach((card) => updateDishCardUI(card, 0));
+        }
+
+        function buildOrderSummary() {
+          const lines = [];
+          cart.forEach((item) => {
+            lines.push(`${item.quantity} × ${item.originalName}`);
+          });
+          return lines.join("\n");
+        }
+
+        function escapeHtml(text) {
+          return String(text ?? "").replace(/[&<>\"']/g, (char) => {
+            const map = {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            };
+            return map[char] || char;
+          });
+        }
+
+        function parsePrice(raw) {
+          if (!raw) {
+            return { value: null, symbol: "", position: "prefix" };
+          }
+          const trimmed = String(raw).trim();
+          if (!trimmed) {
+            return { value: null, symbol: "", position: "prefix" };
+          }
+          const match = trimmed.match(/[0-9]+(?:[.,][0-9]{1,2})?/);
+          if (!match) {
+            return { value: null, symbol: "", position: "prefix" };
+          }
+          const numberPart = match[0].replace(/,/g, ".");
+          const value = Number.parseFloat(numberPart);
+          if (Number.isNaN(value)) {
+            return { value: null, symbol: "", position: "prefix" };
+          }
+          const startIndex = match.index ?? trimmed.indexOf(match[0]);
+          let symbol = "";
+          let position = "prefix";
+          if (startIndex > 0) {
+            symbol = trimmed.slice(0, startIndex).trim();
+          }
+          const endIndex = startIndex + match[0].length;
+          if (!symbol && endIndex < trimmed.length) {
+            symbol = trimmed.slice(endIndex).trim();
+            position = "suffix";
+          }
+          if (symbol.length > 4) {
+            symbol = symbol.slice(0, 4);
+          }
+          return { value, symbol, position };
+        }
+
+        function formatTotalPrice(value, symbol, position) {
+          const hasFraction = Math.abs(value - Math.round(value)) > 0.001;
+          const formatted = value.toLocaleString(undefined, {
+            minimumFractionDigits: hasFraction ? 2 : 0,
+            maximumFractionDigits: 2,
+          });
+          if (symbol) {
+            return position === "suffix" ? `${formatted}${symbol}` : `${symbol}${formatted}`;
+          }
+          return formatted;
+        }
+
+        cartSummaryButton.addEventListener("click", () => {
+          if (!cart.size) {
+            return;
+          }
+          renderCartDialog();
+          cartDialog.showModal();
+        });
+
+        closeCartDialogButton.addEventListener("click", () => {
+          cartDialog.close();
+        });
+
+       generateOrderButton.addEventListener("click", () => {
+         if (!cart.size) {
+           return;
+         }
+         const summary = buildOrderSummary();
+         orderNote.textContent = summary;
+          orderCard.hidden = false;
+          orderCard.style.display = "block";
+          layoutShell.hidden = true;
+          layoutShell.style.display = "none";
+          if (shareFooter) {
+            shareFooter.hidden = true;
+            shareFooter.style.display = "none";
+          }
+          menuActions.hidden = true;
+          menuActions.style.display = "none";
+          menuActions.setAttribute("aria-hidden", "true");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        copyOrderButton.addEventListener("click", async () => {
           try {
-            await navigator.clipboard.writeText(shareUrl);
-            copyButton.textContent = "Link copied";
+            await navigator.clipboard.writeText(orderNote.textContent || "");
+            copyOrderButton.textContent = "Copied";
             setTimeout(() => {
-              copyButton.textContent = "Copy link";
+              copyOrderButton.textContent = "Copy note";
             }, 2000);
           } catch (error) {
             console.error(error);
           }
         });
 
-        openButton?.addEventListener("click", () => {
-          window.open(shareUrl, "_blank", "noopener");
+        clearCartButton.addEventListener("click", () => {
+          clearSelections();
         });
+
+        backToMenuButton.addEventListener("click", () => {
+          orderCard.hidden = true;
+          orderCard.style.display = "none";
+          showMenuScreen();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        sectionsContainer.addEventListener("click", (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) {
+            return;
+          }
+          const dishCard = target.closest(".dish-card");
+          if (!dishCard) {
+            return;
+          }
+          const action = target.dataset.action;
+          if (action === "add") {
+            setDishQuantity(dishCard, 1);
+          } else if (action === "increment") {
+            adjustDishQuantity(dishCard, 1);
+          } else if (action === "decrement") {
+            adjustDishQuantity(dishCard, -1);
+          }
+        });
+
+        renderSections();
+        clearSelections();
+        updateCartUI();
+        showMenuScreen();
       </script>
     {% endif %}
   </body>

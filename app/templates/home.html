@@ -25,6 +25,12 @@
         --radius-card: 18px;
         --radius-pill: 999px;
         --spacing: 18px;
+        --hero-height: 140px;
+        --hero-ring-inset: 24px;
+        --hero-ring-offset: 40px;
+        --hero-orbit-distance: 52px;
+        --hero-dot-size: 12px;
+        --hero-dot-radius: calc(var(--hero-dot-size) / 2);
         background-color: #f5f9ff;
       }
 
@@ -100,7 +106,7 @@
 
       .capture-card .hero-illustration {
         position: relative;
-        height: 160px;
+        height: var(--hero-height);
         border-radius: 16px;
         overflow: hidden;
         background: linear-gradient(140deg, rgba(47, 123, 255, 0.12), rgba(255, 131, 96, 0.18));
@@ -131,14 +137,14 @@
       }
       .travel-ring {
         position: absolute;
-        inset: 28px;
+        inset: var(--hero-ring-inset);
         border-radius: 50%;
         border: 1.5px dashed rgba(47, 123, 255, 0.38);
         animation: rotateRing 16s linear infinite;
       }
 
       .travel-ring--offset {
-        inset: 46px;
+        inset: var(--hero-ring-offset);
         border-style: solid;
         border-color: rgba(255, 131, 96, 0.26);
         opacity: 0.7;
@@ -147,14 +153,14 @@
 
       .travel-dot {
         position: absolute;
-        top: calc(50% - 7px);
-        left: calc(50% - 7px);
-        width: 14px;
-        height: 14px;
+        top: calc(50% - var(--hero-dot-radius));
+        left: calc(50% - var(--hero-dot-radius));
+        width: var(--hero-dot-size);
+        height: var(--hero-dot-size);
         border-radius: 50%;
         background: linear-gradient(135deg, #2f7bff, #1d5bdb);
         box-shadow: 0 0 0 4px rgba(47, 123, 255, 0.12), 0 6px 14px rgba(17, 42, 110, 0.25);
-        transform-origin: 7px 7px;
+        transform-origin: var(--hero-dot-radius) var(--hero-dot-radius);
         animation: orbitDot 7s ease-in-out infinite;
       }
 
@@ -164,6 +170,39 @@
         inset: 3px;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.6);
+      }
+
+      @media (max-width: 520px) {
+        :root {
+          --hero-height: 80px;
+          --hero-ring-inset: 12px;
+          --hero-ring-offset: 20px;
+          --hero-orbit-distance: 32px;
+          --hero-dot-size: 8px;
+          --hero-dot-radius: calc(var(--hero-dot-size) / 2);
+        }
+
+        .capture-card .hero-illustration::before {
+          width: 200px;
+          height: 200px;
+          top: -70px;
+          left: -70px;
+        }
+
+        .capture-card .hero-illustration::after {
+          width: 140px;
+          height: 140px;
+          bottom: -60px;
+          right: -60px;
+        }
+
+        .travel-ring {
+          border-width: 1.1px;
+        }
+
+        .travel-dot {
+          box-shadow: 0 0 0 2px rgba(47, 123, 255, 0.12), 0 3px 8px rgba(17, 42, 110, 0.18);
+        }
       }
 
       @keyframes rotateRing {
@@ -177,15 +216,15 @@
 
       @keyframes orbitDot {
         0% {
-          transform: rotate(0deg) translateX(64px);
+          transform: rotate(0deg) translateX(var(--hero-orbit-distance));
           opacity: 0.5;
         }
         50% {
-          transform: rotate(180deg) translateX(64px);
+          transform: rotate(180deg) translateX(var(--hero-orbit-distance));
           opacity: 1;
         }
         100% {
-          transform: rotate(360deg) translateX(64px);
+          transform: rotate(360deg) translateX(var(--hero-orbit-distance));
           opacity: 0.5;
         }
       }
@@ -233,20 +272,6 @@
         color: #ffffff;
         transform: translateY(-2px);
         box-shadow: 0 12px 24px rgba(29, 91, 219, 0.22);
-      }
-
-      .tips-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        align-self: flex-start;
-        color: var(--primary);
-        background: none;
-        border: none;
-        padding: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
       }
 
       .dropzone {
@@ -750,6 +775,12 @@
         font-size: 0.9rem;
         color: var(--primary-dark);
         cursor: pointer;
+        padding: 2px 4px;
+        line-height: 1;
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .quantity-controls button:focus-visible,
@@ -854,24 +885,6 @@
         background: rgba(15, 27, 57, 0.35);
       }
 
-      dialog.tips-dialog {
-        border: none;
-        border-radius: 18px;
-        max-width: 420px;
-        padding: 24px;
-        box-shadow: var(--shadow-card);
-      }
-
-      dialog.tips-dialog h2 {
-        margin: 0 0 12px;
-      }
-
-      dialog.tips-dialog ul {
-        margin: 0;
-        padding-left: 20px;
-        color: var(--text-muted);
-      }
-
       dialog.cart-dialog {
         border: none;
         border-radius: 18px;
@@ -966,7 +979,201 @@
           min-width: 200px;
         }
         .menu-actions-buttons button {
-          min-width: 150px;
+        min-width: 150px;
+      }
+      }
+
+      .menu-celebration {
+        position: fixed;
+        left: 50%;
+        bottom: calc(112px + env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .menu-celebration[data-active="false"] {
+        display: none;
+      }
+
+      .menu-celebration[data-active="true"] {
+        display: block;
+        animation: celebration-fade 1.8s ease-out forwards;
+      }
+
+      .menu-celebration::before {
+        content: "";
+        position: absolute;
+        inset: -26px -30px -36px -30px;
+        background: radial-gradient(circle at 50% 30%, rgba(47, 123, 255, 0.22), transparent 78%);
+        filter: blur(8px);
+        opacity: 0;
+      }
+
+      .menu-celebration[data-active="true"]::before {
+        animation: celebration-glow 1.2s ease-out forwards;
+      }
+
+      .celebration-tube {
+        width: 40px;
+        height: 58px;
+        border-radius: 12px 12px 20px 20px;
+        background: repeating-linear-gradient(
+          135deg,
+          rgba(255, 200, 87, 0.95) 0 16px,
+          rgba(255, 131, 96, 0.95) 16px 32px,
+          rgba(70, 130, 255, 0.92) 32px 48px
+        );
+        position: relative;
+        box-shadow: 0 18px 34px rgba(15, 27, 57, 0.22);
+        opacity: 0;
+        transform: translateY(16px) scale(0.82) rotate(-18deg);
+      }
+
+      .celebration-tube::before {
+        content: "";
+        position: absolute;
+        inset: 8px 6px 12px 6px;
+        border-radius: 10px 10px 16px 16px;
+        background: linear-gradient(140deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.1));
+      }
+
+      .celebration-tube::after {
+        content: "";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%) rotate(12deg);
+        width: 44px;
+        height: 20px;
+        border-radius: 999px;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(47, 123, 255, 0.22));
+        box-shadow: 0 8px 14px rgba(47, 123, 255, 0.18);
+        opacity: 0.9;
+      }
+
+      .menu-celebration[data-active="true"] .celebration-tube {
+        animation: tube-pop 0.65s cubic-bezier(0.36, 1, 0.3, 1) forwards;
+      }
+
+      .celebration-sparkles {
+        position: absolute;
+        left: 50%;
+        bottom: 54px;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+      }
+
+      .celebration-sparkles span {
+        --tx: 0px;
+        --ty: -80px;
+        --delay: 0ms;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 70%);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+        opacity: 0;
+        transform: translate(0, 0) scale(0.35);
+      }
+
+      .menu-celebration[data-active="true"] .celebration-sparkles span {
+        animation: sparkle-burst 1.2s ease-out forwards;
+        animation-delay: var(--delay);
+      }
+
+      .celebration-sparkles span:nth-child(1) {
+        --tx: -56px;
+        --ty: -110px;
+        --delay: 60ms;
+        background: radial-gradient(circle, rgba(66, 133, 244, 0.95), rgba(66, 133, 244, 0));
+      }
+
+      .celebration-sparkles span:nth-child(2) {
+        --tx: -32px;
+        --ty: -138px;
+        --delay: 0ms;
+        background: radial-gradient(circle, rgba(255, 171, 0, 0.95), rgba(255, 171, 0, 0));
+      }
+
+      .celebration-sparkles span:nth-child(3) {
+        --tx: -2px;
+        --ty: -148px;
+        --delay: 80ms;
+        background: radial-gradient(circle, rgba(250, 250, 250, 0.95), rgba(250, 250, 250, 0));
+      }
+
+      .celebration-sparkles span:nth-child(4) {
+        --tx: 26px;
+        --ty: -134px;
+        --delay: 110ms;
+        background: radial-gradient(circle, rgba(52, 211, 153, 0.95), rgba(52, 211, 153, 0));
+      }
+
+      .celebration-sparkles span:nth-child(5) {
+        --tx: 54px;
+        --ty: -108px;
+        --delay: 160ms;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.95), rgba(168, 85, 247, 0));
+      }
+
+      @keyframes tube-pop {
+        0% {
+          opacity: 0;
+          transform: translateY(18px) scale(0.75);
+        }
+        60% {
+          opacity: 1;
+          transform: translateY(-6px) scale(1.04);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1) rotate(-12deg);
+        }
+      }
+
+      @keyframes celebration-fade {
+        0% {
+          opacity: 1;
+        }
+        75% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes celebration-glow {
+        0% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+        55% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes sparkle-burst {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.35);
+        }
+        35% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--tx), var(--ty)) scale(0.85);
         }
       }
     </style>
@@ -978,8 +1185,8 @@
           <span aria-hidden="true">←</span>
           <span>Mainu on-the-go</span>
         </button>
-        <h1 class="hero-title">One menu, zero confusion</h1>
-        <p class="hero-tagline" id="hero-tagline">Plan tonight's dinner together.</p>
+        <h1 class="hero-title">Make it easy to order</h1>
+        <p class="hero-tagline" id="hero-tagline">Order with ease, in the language you know best!</p>
       </header>
 
       <section class="card capture-card screen" data-screen="capture">
@@ -989,18 +1196,15 @@
           <div class="travel-dot"></div>
         </div>
         <div>
-          <h2>Bring the menu aboard</h2>
-          <p>Snap the restaurant pages, pick a language, and we’ll craft a friendly menu for your crew.</p>
+          <h2>One menu, zero confusion</h2>
+          <p>Read the menu in your language and share with friends!</p>
         </div>
         <form id="upload-form" novalidate>
           <div>
-            <h3 style="margin: 0 0 8px; font-size: 1rem;">Share the menu in</h3>
+            <h3 style="margin: 0 0 8px; font-size: 1rem;">Read the menu in</h3>
             <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
             <input type="hidden" id="output-language" name="output_language" />
           </div>
-          <button type="button" class="tips-link" id="tips-button" aria-haspopup="dialog">
-            <span aria-hidden="true">✦</span> Tips for crisp shots
-          </button>
           <div class="dropzone" id="dropzone">
             <input
               id="menu-files"
@@ -1100,20 +1304,16 @@
       </div>
     </div>
 
-    <dialog class="tips-dialog" id="tips-dialog" aria-modal="true">
-      <form method="dialog" style="display:flex;flex-direction:column;gap:16px;">
-        <div>
-          <h2>Tips for crisp shots</h2>
-          <ul>
-            <li>Take photos straight on with good lighting – avoid strong shadows.</li>
-            <li>Capture each page edge-to-edge so dish names stay sharp.</li>
-            <li>Hold still for a second after tapping the shutter.</li>
-            <li>Snap extra angles if the menu is glossy or handwritten.</li>
-          </ul>
-        </div>
-        <button value="cancel" class="primary">Got it</button>
-      </form>
-    </dialog>
+    <div class="menu-celebration" id="menu-celebration" data-active="false" aria-hidden="true">
+      <div class="celebration-tube"></div>
+      <div class="celebration-sparkles" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
 
     <dialog class="cart-dialog" id="cart-dialog" aria-modal="true">
       <form method="dialog" class="cart-dialog-content">
@@ -1154,8 +1354,6 @@
       const captureActions = document.getElementById("capture-actions");
       const translateButton = document.getElementById("translate-button");
       const captureStatus = document.getElementById("capture-status");
-      const tipsDialog = document.getElementById("tips-dialog");
-      const tipsButton = document.getElementById("tips-button");
       const heroBackButton = document.getElementById("hero-back");
 
       const dropzone = document.getElementById("dropzone");
@@ -1190,11 +1388,11 @@
       const cartDialogList = document.getElementById("cart-dialog-list");
       const cartDialogEmpty = document.getElementById("cart-dialog-empty");
       const closeCartDialogButton = document.getElementById("close-cart-dialog");
+      const menuCelebration = document.getElementById("menu-celebration");
 
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
         { code: "", label: "Auto-detect" },
-        { code: "English", label: "English" },
         { code: "es", label: "Español" },
         { code: "zh-CN", label: "简体中文" },
         { code: "zh-TW", label: "繁體中文" },
@@ -1203,13 +1401,16 @@
         { code: "fr", label: "Français" },
         { code: "de", label: "Deutsch" },
         { code: "it", label: "Italiano" },
+        { code: "English", label: "English" },
       ];
 
       const taglineMessages = [
-        "Plan tonight's dinner together.",
-        "Keep everyone looped in, even on the move.",
-        "Share dishes before you reach the restaurant.",
-        "Feel confident ordering abroad.",
+        "用熟悉的语言点单更简单!",
+        "慣れた言葉で注文すれば、もっと簡単!",
+        "익숙한 언어로 주문하면 더 쉬워요!",
+        "Commander dans une langue familière, c’est plus simple !",
+        "Bestellen in einer vertrauten Sprache ist einfacher!",
+        "¡Pedir en un idioma familiar es más fácil!"
       ];
 
       let taglineIndex = 0;
@@ -1228,9 +1429,11 @@
         countdownTimer: null,
         sectionObserver: null,
         selectedLanguage: "",
+        shouldCelebrateMenu: false,
       };
 
       const cart = new Map();
+      let celebrationTimer = null;
 
       function showScreen(name) {
         screens.forEach((node, key) => {
@@ -1245,7 +1448,29 @@
         menuActions.hidden = !showMenu;
         menuActions.style.display = showMenu ? "flex" : "none";
         menuActions.setAttribute("aria-hidden", showMenu ? "false" : "true");
+        if (showMenu && state.shouldCelebrateMenu) {
+          playMenuCelebration();
+          state.shouldCelebrateMenu = false;
+        }
         heroBackButton.hidden = showCapture;
+      }
+
+      function playMenuCelebration() {
+        if (!menuCelebration) {
+          return;
+        }
+        if (celebrationTimer) {
+          clearTimeout(celebrationTimer);
+        }
+        menuCelebration.dataset.active = "false";
+        menuCelebration.setAttribute("aria-hidden", "true");
+        void menuCelebration.offsetWidth;
+        menuCelebration.dataset.active = "true";
+        menuCelebration.setAttribute("aria-hidden", "false");
+        celebrationTimer = window.setTimeout(() => {
+          menuCelebration.dataset.active = "false";
+          menuCelebration.setAttribute("aria-hidden", "true");
+        }, 1800);
       }
 
       function setWarning(message) {
@@ -1386,6 +1611,7 @@
           })
           .then((payload) => {
             renderResults(payload);
+            state.shouldCelebrateMenu = true;
             showScreen("menu");
           })
           .catch((error) => {
@@ -1758,7 +1984,7 @@
 
         if (hasPrice && totalPriceValue > 0) {
           const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
-          menuSummaryPrice.textContent = `Total ${formatted}`;
+          menuSummaryPrice.textContent = `Total price: ${formatted}`;
         } else {
           menuSummaryPrice.textContent = "";
         }
@@ -1808,6 +2034,7 @@
       function resetMenuView() {
         state.menu = null;
         state.share = null;
+        state.shouldCelebrateMenu = false;
         if (state.countdownTimer) {
           clearInterval(state.countdownTimer);
         }
@@ -1869,10 +2096,6 @@
       });
 
       translateButton.addEventListener("click", submitUpload);
-
-      tipsButton.addEventListener("click", () => {
-        tipsDialog.showModal();
-      });
 
       copyShareLink.addEventListener("click", async () => {
         if (!state.share?.url) return;

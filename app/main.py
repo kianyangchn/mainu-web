@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 
+import segno
 from .routes import router as menu_router
 from .routes.menu import get_share_service
 from .schemas import MenuTemplate
@@ -28,8 +29,8 @@ async def home(request: Request):
         request,
         "home.html",
         {
-            "title": "mainu Web",
-            "subtitle": "Translate menus on the go",
+            "title": "Mainu on-the-go",
+            "subtitle": "Make it easy to order",
         },
     )
 
@@ -62,6 +63,10 @@ async def share_view(request: Request, token: str):
             "created_at": record.created_at,
             "expires_at": record.expires_at,
             "expires_in_seconds": record.ttl_seconds,
+            "share_url": str(request.url),
+            "share_qr": segno.make_qr(str(request.url)).png_data_uri(
+                scale=4, dark="#1d5bdb", light="#f8fafc"
+            ),
             "is_expired": False,
         },
     )
