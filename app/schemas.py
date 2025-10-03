@@ -38,9 +38,24 @@ class MenuProcessingResponse(BaseModel):
     """Response payload after processing uploaded menus."""
 
     template: MenuTemplate
+    detected_language: str | None = Field(
+        default=None,
+        description="Temporary debug field exposing the derived output language. Remove before GA.",
+    )
+
+
+class ShareMenuRequest(BaseModel):
+    """Request body for minting a share token on demand."""
+
+    template: MenuTemplate
+
+
+class ShareMenuResponse(BaseModel):
+    """Response payload containing share token details."""
+
     share_token: str
-    share_url: str | None = None
-    share_api_url: str | None = None
+    share_url: str
+    share_api_url: str
     share_qr: str | None = Field(
         default=None,
         description="PNG data URI for scanning the shared menu.",
@@ -50,8 +65,4 @@ class MenuProcessingResponse(BaseModel):
     )
     share_expires_in_seconds: int = Field(
         description="Seconds remaining before the share link expires."
-    )
-    detected_language: str | None = Field(
-        default=None,
-        description="Temporary debug field exposing the derived output language. Remove before GA.",
     )

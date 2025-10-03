@@ -568,12 +568,13 @@
       }
 
       .share-qr {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(29, 91, 219, 0.08);
+        display: grid;
+        place-items: center;
+        background: rgba(29, 91, 219, 0.06);
         border-radius: 14px;
-        padding: 12px 16px;
+        padding: 14px;
+        min-height: 152px;
+        position: relative;
       }
 
       .share-qr img {
@@ -582,6 +583,45 @@
         border-radius: 12px;
         background: white;
         padding: 8px;
+        box-shadow: 0 6px 16px rgba(14, 31, 86, 0.08);
+      }
+
+      .share-qr-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, rgba(29, 91, 219, 0.12), rgba(29, 91, 219, 0.04));
+        border: 2px dashed rgba(29, 91, 219, 0.25);
+        display: grid;
+        place-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .share-qr-placeholder::before,
+      .share-qr-placeholder::after {
+        content: "";
+        position: absolute;
+        background: rgba(29, 91, 219, 0.6);
+        border-radius: 999px;
+      }
+
+      .share-qr-placeholder::before {
+        width: 40px;
+        height: 6px;
+      }
+
+      .share-qr-placeholder::after {
+        width: 6px;
+        height: 40px;
+      }
+
+      .share-qr[data-state="placeholder"] img {
+        display: none;
+      }
+
+      .share-qr[data-state="ready"] .share-qr-placeholder {
+        display: none;
       }
 
       .share-link-btn {
@@ -597,11 +637,34 @@
         font-size: 1rem;
         cursor: pointer;
         transition: transform 0.18s ease;
+        position: relative;
       }
 
       .share-link-btn:hover,
       .share-link-btn:focus-visible {
         transform: translateY(-1px);
+      }
+
+      .share-link-btn[data-loading="true"] {
+        pointer-events: none;
+      }
+
+      .share-link-btn[data-loading="true"]::after {
+        content: "";
+        position: absolute;
+        right: 16px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        animation: share-spin 0.9s linear infinite;
+      }
+
+      @keyframes share-spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       .menu-results-layout {
@@ -1267,8 +1330,9 @@
             </div>
           </div>
         <div class="summary-share" id="summary-share">
-          <button type="button" class="share-link-btn" id="copy-share-link">Copy share link</button>
-          <div class="share-qr" id="share-qr" hidden>
+          <button type="button" class="share-link-btn" id="share-menu-button">Share the menu</button>
+          <div class="share-qr" id="share-qr" data-state="placeholder" aria-live="polite">
+            <div class="share-qr-placeholder" id="share-qr-placeholder" aria-hidden="true"></div>
             <img id="share-qr-image" alt="QR code to open this menu" />
           </div>
         </div>
@@ -1387,7 +1451,7 @@
       const detectedLanguagePill = document.getElementById("detected-language-pill");
       const shareCountdown = document.getElementById("share-countdown");
       const menuTitle = document.getElementById("menu-title");
-      const copyShareLink = document.getElementById("copy-share-link");
+      const shareMenuButton = document.getElementById("share-menu-button");
       const shareQrContainer = document.getElementById("share-qr");
       const shareQrImage = document.getElementById("share-qr-image");
       const sectionNav = document.getElementById("section-nav");
@@ -1445,14 +1509,19 @@
         files: [],
         menu: null,
         share: null,
+        detectedLanguage: null,
         countdownTimer: null,
         sectionObserver: null,
         selectedLanguage: "",
         shouldCelebrateMenu: false,
+        isSharing: false,
       };
 
       const cart = new Map();
       let celebrationTimer = null;
+      let shareButtonResetTimer = null;
+      const SHARE_BUTTON_DEFAULT_LABEL = "Share the menu";
+      const SHARE_BUTTON_SUCCESS_LABEL = "Link copied";
 
       function showScreen(name) {
         screens.forEach((node, key) => {
@@ -1490,6 +1559,94 @@
           menuCelebration.dataset.active = "false";
           menuCelebration.setAttribute("aria-hidden", "true");
         }, 1800);
+      }
+
+      function resetShareState() {
+        state.share = null;
+        state.isSharing = false;
+        if (state.countdownTimer) {
+          clearInterval(state.countdownTimer);
+          state.countdownTimer = null;
+        }
+        if (shareButtonResetTimer) {
+          clearTimeout(shareButtonResetTimer);
+          shareButtonResetTimer = null;
+        }
+        shareCountdown.hidden = true;
+        shareCountdown.textContent = "";
+        shareMenuButton.dataset.loading = "false";
+        shareMenuButton.disabled = false;
+        shareMenuButton.setAttribute("aria-busy", "false");
+        shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
+        shareQrImage.removeAttribute("src");
+        shareQrContainer.dataset.state = "placeholder";
+      }
+
+      function setShareButtonLoading(isLoading) {
+        shareMenuButton.dataset.loading = isLoading ? "true" : "false";
+        shareMenuButton.setAttribute("aria-busy", isLoading ? "true" : "false");
+        shareMenuButton.disabled = isLoading;
+      }
+
+      function applySharePayload(payload) {
+        state.share = {
+          token: payload.share_token,
+          url: payload.share_url,
+          apiUrl: payload.share_api_url,
+          qr: payload.share_qr,
+          expiresAt: new Date(payload.share_expires_at),
+          ttlSeconds: payload.share_expires_in_seconds,
+        };
+
+        if (state.share.qr) {
+          shareQrImage.src = state.share.qr;
+          shareQrContainer.dataset.state = "ready";
+        } else {
+          shareQrImage.removeAttribute("src");
+          shareQrContainer.dataset.state = "placeholder";
+        }
+
+        startShareCountdown();
+      }
+
+      function startShareCountdown() {
+        if (!state.share) {
+          return;
+        }
+        shareCountdown.hidden = false;
+        updateCountdown();
+        if (state.countdownTimer) {
+          clearInterval(state.countdownTimer);
+        }
+        state.countdownTimer = window.setInterval(updateCountdown, 1000);
+      }
+
+      function setShareButtonTemporaryLabel(label, duration = 2000) {
+        shareMenuButton.textContent = label;
+        if (shareButtonResetTimer) {
+          clearTimeout(shareButtonResetTimer);
+        }
+        shareButtonResetTimer = window.setTimeout(() => {
+          shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
+          shareButtonResetTimer = null;
+        }, duration);
+      }
+
+      function showShareCopiedFeedback() {
+        setShareButtonTemporaryLabel(SHARE_BUTTON_SUCCESS_LABEL);
+      }
+
+      async function writeShareLinkToClipboard(url) {
+        if (!url) {
+          return false;
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          return true;
+        } catch (error) {
+          console.error(error);
+          return false;
+        }
       }
 
       function setWarning(message) {
@@ -1644,44 +1801,16 @@
 
       function renderResults(payload) {
         state.menu = payload.template;
-        state.share = {
-          token: payload.share_token,
-          url: payload.share_url,
-          apiUrl: payload.share_api_url,
-          qr: payload.share_qr,
-          expiresAt: new Date(payload.share_expires_at),
-          ttlSeconds: payload.share_expires_in_seconds,
-          detectedLanguage: payload.detected_language,
-        };
+        state.detectedLanguage = payload.detected_language || null;
+        resetShareState();
 
         menuTitle.textContent = menuTitle.textContent?.trim() || "Order please";
 
-        if (state.share.detectedLanguage) {
-          detectedLanguagePill.textContent = `Serving in ${state.share.detectedLanguage}`;
+        if (state.detectedLanguage) {
+          detectedLanguagePill.textContent = `Serving in ${state.detectedLanguage}`;
           detectedLanguagePill.hidden = false;
         } else {
           detectedLanguagePill.hidden = true;
-        }
-
-        if (state.share.ttlSeconds > 0) {
-          shareCountdown.hidden = false;
-          updateCountdown();
-          if (state.countdownTimer) {
-            clearInterval(state.countdownTimer);
-          }
-          state.countdownTimer = setInterval(updateCountdown, 1000);
-        } else {
-          shareCountdown.hidden = true;
-        }
-
-        copyShareLink.dataset.url = state.share.url;
-
-        if (state.share.qr) {
-          shareQrImage.src = state.share.qr;
-          shareQrContainer.hidden = false;
-        } else {
-          shareQrImage.removeAttribute("src");
-          shareQrContainer.hidden = true;
         }
 
         renderSections();
@@ -1691,6 +1820,7 @@
 
       function updateCountdown() {
         if (!state.share) {
+          shareCountdown.hidden = true;
           return;
         }
         const remaining = Math.max(0, Math.floor((state.share.expiresAt - new Date()) / 1000));
@@ -2052,12 +2182,9 @@
 
       function resetMenuView() {
         state.menu = null;
-        state.share = null;
+        state.detectedLanguage = null;
+        resetShareState();
         state.shouldCelebrateMenu = false;
-        if (state.countdownTimer) {
-          clearInterval(state.countdownTimer);
-        }
-        state.countdownTimer = null;
         if (state.sectionObserver) {
           state.sectionObserver.disconnect();
           state.sectionObserver = null;
@@ -2065,9 +2192,6 @@
         sectionsContainer.innerHTML = "";
         sectionNav.innerHTML = "";
         detectedLanguagePill.hidden = true;
-        shareCountdown.hidden = true;
-        shareQrContainer.hidden = true;
-        shareQrImage.removeAttribute("src");
         menuActions.hidden = true;
         menuActions.style.display = "none";
         menuActions.setAttribute("aria-hidden", "true");
@@ -2116,16 +2240,56 @@
 
       translateButton.addEventListener("click", submitUpload);
 
-      copyShareLink.addEventListener("click", async () => {
-        if (!state.share?.url) return;
-        try {
-          await navigator.clipboard.writeText(state.share.url);
-          copyShareLink.textContent = "Link copied";
-          setTimeout(() => {
-            copyShareLink.textContent = "Copy share link";
-          }, 2000);
-        } catch (error) {
-          console.error(error);
+      shareMenuButton.addEventListener("click", async () => {
+        if (!state.menu) {
+          return;
+        }
+        if (state.isSharing) {
+          return;
+        }
+
+        if (!state.share) {
+          state.isSharing = true;
+          setShareButtonLoading(true);
+          shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
+
+          try {
+            const response = await fetch("/menu/share", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ template: state.menu }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Share failed with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+            applySharePayload(payload);
+
+            const copied = await writeShareLinkToClipboard(state.share?.url);
+            if (copied) {
+              showShareCopiedFeedback();
+            } else {
+              setShareButtonTemporaryLabel("Share link ready");
+            }
+          } catch (error) {
+            console.error(error);
+            setShareButtonTemporaryLabel("Tap to retry", 2500);
+          } finally {
+            state.isSharing = false;
+            setShareButtonLoading(false);
+          }
+          return;
+        }
+
+        const copied = await writeShareLinkToClipboard(state.share.url);
+        if (copied) {
+          showShareCopiedFeedback();
+        } else {
+          setShareButtonTemporaryLabel("Share link ready");
         }
       });
 
