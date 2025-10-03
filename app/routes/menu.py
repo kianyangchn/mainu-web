@@ -10,8 +10,13 @@ import segno
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 
 from app.config import settings
-from app.schemas import MenuProcessingResponse, MenuTemplate
-from app.services.llm import LLMMenuService
+from app.schemas import (
+    MenuProcessingResponse,
+    MenuTemplate,
+    ShareMenuRequest,
+    ShareMenuResponse,
+)
+from app.services.llm import LLMMenuService, MenuGenerationResult
 from app.services.share import ShareService
 
 router = APIRouter(prefix="/menu", tags=["menu"])
@@ -38,7 +43,6 @@ async def process_menu(
         default=None, alias="output_language"
     ),
     menu_service: LLMMenuService = Depends(get_menu_service),
-    share_service: ShareService = Depends(get_share_service),
 ) -> MenuProcessingResponse:
     if not files:
         raise HTTPException(status_code=400, detail="At least one image is required")
@@ -58,33 +62,43 @@ async def process_menu(
 
     output_language = requested_output_language or _detect_language(request)
     logger.debug("Processing menu with output language: %s", output_language)
-    template = await menu_service.generate_menu_template(
+    generation_result: MenuGenerationResult = await menu_service.generate_menu_template(
         contents,
         filenames,
         content_types,
         input_language=settings.input_language,
         output_language=output_language,
     )
+    return MenuProcessingResponse(
+        template=generation_result.template,
+        detected_language=output_language,
+    )
+
+
+@router.post("/share", response_model=ShareMenuResponse)
+async def create_share_link(
+    request: Request,
+    payload: ShareMenuRequest,
+    share_service: ShareService = Depends(get_share_service),
+) -> ShareMenuResponse:
     await share_service.purge_expired()
-    token = await share_service.create_template(template)
+    token = await share_service.create_template(payload.template)
     record = await share_service.describe(token)
     if record is None:
         raise RuntimeError("Share token expired unexpectedly")
+
     share_html_url = str(request.url_for("share_view", token=token))
     share_api_url = str(request.url_for("get_shared_menu", token=token))
-
     qr = segno.make_qr(share_html_url)
     qr_data = qr.png_data_uri(scale=4, dark="#1d5bdb", light="#f8fafc")
 
-    return MenuProcessingResponse(
-        template=template,
+    return ShareMenuResponse(
         share_token=token,
         share_url=share_html_url,
         share_api_url=share_api_url,
         share_qr=qr_data,
         share_expires_at=record.expires_at,
         share_expires_in_seconds=record.ttl_seconds,
-        detected_language=output_language,  # TODO: remove once locale debugging is complete.
     )
 
 

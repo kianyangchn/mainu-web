@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Iterable, List, Sequence
 
 from openai import AsyncOpenAI, OpenAIError
@@ -17,6 +18,14 @@ from app.services.prompt import (
     build_text_config,
     build_user_prompt,
 )
+
+
+@dataclass(frozen=True)
+class MenuGenerationResult:
+    """Structured result produced by the LLM generation flow."""
+
+    template: MenuTemplate
+    detected_input_language: str | None
 
 
 class LLMMenuService:
@@ -43,16 +52,26 @@ class LLMMenuService:
         *,
         input_language: str | None = None,
         output_language: str | None = None,
-    ) -> MenuTemplate:
+    ) -> MenuGenerationResult:
         """Invoke the multimodal LLM and coerce the response into a template."""
 
         if not images:
             raise ValueError("At least one image is required")
 
         file_ids = await self._upload_images(images, filenames, content_types)
+        detected_input_language = None
+        if file_ids:
+            detected_input_language = await self._detect_input_language(file_ids[0])
+
+        effective_input_language = (
+            (detected_input_language or "").strip()
+            or input_language
+            or settings.input_language
+        )
+
         schema_text = json.dumps(build_response_object_schema())
         user_prompt = build_user_prompt(
-            input_language or settings.input_language,
+            effective_input_language,
             output_language or settings.default_output_language,
         )
         request_content = _build_request_content(
@@ -78,7 +97,11 @@ class LLMMenuService:
             await self._delete_files(file_ids)
 
         payload = _extract_json_payload(response)
-        return _build_menu_template(payload)
+        template = _build_menu_template(payload)
+        return MenuGenerationResult(
+            template=template,
+            detected_input_language=(detected_input_language or "").strip() or None,
+        )
 
     async def _upload_images(
         self,
@@ -113,6 +136,32 @@ class LLMMenuService:
                 await self.client.files.delete(file_id)
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
+
+    async def _detect_input_language(self, file_id: str) -> str | None:
+        """Detect the dominant language present in the provided menu image."""
+
+        try:
+            response = await self.client.responses.create(
+                model="gpt-5-nano",
+                reasoning=build_reasoning_config(),
+                input=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": "detect what is the main language used in the menu. Only return the language name",
+                            },
+                            {"type": "input_image", "file_id": file_id},
+                        ],
+                    }
+                ],
+            )
+        except OpenAIError:  # pragma: no cover - detection best effort
+            return None
+
+        output_text = getattr(response, "output_text", None)
+        return str(output_text).strip() if output_text else None
 
 
 def _build_request_content(
