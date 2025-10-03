@@ -979,7 +979,201 @@
           min-width: 200px;
         }
         .menu-actions-buttons button {
-          min-width: 150px;
+        min-width: 150px;
+      }
+      }
+
+      .menu-celebration {
+        position: fixed;
+        left: 50%;
+        bottom: calc(112px + env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      .menu-celebration[data-active="false"] {
+        display: none;
+      }
+
+      .menu-celebration[data-active="true"] {
+        display: block;
+        animation: celebration-fade 1.8s ease-out forwards;
+      }
+
+      .menu-celebration::before {
+        content: "";
+        position: absolute;
+        inset: -26px -30px -36px -30px;
+        background: radial-gradient(circle at 50% 30%, rgba(47, 123, 255, 0.22), transparent 78%);
+        filter: blur(8px);
+        opacity: 0;
+      }
+
+      .menu-celebration[data-active="true"]::before {
+        animation: celebration-glow 1.2s ease-out forwards;
+      }
+
+      .celebration-tube {
+        width: 40px;
+        height: 58px;
+        border-radius: 12px 12px 20px 20px;
+        background: repeating-linear-gradient(
+          135deg,
+          rgba(255, 200, 87, 0.95) 0 16px,
+          rgba(255, 131, 96, 0.95) 16px 32px,
+          rgba(70, 130, 255, 0.92) 32px 48px
+        );
+        position: relative;
+        box-shadow: 0 18px 34px rgba(15, 27, 57, 0.22);
+        opacity: 0;
+        transform: translateY(16px) scale(0.82) rotate(-18deg);
+      }
+
+      .celebration-tube::before {
+        content: "";
+        position: absolute;
+        inset: 8px 6px 12px 6px;
+        border-radius: 10px 10px 16px 16px;
+        background: linear-gradient(140deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.1));
+      }
+
+      .celebration-tube::after {
+        content: "";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%) rotate(12deg);
+        width: 44px;
+        height: 20px;
+        border-radius: 999px;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(47, 123, 255, 0.22));
+        box-shadow: 0 8px 14px rgba(47, 123, 255, 0.18);
+        opacity: 0.9;
+      }
+
+      .menu-celebration[data-active="true"] .celebration-tube {
+        animation: tube-pop 0.65s cubic-bezier(0.36, 1, 0.3, 1) forwards;
+      }
+
+      .celebration-sparkles {
+        position: absolute;
+        left: 50%;
+        bottom: 54px;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+      }
+
+      .celebration-sparkles span {
+        --tx: 0px;
+        --ty: -80px;
+        --delay: 0ms;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 70%);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+        opacity: 0;
+        transform: translate(0, 0) scale(0.35);
+      }
+
+      .menu-celebration[data-active="true"] .celebration-sparkles span {
+        animation: sparkle-burst 1.2s ease-out forwards;
+        animation-delay: var(--delay);
+      }
+
+      .celebration-sparkles span:nth-child(1) {
+        --tx: -56px;
+        --ty: -110px;
+        --delay: 60ms;
+        background: radial-gradient(circle, rgba(66, 133, 244, 0.95), rgba(66, 133, 244, 0));
+      }
+
+      .celebration-sparkles span:nth-child(2) {
+        --tx: -32px;
+        --ty: -138px;
+        --delay: 0ms;
+        background: radial-gradient(circle, rgba(255, 171, 0, 0.95), rgba(255, 171, 0, 0));
+      }
+
+      .celebration-sparkles span:nth-child(3) {
+        --tx: -2px;
+        --ty: -148px;
+        --delay: 80ms;
+        background: radial-gradient(circle, rgba(250, 250, 250, 0.95), rgba(250, 250, 250, 0));
+      }
+
+      .celebration-sparkles span:nth-child(4) {
+        --tx: 26px;
+        --ty: -134px;
+        --delay: 110ms;
+        background: radial-gradient(circle, rgba(52, 211, 153, 0.95), rgba(52, 211, 153, 0));
+      }
+
+      .celebration-sparkles span:nth-child(5) {
+        --tx: 54px;
+        --ty: -108px;
+        --delay: 160ms;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.95), rgba(168, 85, 247, 0));
+      }
+
+      @keyframes tube-pop {
+        0% {
+          opacity: 0;
+          transform: translateY(18px) scale(0.75);
+        }
+        60% {
+          opacity: 1;
+          transform: translateY(-6px) scale(1.04);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1) rotate(-12deg);
+        }
+      }
+
+      @keyframes celebration-fade {
+        0% {
+          opacity: 1;
+        }
+        75% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes celebration-glow {
+        0% {
+          opacity: 0;
+          transform: scale(0.55);
+        }
+        55% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes sparkle-burst {
+        0% {
+          opacity: 0;
+          transform: translate(0, 0) scale(0.35);
+        }
+        35% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--tx), var(--ty)) scale(0.85);
         }
       }
     </style>
@@ -1007,7 +1201,7 @@
         </div>
         <form id="upload-form" novalidate>
           <div>
-            <h3 style="margin: 0 0 8px; font-size: 1rem;">Transfer the menu to</h3>
+            <h3 style="margin: 0 0 8px; font-size: 1rem;">Read the menu in</h3>
             <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
             <input type="hidden" id="output-language" name="output_language" />
           </div>
@@ -1109,6 +1303,18 @@
         <button type="button" class="secondary" id="clear-cart" disabled>Clear selections</button>
       </div>
     </div>
+
+    <div class="menu-celebration" id="menu-celebration" data-active="false" aria-hidden="true">
+      <div class="celebration-tube"></div>
+      <div class="celebration-sparkles" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
     <dialog class="cart-dialog" id="cart-dialog" aria-modal="true">
       <form method="dialog" class="cart-dialog-content">
         <header class="cart-dialog-header">
@@ -1182,6 +1388,7 @@
       const cartDialogList = document.getElementById("cart-dialog-list");
       const cartDialogEmpty = document.getElementById("cart-dialog-empty");
       const closeCartDialogButton = document.getElementById("close-cart-dialog");
+      const menuCelebration = document.getElementById("menu-celebration");
 
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
@@ -1222,9 +1429,11 @@
         countdownTimer: null,
         sectionObserver: null,
         selectedLanguage: "",
+        shouldCelebrateMenu: false,
       };
 
       const cart = new Map();
+      let celebrationTimer = null;
 
       function showScreen(name) {
         screens.forEach((node, key) => {
@@ -1239,7 +1448,29 @@
         menuActions.hidden = !showMenu;
         menuActions.style.display = showMenu ? "flex" : "none";
         menuActions.setAttribute("aria-hidden", showMenu ? "false" : "true");
+        if (showMenu && state.shouldCelebrateMenu) {
+          playMenuCelebration();
+          state.shouldCelebrateMenu = false;
+        }
         heroBackButton.hidden = showCapture;
+      }
+
+      function playMenuCelebration() {
+        if (!menuCelebration) {
+          return;
+        }
+        if (celebrationTimer) {
+          clearTimeout(celebrationTimer);
+        }
+        menuCelebration.dataset.active = "false";
+        menuCelebration.setAttribute("aria-hidden", "true");
+        void menuCelebration.offsetWidth;
+        menuCelebration.dataset.active = "true";
+        menuCelebration.setAttribute("aria-hidden", "false");
+        celebrationTimer = window.setTimeout(() => {
+          menuCelebration.dataset.active = "false";
+          menuCelebration.setAttribute("aria-hidden", "true");
+        }, 1800);
       }
 
       function setWarning(message) {
@@ -1380,6 +1611,7 @@
           })
           .then((payload) => {
             renderResults(payload);
+            state.shouldCelebrateMenu = true;
             showScreen("menu");
           })
           .catch((error) => {
@@ -1802,6 +2034,7 @@
       function resetMenuView() {
         state.menu = null;
         state.share = null;
+        state.shouldCelebrateMenu = false;
         if (state.countdownTimer) {
           clearInterval(state.countdownTimer);
         }
