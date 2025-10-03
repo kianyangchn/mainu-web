@@ -29,8 +29,8 @@ async def home(request: Request):
         request,
         "home.html",
         {
-            "title": "mainu Web",
-            "subtitle": "Translate menus on the go",
+            "title": "Mainu on-the-go",
+            "subtitle": "Make it easy to order",
         },
     )
 
