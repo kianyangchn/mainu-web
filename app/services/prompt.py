@@ -5,28 +5,29 @@ from __future__ import annotations
 from copy import deepcopy
 
 __all__ = [
-    "SYSTEM_INSTRUCTIONS",
     "JSON_SCHEMA_NAME",
     "RESPONSE_JSON_SCHEMA",
     "build_response_object_schema",
     "build_text_format_config",
     "build_text_config",
     "build_reasoning_config",
-    "build_user_prompt",
+    "STAGE_ONE_SYSTEM_INSTRUCTIONS",
+    "STAGE_TWO_SYSTEM_INSTRUCTIONS"
 ]
 
-SYSTEM_INSTRUCTIONS = (
-    "You convert raw OCR menu text into structured menu data. Follow these rules strictly: "
-    "1) Extract distinct dish names from the text. "
-    "2) Preserve the original dish wording in `original_name` and translate it into the requested "
-    "output language for `translated_name`. "
-    "3) For each dish, write a short descriptive sentence in the output language that includes "
-    "typical ingredients, preparation method, and expected flavour profile (for example sweet, "
-    "savory, spicy). Use natural phrasing rather than bullet lists."
-    "4) extract the price of each dishes if listed in menu "
-    "5) extract the section if exsits, e.g. main dish; dessert; soup; etc. Translate to the short words. By default `menu` "
-    "6) Return only a JSON array and ensure every object contains `section`, `original_name`, `translated_name`, "
-    "`description` and `price`. No extra commentary or keys."
+STAGE_ONE_SYSTEM_INSTRUCTIONS = (
+    "You are a meticulous transcription assistant for restaurant menus. "
+    "You can recognize menus written in different languages. "
+    "You can extract every dish exactly as written without translating names. "
+    "You can also extract information such as dish category, price if available. "
+    "Even the photo can be blurry, you always try your best."
+)
+
+STAGE_TWO_SYSTEM_INSTRUCTIONS = (
+    "You are an traveller expert and language master. You are familiar with the language and food culture of the world. "
+    "You are able to understand the menu and translate it into the target language. "
+    "With knowledge of the food and cultural, you can explain the dishes well in any language. "
+    "You should always follow the instructions and return in expected json format."
 )
 
 JSON_SCHEMA_NAME = "menu_items"
@@ -110,17 +111,3 @@ def build_reasoning_config() -> dict[str, object]:
     """Return reasoning configuration for the OpenAI Responses API."""
 
     return {"effort": "low"}
-
-
-def build_user_prompt(lang_in: str | None, lang_out: str) -> str:
-    """Return the prompt used for OpenAI call."""
-
-    language_hint = [
-        f"Input language: {lang_in if lang_in else 'unspecified (detect automatically)'}",
-        f"Output language: {lang_out}",
-    ]
-    return (
-        "Review all the menu pages. Combine related lines when appropriate and produce "
-        "a JSON array of menu items that follows the schema.\n"
-        + "\n".join(language_hint)
-    )
