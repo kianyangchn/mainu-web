@@ -12,13 +12,11 @@ from openai import AsyncOpenAI, OpenAIError
 from app.config import settings
 from app.schemas import MenuDish, MenuSection, MenuTemplate
 from app.services.prompt import (
-    SYSTEM_INSTRUCTIONS,
     build_reasoning_config,
-    build_response_object_schema,
     build_text_config,
-    build_user_prompt,
+    STAGE_ONE_SYSTEM_INSTRUCTIONS,
+    STAGE_TWO_SYSTEM_INSTRUCTIONS
 )
-
 
 @dataclass(frozen=True)
 class MenuGenerationResult:
@@ -58,34 +56,24 @@ class LLMMenuService:
         if not images:
             raise ValueError("At least one image is required")
 
+        detected_input_language: str | None = None
+
         file_ids = await self._upload_images(images, filenames, content_types)
-        detected_input_language = None
-        if file_ids:
-            detected_input_language = await self._detect_input_language(file_ids[0])
-
-        effective_input_language = (
-            (detected_input_language or "").strip()
-            or input_language
-            or settings.input_language
-        )
-
-        schema_text = json.dumps(build_response_object_schema())
-        user_prompt = build_user_prompt(
-            effective_input_language,
-            output_language or settings.default_output_language,
-        )
-        request_content = _build_request_content(
-            file_ids, filenames, user_prompt, schema_text
-        )
-
         try:
+            transcription = await self._extract_menu_transcription(file_ids, input_language)
+
+            stage_two_content = _build_stage_two_content(
+                transcription=transcription,
+                lang_out=output_language or settings.default_output_language
+            )
+
             response = await self.client.responses.create(
                 model=settings.openai_model,
-                instructions=SYSTEM_INSTRUCTIONS,
+                instructions=STAGE_TWO_SYSTEM_INSTRUCTIONS,
                 input=[
                     {
                         "role": "user",
-                        "content": request_content,
+                        "content": stage_two_content,
                     }
                 ],
                 text=build_text_config(),
@@ -137,64 +125,93 @@ class LLMMenuService:
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
 
-    async def _detect_input_language(self, file_id: str) -> str | None:
-        """Detect the dominant language present in the provided menu image."""
+    async def _extract_menu_transcription(self,file_ids: Sequence[str], lang_in: str | None) -> str:
+        """Use the LLM to extract raw dish lines from the provided images."""
 
-        try:
-            response = await self.client.responses.create(
-                model="gpt-5-nano",
-                reasoning=build_reasoning_config(),
-                input=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "input_text",
-                                "text": "detect what is the main language used in the menu. Only return the language name",
-                            },
-                            {"type": "input_image", "file_id": file_id},
-                        ],
-                    }
-                ],
-            )
-        except OpenAIError:  # pragma: no cover - detection best effort
-            return None
+        if not file_ids:
+            return ""
+
+        content = _build_stage_one_content(file_ids, lang_in)
+
+        response = await self.client.responses.create(
+            model=settings.openai_model,
+            instructions=STAGE_ONE_SYSTEM_INSTRUCTIONS,
+            input=[{"role": "user", "content": content}],
+            reasoning=build_reasoning_config(),
+        )
 
         output_text = getattr(response, "output_text", None)
-        return str(output_text).strip() if output_text else None
+        if not output_text:
+            raise RuntimeError("OpenAI response returned empty output_text")
+        return str(output_text).strip()
 
 
-def _build_request_content(
-    file_ids: Sequence[str],
-    filenames: Sequence[str] | None,
-    user_prompt: str,
-    schema_text: str,
-) -> List[dict]:
-    """Construct multimodal content referencing uploaded file IDs."""
+def _build_stage_one_content(file_ids: Sequence[str], lang_in: str | None) -> List[dict]:
+    """Construct the request payload for the transcription stage."""
+    if lang_in:
+        language_hint = f"Review every photos of the menu written in {lang_in}"
+        language_tag = ""
+    else:
+        language_hint = (
+            "Review every attached menu photo. First recognize the language used to write the menu. "
+            "If there're several languages, choose the most common one. "
+        )
+        language_tag = (
+            "After listing all dishes, "
+            "append a final line that reads exactly 'the menu is written in <language of the "
+            "menu you recognized>'."
+        )
+    recognize_rule = (
+    "Then for each dish you see, output a single "
+    "line formatted as '<section> | <dish name> | <price>'. Repeat the section "
+    "for each dish; if no section is provided, use 'Menu'. Keep dish names in the "
+    "original language and do not translate anything. Use 'N/A' when the price is "
+    "missing. Do not add numbering or bullet characters. "
+    )
+    content: List[dict] = [
+        {"type": "input_text", "text": language_hint},
+        {"type": "input_text", "text": recognize_rule},
+    ]
+    if language_tag:
+        content.append({"type": "input_text", "text": language_tag})
+    for file_id in file_ids:
+        content.append({"type": "input_image", "file_id": file_id})
+    return content
+
+
+def _build_stage_two_content(transcription: str, lang_out: str) -> List[dict]:
+    """Prepare the second-stage request using text-only input."""
+
+    intro = (
+        "Use the following transcription of menu sections, dish names, and prices "
+        "that was extracted from images to build a structured menu data." 
+        "Each line follows '<section> | <dish name> | "
+        "<price>' and prices may be 'N/A' when unavailable. "
+        "The langauge of the menu is declared in the end of the transcription. "
+    )
+    safe_transcription = transcription.strip() or "No dish lines were extracted."
+    safe_transcription = (
+        f"--- transcription start --- \n {safe_transcription} \n --- transcription end --- \n"
+    )
+    structure_rule = (
+        "To structure menu data. Follow these rules strictly: "
+        "1) Extract distinct dish names from the text. "
+        "2) PRESERVE the original dish wording in `original_name` and translate it into  "
+        f"{lang_out} for `translated_name`. "
+        f"3) For each dish, write a short descriptive sentence in the {lang_out} that includes "
+        "typical ingredients, preparation method, and expected flavour profile (for example sweet, "
+        "savory, spicy). Use natural phrasing rather than bullet lists."
+        "4) extract the price of each dishes if listed. By default 0 "
+        "5) extract the section if exsits, e.g. main dish; dessert; soup; etc. Translate to the short words. By default `menu` "
+        "Return only a JSON array and ensure every object contains `section`, `original_name`, `translated_name`, "
+        "`description` and `price`. No extra commentary or keys."
+    )
 
     content: List[dict] = [
-        {"type": "input_text", "text": user_prompt},
-        {
-            "type": "input_text",
-            "text": (
-                "Return a JSON object matching this schema: "
-                f"{schema_text}. Do not include extra text."
-            ),
-        },
+        {"type": "input_text", "text": intro},
+        {"type": "input_text", "text": safe_transcription},
+        {"type": "input_text", "text": structure_rule},
     ]
-    for index, file_id in enumerate(file_ids):
-        name = (
-            filenames[index]
-            if filenames and index < len(filenames)
-            else f"page-{index + 1}"
-        )
-        content.append(
-            {
-                "type": "input_text",
-                "text": f"Image source: {name}",
-            }
-        )
-        content.append({"type": "input_image", "file_id": file_id})
     return content
 
 

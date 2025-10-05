@@ -71,7 +71,9 @@ async def process_menu(
     )
     return MenuProcessingResponse(
         template=generation_result.template,
-        detected_language=output_language,
+        detected_language=(
+            generation_result.detected_input_language or output_language
+        ),
     )
 
 
