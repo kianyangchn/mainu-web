@@ -695,17 +695,19 @@
 
       .section-nav {
         position: sticky;
-        top: env(safe-area-inset-top, 0px);
-        z-index: 5;
+        top: calc(env(safe-area-inset-top, 0px) + 8px);
+        z-index: 6;
         display: flex;
         gap: 10px;
         overflow-x: auto;
-        width: 100%;
+        width: calc(100% + 40px);
         justify-content: flex-start;
-        padding: 8px 8px;
-        background: #f7f9ff;
-        border-radius: 14px;
-        border: 1px solid rgba(29, 91, 219, 0.08);
+        margin: 0 -20px;
+        padding: 10px 20px;
+        background: rgba(247, 249, 255, 0.95);
+        backdrop-filter: blur(6px);
+        border-bottom: 1px solid rgba(29, 91, 219, 0.08);
+        box-shadow: 0 12px 32px rgba(17, 42, 110, 0.12);
       }
 
       .section-nav button {
