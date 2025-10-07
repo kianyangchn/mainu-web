@@ -15,7 +15,6 @@ class Settings(BaseSettings):
 
     openai_api_key: Optional[str] = None
     openai_model: str = "gpt-5-mini"
-    input_language: Optional[str] = None
     default_output_language: str = "English"
     share_token_ttl_minutes: int = 240  # 4 hours default
     database_url: Optional[str] = None

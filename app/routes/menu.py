@@ -66,14 +66,11 @@ async def process_menu(
         contents,
         filenames,
         content_types,
-        input_language=settings.input_language,
         output_language=output_language,
     )
     return MenuProcessingResponse(
         template=generation_result.template,
-        detected_language=(
-            generation_result.detected_input_language or output_language
-        ),
+        detected_language=None,
     )
 
 
