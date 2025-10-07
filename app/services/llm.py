@@ -59,31 +59,15 @@ class LLMMenuService:
 
         file_ids = await self._upload_images(images, filenames, content_types)
         try:
-            transcription = await self._transcribe_menu(file_ids)
-
-            stage_two_prompt = build_stage_two_prompt(
-                transcription=transcription,
-                output_language=output_language or settings.default_output_language,
-            )
-
-            response = await self.client.responses.create(
-                model=settings.openai_model,
-                instructions=stage_two_prompt.instructions,
-                input=[
-                    {
-                        "role": "user",
-                        "content": stage_two_prompt.content,
-                    }
-                ],
-                text=build_text_config(),
-                reasoning=build_reasoning_config(),
+            transcription = await self._run_stage_one(file_ids)
+            payload = await self._run_stage_two(
+                transcription, output_language or settings.default_output_language
             )
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
         finally:
             await self._delete_files(file_ids)
 
-        payload = _extract_json_payload(response)
         template = _build_menu_template(payload)
         return MenuGenerationResult(template=template)
 
@@ -121,7 +105,7 @@ class LLMMenuService:
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
 
-    async def _transcribe_menu(self, file_ids: Sequence[str]) -> str:
+    async def _run_stage_one(self, file_ids: Sequence[str]) -> str:
         """Run stage one of the pipeline to collect transcription and language."""
 
         if not file_ids:
@@ -137,6 +121,24 @@ class LLMMenuService:
         )
 
         return _extract_output_text(response)
+
+    async def _run_stage_two(self, transcription: str, output_language: str) -> dict:
+        """Run stage two of the pipeline to structure the transcription."""
+
+        prompt = build_stage_two_prompt(
+            transcription=transcription,
+            output_language=output_language,
+        )
+
+        response = await self.client.responses.create(
+            model=settings.openai_model,
+            instructions=prompt.instructions,
+            input=[{"role": "user", "content": prompt.content}],
+            text=build_text_config(),
+            reasoning=build_reasoning_config(),
+        )
+
+        return _extract_json_payload(response)
 
 
 def _extract_json_payload(response: object) -> dict:
