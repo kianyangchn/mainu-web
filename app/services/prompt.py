@@ -21,7 +21,7 @@ __all__ = [
     "build_text_format_config",
 ]
 
-LANGUAGE_MARKER = "MENU_LANGUAGE:"
+LANGUAGE_MARKER = "The menu is written in: "
 
 
 @dataclass(frozen=True)

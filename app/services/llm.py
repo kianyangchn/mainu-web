@@ -117,6 +117,7 @@ class LLMMenuService:
             model=settings.openai_model,
             instructions=prompt.instructions,
             input=[{"role": "user", "content": prompt.content}],
+            text={"verbosity": "low"},
             reasoning=build_reasoning_config(),
         )
 
