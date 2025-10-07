@@ -12,10 +12,10 @@ from openai import AsyncOpenAI, OpenAIError
 from app.config import settings
 from app.schemas import MenuDish, MenuSection, MenuTemplate
 from app.services.prompt import (
+    build_stage_one_prompt,
+    build_stage_two_prompt,
     build_reasoning_config,
     build_text_config,
-    STAGE_ONE_SYSTEM_INSTRUCTIONS,
-    STAGE_TWO_SYSTEM_INSTRUCTIONS
 )
 
 @dataclass(frozen=True)
@@ -23,13 +23,15 @@ class MenuGenerationResult:
     """Structured result produced by the LLM generation flow."""
 
     template: MenuTemplate
-    detected_input_language: str | None
 
 
 class LLMMenuService:
     """Service responsible for converting menu images into structured templates."""
 
-    def __init__(self, client: AsyncOpenAI | None = None) -> None:
+    def __init__(
+        self,
+        client: AsyncOpenAI | None = None,
+    ) -> None:
         self._client = client
 
     @property
@@ -48,7 +50,6 @@ class LLMMenuService:
         filenames: Sequence[str] | None = None,
         content_types: Sequence[str] | None = None,
         *,
-        input_language: str | None = None,
         output_language: str | None = None,
     ) -> MenuGenerationResult:
         """Invoke the multimodal LLM and coerce the response into a template."""
@@ -56,40 +57,19 @@ class LLMMenuService:
         if not images:
             raise ValueError("At least one image is required")
 
-        detected_input_language: str | None = None
-
         file_ids = await self._upload_images(images, filenames, content_types)
         try:
-            transcription = await self._extract_menu_transcription(file_ids, input_language)
-
-            stage_two_content = _build_stage_two_content(
-                transcription=transcription,
-                lang_out=output_language or settings.default_output_language
-            )
-
-            response = await self.client.responses.create(
-                model=settings.openai_model,
-                instructions=STAGE_TWO_SYSTEM_INSTRUCTIONS,
-                input=[
-                    {
-                        "role": "user",
-                        "content": stage_two_content,
-                    }
-                ],
-                text=build_text_config(),
-                reasoning=build_reasoning_config(),
+            transcription = await self._run_stage_one(file_ids)
+            payload = await self._run_stage_two(
+                transcription, output_language or settings.default_output_language
             )
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
         finally:
             await self._delete_files(file_ids)
 
-        payload = _extract_json_payload(response)
         template = _build_menu_template(payload)
-        return MenuGenerationResult(
-            template=template,
-            detected_input_language=(detected_input_language or "").strip() or None,
-        )
+        return MenuGenerationResult(template=template)
 
     async def _upload_images(
         self,
@@ -125,98 +105,51 @@ class LLMMenuService:
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
 
-    async def _extract_menu_transcription(self,file_ids: Sequence[str], lang_in: str | None) -> str:
-        """Use the LLM to extract raw dish lines from the provided images."""
+    async def _run_stage_one(self, file_ids: Sequence[str]) -> str:
+        """Run stage one of the pipeline to collect transcription and language."""
 
         if not file_ids:
             return ""
 
-        content = _build_stage_one_content(file_ids, lang_in)
+        prompt = build_stage_one_prompt(file_ids)
 
         response = await self.client.responses.create(
             model=settings.openai_model,
-            instructions=STAGE_ONE_SYSTEM_INSTRUCTIONS,
-            input=[{"role": "user", "content": content}],
+            instructions=prompt.instructions,
+            input=[{"role": "user", "content": prompt.content}],
             reasoning=build_reasoning_config(),
         )
 
-        output_text = getattr(response, "output_text", None)
-        if not output_text:
-            raise RuntimeError("OpenAI response returned empty output_text")
-        return str(output_text).strip()
+        return _extract_output_text(response)
 
+    async def _run_stage_two(self, transcription: str, output_language: str) -> dict:
+        """Run stage two of the pipeline to structure the transcription."""
 
-def _build_stage_one_content(file_ids: Sequence[str], lang_in: str | None) -> List[dict]:
-    """Construct the request payload for the transcription stage."""
-    if lang_in:
-        language_hint = f"Review every photos of the menu written in {lang_in}"
-        language_tag = ""
-    else:
-        language_hint = (
-            "Review every attached menu photo. First recognize the language used to write the menu. "
-            "If there're several languages, choose the most common one. "
+        prompt = build_stage_two_prompt(
+            transcription=transcription,
+            output_language=output_language,
         )
-        language_tag = (
-            "After listing all dishes, "
-            "append a final line that reads exactly 'the menu is written in <language of the "
-            "menu you recognized>'."
+
+        response = await self.client.responses.create(
+            model=settings.openai_model,
+            instructions=prompt.instructions,
+            input=[{"role": "user", "content": prompt.content}],
+            text=build_text_config(),
+            reasoning=build_reasoning_config(),
         )
-    recognize_rule = (
-    "Then for each dish you see, output a single "
-    "line formatted as '<section> | <dish name> | <price>'. Repeat the section "
-    "for each dish; if no section is provided, use 'Menu'. Keep dish names in the "
-    "original language and do not translate anything. Use 'N/A' when the price is "
-    "missing. Do not add numbering or bullet characters. "
-    )
-    content: List[dict] = [
-        {"type": "input_text", "text": language_hint},
-        {"type": "input_text", "text": recognize_rule},
-    ]
-    if language_tag:
-        content.append({"type": "input_text", "text": language_tag})
-    for file_id in file_ids:
-        content.append({"type": "input_image", "file_id": file_id})
-    return content
 
-
-def _build_stage_two_content(transcription: str, lang_out: str) -> List[dict]:
-    """Prepare the second-stage request using text-only input."""
-
-    intro = (
-        "Use the following transcription of menu sections, dish names, and prices "
-        "that was extracted from images to build a structured menu data." 
-        "Each line follows '<section> | <dish name> | "
-        "<price>' and prices may be 'N/A' when unavailable. "
-        "The langauge of the menu is declared in the end of the transcription. "
-    )
-    safe_transcription = transcription.strip() or "No dish lines were extracted."
-    safe_transcription = (
-        f"--- transcription start --- \n {safe_transcription} \n --- transcription end --- \n"
-    )
-    structure_rule = (
-        "To structure menu data. Follow these rules strictly: "
-        "1) Extract distinct dish names from the text. "
-        "2) PRESERVE the original dish wording in `original_name` and translate it into  "
-        f"{lang_out} for `translated_name`. "
-        f"3) For each dish, write a short descriptive sentence in the {lang_out} that includes "
-        "typical ingredients, preparation method, and expected flavour profile (for example sweet, "
-        "savory, spicy). Use natural phrasing rather than bullet lists."
-        "4) extract the price of each dishes if listed. By default 0 "
-        "5) extract the section if exsits, e.g. main dish; dessert; soup; etc. Translate to the short words. By default `menu` "
-        "Return only a JSON array and ensure every object contains `section`, `original_name`, `translated_name`, "
-        "`description` and `price`. No extra commentary or keys."
-    )
-
-    content: List[dict] = [
-        {"type": "input_text", "text": intro},
-        {"type": "input_text", "text": safe_transcription},
-        {"type": "input_text", "text": structure_rule},
-    ]
-    return content
+        return _extract_json_payload(response)
 
 
 def _extract_json_payload(response: object) -> dict:
     """Traverse the responses API payload to pull JSON content."""
+
+    output_text = _extract_output_text(response)
+    return json.loads(output_text)
+
+
+def _extract_output_text(response: object) -> str:
+    """Return the textual content for a Responses API call."""
 
     try:
         output_text = response.output_text  # type: ignore[attr-defined]
@@ -225,8 +158,7 @@ def _extract_json_payload(response: object) -> dict:
 
     if not output_text:
         raise RuntimeError("OpenAI response returned empty output_text")
-
-    return json.loads(output_text)
+    return str(output_text).strip()
 
 
 def _build_menu_template(payload: dict) -> MenuTemplate:

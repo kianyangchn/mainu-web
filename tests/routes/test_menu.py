@@ -16,14 +16,12 @@ client = TestClient(app)
 def reset_services(monkeypatch):
     menu_routes._share_service.reset()
     menu_routes._expected_output_language = "zh-CN"
-    menu_routes._fake_detected_language = "Chinese"
 
     async def fake_generate_menu_template(
         images,
         filenames,
         content_types=None,
         *,
-        input_language=None,
         output_language=None,
     ) -> MenuGenerationResult:
         assert output_language == menu_routes._expected_output_language
@@ -42,10 +40,7 @@ def reset_services(monkeypatch):
                 )
             ]
         )
-        return MenuGenerationResult(
-            template=template,
-            detected_input_language=menu_routes._fake_detected_language,
-        )
+        return MenuGenerationResult(template=template)
 
     monkeypatch.setattr(
         menu_routes._menu_service, "generate_menu_template", fake_generate_menu_template
@@ -53,7 +48,6 @@ def reset_services(monkeypatch):
     yield
     menu_routes._share_service.reset()
     delattr(menu_routes, "_expected_output_language")
-    delattr(menu_routes, "_fake_detected_language")
 
 
 def test_home_page_renders_template():
@@ -83,7 +77,7 @@ def test_process_menu_returns_template_without_sharing():
         payload["template"]["sections"][0]["dishes"][0]["translated_name"]
         == "Spicy Mapo Tofu"
     )
-    assert payload["detected_language"] == "Chinese"
+    assert payload["detected_language"] is None
     assert "share_token" not in payload
 
 
@@ -149,7 +143,6 @@ def test_share_view_renders_html():
 
 def test_process_menu_respects_manual_language_selection():
     menu_routes._expected_output_language = "fr"
-    menu_routes._fake_detected_language = "French"
     response = client.post(
         "/menu/process",
         files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
@@ -159,4 +152,4 @@ def test_process_menu_respects_manual_language_selection():
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["detected_language"] == "French"
+    assert payload["detected_language"] is None
