@@ -12,8 +12,7 @@ from openai import AsyncOpenAI, OpenAIError
 from app.config import settings
 from app.schemas import MenuDish, MenuSection, MenuTemplate
 from app.services.prompt import (
-    build_stage_one_prompt,
-    build_stage_two_prompt,
+    build_prompt,
     build_reasoning_config,
     build_text_config,
 )
@@ -59,10 +58,7 @@ class LLMMenuService:
 
         file_ids = await self._upload_images(images, filenames, content_types)
         try:
-            transcription = await self._run_stage_one(file_ids)
-            payload = await self._run_stage_two(
-                transcription, output_language or settings.default_output_language
-            )
+            payload = await self._run_extract_request(file_ids, output_language or settings.default_output_language)
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
         finally:
@@ -105,31 +101,14 @@ class LLMMenuService:
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
 
-    async def _run_stage_one(self, file_ids: Sequence[str]) -> str:
-        """Run stage one of the pipeline to collect transcription and language."""
+
+    async def _run_extract_request(self, file_ids: Sequence[str], output_language: str) -> str:
+        """Run pipeline to collect menu information."""
 
         if not file_ids:
             return ""
 
-        prompt = build_stage_one_prompt(file_ids)
-
-        response = await self.client.responses.create(
-            model=settings.openai_model,
-            instructions=prompt.instructions,
-            input=[{"role": "user", "content": prompt.content}],
-            text={"verbosity": "low"},
-            reasoning=build_reasoning_config(),
-        )
-
-        return _extract_output_text(response)
-
-    async def _run_stage_two(self, transcription: str, output_language: str) -> dict:
-        """Run stage two of the pipeline to structure the transcription."""
-
-        prompt = build_stage_two_prompt(
-            transcription=transcription,
-            output_language=output_language,
-        )
+        prompt = build_prompt(file_ids, output_language=output_language)
 
         response = await self.client.responses.create(
             model=settings.openai_model,
@@ -166,7 +145,7 @@ def _build_menu_template(payload: dict) -> MenuTemplate:
     """Convert the raw payload into the MenuTemplate structure."""
 
     if not isinstance(payload, dict) or "items" not in payload:
-        raise RuntimeError("OpenAI response missing 'items' payload")
+        raise RuntimeError(f"OpenAI response missing 'items' payload: {payload}")
 
     sections: defaultdict[str, List[MenuDish]] = defaultdict(list)
     for item in payload.get("items", []):

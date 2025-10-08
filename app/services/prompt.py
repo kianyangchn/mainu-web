@@ -11,12 +11,9 @@ __all__ = [
     "LANGUAGE_MARKER",
     "PromptRequest",
     "RESPONSE_JSON_SCHEMA",
-    "STAGE_ONE_SYSTEM_INSTRUCTIONS",
-    "STAGE_TWO_SYSTEM_INSTRUCTIONS",
     "build_reasoning_config",
     "build_response_object_schema",
-    "build_stage_one_prompt",
-    "build_stage_two_prompt",
+    "build_prompt",
     "build_text_config",
     "build_text_format_config",
 ]
@@ -32,16 +29,13 @@ class PromptRequest:
     content: List[dict[str, str]]
 
 
-STAGE_ONE_SYSTEM_INSTRUCTIONS = (
+SYSTEM_INSTRUCTIONS = (
     "You are a meticulous transcription assistant for restaurant menus. "
-    "Recognize the menu language, copy dish names exactly as written, and "
-    "preserve the original ordering even if the photos are low quality."
-)
-
-STAGE_TWO_SYSTEM_INSTRUCTIONS = (
-    "You are a culinary translator. You understand regional dishes, can translate "
-    "them into the requested language, and can summarise flavour, ingredients, and "
-    "preparation details in a single approachable sentence."
+    "You can recognize the menu language, remember dish names exactly as written, and "
+    "preserve the original ordering even if the photos are low quality. "
+    "You can understand regional dishes, can translate them into the requested language, "
+    "and can summarise flavour, ingredients, and preparation details in a single approachable sentence. "
+    "Your final goal is to sutrcture the required menu information into desired json format."
 )
 
 JSON_SCHEMA_NAME = "menu_items"
@@ -88,8 +82,10 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
 }
 
 
-def build_stage_one_prompt(
+def build_prompt(
     file_ids: Sequence[str],
+    *,
+    output_language: str,
 ) -> PromptRequest:
     """Return the stage-one prompt for transcription and language detection."""
 
@@ -97,69 +93,46 @@ def build_stage_one_prompt(
         raise ValueError("Stage one prompt requires at least one uploaded file id.")
 
     language_hint = (
-        "Detect the primary language used throughout the menu. After you finish "
-        f"listing dishes, append a final line that reads '{LANGUAGE_MARKER} <language name>'."
+        "First, detect the primary language used throughout the menu. "
+        "Remember the menu is written in this language. "
+        "This language is an important information to further processing the menu"
     )
 
     transcription_rule = (
-        "For each dish you see, output one line formatted exactly as "
-        "'<section> | <dish name> | <price>'. Repeat the section for each dish. "
+        "Then extract dishes information from ALL the pages. "
+        "keep the section, dish name and price of each dishes. "
         "If a section title is missing, use 'Menu'. Keep dish names in the original "
         "language without translation. When prices are missing, write 'N/A'. Do not "
         "prepend bullets or numbering and do not translate anything in this stage."
+        "Do not miss any dish information."
+    )
+
+    structure_rule = (
+        "Based on the extracted text, you can construct a structured menu. "
+        f"Translate section names into {output_language}. "
+        f"Translate dish titles into {output_language} but keep the original "
+        "names available in the JSON. Write a natural one-sentence description in the "
+        f"{output_language} describing key ingredients, preparation details, and flavour. "
+        "If price is listed as 'N/A', keep it as 'N/A'. Make use of any language markers present "
+    )
+    json_rule = (
+        "Last step, respond strictly with JSON that matches the provided schema. "
+        "Do not include any explanatory text before or after the JSON."
     )
 
     content: List[dict[str, str]] = [
         {"type": "input_text", "text": language_hint},
         {"type": "input_text", "text": transcription_rule},
+        {"type": "input_text", "text": structure_rule},
+        {"type": "input_text", "text": json_rule},
     ]
     for file_id in file_ids:
         content.append({"type": "input_image", "file_id": file_id})
 
     return PromptRequest(
-        instructions=STAGE_ONE_SYSTEM_INSTRUCTIONS,
+        instructions=SYSTEM_INSTRUCTIONS,
         content=content,
     )
-
-
-def build_stage_two_prompt(
-    transcription: str,
-    *,
-    output_language: str,
-) -> PromptRequest:
-    """Return the stage-two prompt that transforms transcription into menu JSON."""
-
-    structure_rule = (
-        "Using the transcription between the delimiters below, construct a structured menu. "
-        "Each source line follows '<section> | <dish name> | <price>'. "
-        f"Translate section names and dish titles into {output_language} but keep the original "
-        "names available in the JSON. Write a natural one-sentence description in the "
-        f"{output_language} describing key ingredients, preparation details, and flavour. "
-        "If price is listed as 'N/A', keep it as 'N/A'. Make use of any language markers present "
-        f"in the transcription (such as lines beginning with '{LANGUAGE_MARKER}') to choose appropriate terminology."
-    )
-    json_rule = (
-        "Respond strictly with JSON that matches the provided schema. "
-        "Do not include any explanatory text before or after the JSON."
-    )
-    safe_transcription = transcription.strip() or "No dishes were extracted."
-    transcription_block = (
-        "--- transcription start ---\n"
-        f"{safe_transcription}\n"
-        "--- transcription end ---"
-    )
-
-    content: List[dict[str, str]] = [
-        {"type": "input_text", "text": structure_rule},
-        {"type": "input_text", "text": transcription_block},
-        {"type": "input_text", "text": json_rule},
-    ]
-
-    return PromptRequest(
-        instructions=STAGE_TWO_SYSTEM_INSTRUCTIONS,
-        content=content,
-    )
-
 
 def build_response_object_schema() -> dict[str, object]:
     """Return top-level object schema required by OpenAI Responses."""
