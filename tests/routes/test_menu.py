@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from app.main import app
 from app.routes import menu as menu_routes
@@ -25,6 +26,7 @@ def reset_services(monkeypatch):
         output_language=None,
     ) -> MenuGenerationResult:
         assert output_language == menu_routes._expected_output_language
+        menu_routes._last_uploads = [bytes(blob) for blob in images]
         template = MenuTemplate(
             sections=[
                 MenuSection(
@@ -48,6 +50,8 @@ def reset_services(monkeypatch):
     yield
     menu_routes._share_service.reset()
     delattr(menu_routes, "_expected_output_language")
+    if hasattr(menu_routes, "_last_uploads"):
+        delattr(menu_routes, "_last_uploads")
 
 
 def test_home_page_renders_template():
@@ -153,3 +157,25 @@ def test_process_menu_respects_manual_language_selection():
     assert response.status_code == 200
     payload = response.json()
     assert payload["detected_language"] is None
+
+
+def test_process_menu_downscales_large_images():
+    img = Image.new("RGB", (3000, 2000), color="white")
+    original_bytes = BytesIO()
+    img.save(original_bytes, format="JPEG", quality=95)
+    raw = original_bytes.getvalue()
+
+    response = client.post(
+        "/menu/process",
+        files=[("files", ("menu.jpg", BytesIO(raw), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
+    )
+
+    assert response.status_code == 200
+    assert hasattr(menu_routes, "_last_uploads")
+    processed = menu_routes._last_uploads[0]
+    assert len(processed) < len(raw)
+
+    with Image.open(BytesIO(processed)) as downsized:
+        downsized.load()
+        assert max(downsized.size) <= 1280

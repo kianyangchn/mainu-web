@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import logging
-from typing import List
+from io import BytesIO
+from typing import List, Tuple
 
 import segno
+from PIL import Image, UnidentifiedImageError
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 
@@ -25,6 +27,10 @@ logger = logging.getLogger(__name__)
 
 _menu_service = LLMMenuService()
 _share_service = ShareService()
+
+_MAX_IMAGE_DIMENSION = 1280
+_JPEG_QUALITY = 80
+_PNG_COMPRESS_LEVEL = 6
 
 
 def get_menu_service() -> LLMMenuService:
@@ -56,9 +62,10 @@ async def process_menu(
         raw = await upload.read()
         if not raw:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
-        contents.append(raw)
+        optimised, content_type = _optimise_image_payload(raw, upload.content_type)
+        contents.append(optimised)
         filenames.append(upload.filename or "menu-page")
-        content_types.append(upload.content_type)
+        content_types.append(content_type)
 
     output_language = requested_output_language or _detect_language(request)
     logger.debug("Processing menu with output language: %s", output_language)
@@ -121,3 +128,49 @@ def _detect_language(request: Request) -> str:
         if primary:
             return primary
     return settings.default_output_language
+
+
+def _optimise_image_payload(raw: bytes, content_type: str) -> Tuple[bytes, str]:
+    """Downscale and recompress menu images to reduce upload latency."""
+
+    if content_type not in {"image/jpeg", "image/png"}:
+        return raw, content_type
+
+    try:
+        with Image.open(BytesIO(raw)) as image:
+            image.load()
+            original_size = image.size
+            processed = image.copy()
+    except (UnidentifiedImageError, OSError):
+        return raw, content_type
+
+    resampling = getattr(getattr(Image, "Resampling", Image), "LANCZOS")
+    if max(processed.size) > _MAX_IMAGE_DIMENSION:
+        processed.thumbnail((_MAX_IMAGE_DIMENSION, _MAX_IMAGE_DIMENSION), resampling)
+
+    buffer = BytesIO()
+    if content_type == "image/jpeg":
+        if processed.mode not in {"RGB", "L"}:
+            processed = processed.convert("RGB")
+        processed.save(
+            buffer,
+            format="JPEG",
+            quality=_JPEG_QUALITY,
+            optimize=True,
+        )
+        optimised_type = "image/jpeg"
+    else:  # image/png
+        if processed.mode == "P":
+            processed = processed.convert("RGBA")
+        processed.save(
+            buffer,
+            format="PNG",
+            optimize=True,
+            compress_level=_PNG_COMPRESS_LEVEL,
+        )
+        optimised_type = "image/png"
+
+    optimised_bytes = buffer.getvalue()
+    if max(processed.size) == max(original_size) and len(optimised_bytes) >= len(raw):
+        return raw, content_type
+    return optimised_bytes, optimised_type

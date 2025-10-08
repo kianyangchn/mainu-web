@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from collections import defaultdict
 from dataclasses import dataclass
@@ -75,7 +76,7 @@ class LLMMenuService:
     ) -> List[str]:
         """Upload images to the Files API and return file IDs."""
 
-        file_ids: List[str] = []
+        uploads = []
         for index, raw in enumerate(images):
             name = (
                 filenames[index]
@@ -87,19 +88,30 @@ class LLMMenuService:
                 if content_types and index < len(content_types)
                 else "image/jpeg"
             )
-            upload = await self.client.files.create(
-                file=(name, raw, content_type),
-                purpose="vision",
+            uploads.append(
+                self.client.files.create(
+                    file=(name, raw, content_type),
+                    purpose="vision",
+                )
             )
-            file_ids.append(upload.id)
-        return file_ids
+
+        results = await asyncio.gather(*uploads)
+        return [upload.id for upload in results]
 
     async def _delete_files(self, file_ids: Iterable[str]) -> None:
-        for file_id in file_ids:
+        if not file_ids:
+            return
+
+        async def _delete(file_id: str) -> None:
             try:
                 await self.client.files.delete(file_id)
             except OpenAIError:  # pragma: no cover - best effort cleanup
                 pass
+
+        await asyncio.gather(
+            *(_delete(file_id) for file_id in file_ids),
+            return_exceptions=True,
+        )
 
 
     async def _run_extract_request(self, file_ids: Sequence[str], output_language: str) -> str:
