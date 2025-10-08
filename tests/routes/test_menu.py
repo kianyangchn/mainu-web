@@ -8,6 +8,8 @@ from app.main import app
 from app.routes import menu as menu_routes
 from app.schemas import MenuDish, MenuSection, MenuTemplate
 from app.services.llm import MenuGenerationResult
+from app.services.location import Place
+from app.services.tips import Tip
 
 
 client = TestClient(app)
@@ -179,3 +181,43 @@ def test_process_menu_downscales_large_images():
     with Image.open(BytesIO(processed)) as downsized:
         downsized.load()
         assert max(downsized.size) <= 1280
+
+
+def test_stream_menu_tips(monkeypatch):
+    async def fake_get_tips(topic, lang, *, limit=6):  # noqa: ARG001
+        return [
+            Tip(
+                title="Pad Thai",
+                body="Sweet, tangy rice noodles popular across Bangkok night markets.",
+                image_url="https://example.com/pad-thai.jpg",
+                source_name="Test Source",
+                source_url="https://example.com",
+            )
+        ]
+
+    monkeypatch.setattr(menu_routes._tip_service, "get_tips", fake_get_tips)
+
+    with client.stream(
+        "GET",
+        "/menu/tips?topic=thai",
+        headers={"Accept": "text/event-stream"},
+    ) as response:
+        assert response.status_code == 200
+        body = "".join(chunk for chunk in response.iter_text())
+
+    assert "event: tip" in body
+    assert "Pad Thai" in body
+    assert "event: complete" in body
+
+
+def test_reverse_location_endpoint(monkeypatch):
+    async def fake_reverse_geocode(lat, lon):  # noqa: ARG001
+        return Place(city="Bangkok", country="Thailand")
+
+    monkeypatch.setattr(menu_routes._location_service, "reverse_geocode", fake_reverse_geocode)
+
+    response = client.get("/menu/location/reverse", params={"lat": "13.75", "lon": "100.5"})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["city"] == "Bangkok"
+    assert payload["country"] == "Thailand"

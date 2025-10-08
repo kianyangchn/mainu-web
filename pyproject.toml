@@ -17,6 +17,7 @@ dependencies = [
     "asyncpg>=0.29",
     "psycopg2>=2.9.10",
     "pillow>=10.4",
+    "sse-starlette>=1.8",
 ]
 
 [project.optional-dependencies]
