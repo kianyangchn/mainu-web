@@ -63,7 +63,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             },
             "description": {
                 "type": "string",
-                "description": "One sentence describing ingredients, preparation, and flavour.",
+                "description": "Translate of the original description or one sentence describing ingredients, preparation, and flavour.",
             },
             "price": {
                 "type": "number",
