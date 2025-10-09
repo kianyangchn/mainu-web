@@ -478,18 +478,12 @@ _CUISINE_TIPS: Tuple[Tip, ...] = tuple(_build_tip(info) for info in _CURATED_CUI
 
 
 class TipService:
-    """Serve cuisine tips in a randomised rotation irrespective of location."""
+    """Serve cuisine tips in a randomised rotation."""
 
     def __init__(self, tips: Sequence[Tip] | None = None) -> None:
         self._tips: Tuple[Tip, ...] = tuple(tips) if tips is not None else _CUISINE_TIPS
 
-    async def get_tips(
-        self,
-        topic: str | None,
-        language: str | None,
-        *,
-        limit: int = 6,
-    ) -> List[Tip]:
+    async def get_tips(self, *, limit: int = 6) -> List[Tip]:
         """Return a shuffled subset of the curated cuisine tips."""
 
         if limit <= 0:

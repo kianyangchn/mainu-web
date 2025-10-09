@@ -463,19 +463,20 @@
 
       .tip-card {
         display: flex;
-        gap: 16px;
-        padding: 18px;
-        border-radius: 18px;
+        gap: 20px;
+        padding: 26px;
+        border-radius: 22px;
         background: rgba(255, 255, 255, 0.94);
         border: 1px solid rgba(29, 91, 219, 0.12);
-        box-shadow: 0 16px 32px rgba(17, 42, 110, 0.14);
+        box-shadow: 0 18px 36px rgba(17, 42, 110, 0.16);
         text-align: left;
+        min-height: 240px;
       }
 
       .tip-card-figure {
-        flex: 0 0 96px;
-        height: 96px;
-        border-radius: 14px;
+        flex: 0 0 180px;
+        height: 180px;
+        border-radius: 20px;
         overflow: hidden;
         position: relative;
         background: rgba(47, 123, 255, 0.12);
@@ -488,8 +489,18 @@
         display: block;
       }
 
-      .tip-card-figure[data-visible="false"] {
+      .tip-card-figure[data-visible="false"] img {
         display: none;
+      }
+
+      .tip-card-figure[data-visible="false"]::before {
+        content: "🍽️";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 2.2rem;
+        color: rgba(29, 91, 219, 0.65);
       }
 
       .tip-card-content {
@@ -541,12 +552,17 @@
       }
 
       .tip-card-placeholder {
-        padding: 14px 18px;
-        border-radius: 16px;
+        padding: 40px;
+        border-radius: 20px;
         background: rgba(47, 123, 255, 0.08);
         color: var(--primary-dark);
         font-weight: 500;
         font-size: 0.95rem;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
       }
 
       .progress-ring {
@@ -584,7 +600,7 @@
 
         .tip-card-figure {
           width: 100%;
-          height: 160px;
+          height: 260px;
         }
       }
 
@@ -1617,20 +1633,6 @@
         { code: "English", label: "English" },
       ];
 
-      const languageTopicHints = {
-        es: "Spanish cuisine",
-        zh: "Chinese cuisine",
-        "zh-cn": "Chinese cuisine",
-        "zh-tw": "Chinese cuisine",
-        ja: "Japanese cuisine",
-        ko: "Korean cuisine",
-        fr: "French cuisine",
-        de: "German cuisine",
-        it: "Italian cuisine",
-        en: "global dining",
-        english: "global dining",
-      };
-
       const taglineMessages = [
         "用熟悉的语言点单更简单!",
         "慣れた言葉で注文すれば、もっと簡単!",
@@ -1670,7 +1672,6 @@
       let tipRotationTimer = null;
       let activeTipIndex = 0;
       const TIP_ROTATION_MS = 10000;
-      let userLocation = null;
 
       function showScreen(name) {
         activeScreen = name;
@@ -1693,7 +1694,6 @@
         heroBackButton.hidden = showCapture;
 
         if (name === "processing") {
-          ensureLocation();
           loadTips();
         } else {
           stopTipRotation(false);
@@ -1896,55 +1896,6 @@
         }
       }
 
-      function resolveTipTopic() {
-        if (userLocation) {
-          const city = (userLocation.city || "").trim();
-          const country = (userLocation.country || "").trim();
-          if (city) {
-            return country ? `${city} cuisine ${country}` : `${city} cuisine`;
-          }
-          if (country) {
-            return `Cuisine of ${country}`;
-          }
-        }
-        const language = (state.selectedLanguage || navigator.language || "").toLowerCase();
-        const key = language.split("-")[0];
-        return languageTopicHints[key] || languageTopicHints[language] || "global dining";
-      }
-
-      function ensureLocation() {
-        if (!navigator.geolocation || userLocation) {
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            try {
-              const { latitude, longitude } = position.coords;
-              const response = await fetch(
-                `/menu/location/reverse?lat=${latitude}&lon=${longitude}`
-              );
-              if (!response.ok) {
-                throw new Error("Reverse geocode failed");
-              }
-              const payload = await response.json();
-              if (payload && payload.city) {
-                userLocation = payload;
-                if (activeScreen === "processing") {
-                  reloadTips();
-                }
-              }
-            } catch (error) {
-              console.error(error);
-            }
-          },
-          (error) => {
-            console.warn("Unable to access location", error);
-          },
-          { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 }
-        );
-      }
-
       async function loadTips() {
         tipBuffer.length = 0;
         activeTipIndex = 0;
@@ -1959,15 +1910,8 @@
           tipCard.hidden = true;
         }
 
-        const params = new URLSearchParams();
-        const topic = resolveTipTopic();
-        if (topic) {
-          params.set("topic", topic);
-        }
-        params.set("lang", navigator.language || "en");
-
         try {
-          const response = await fetch(`/menu/tips?${params.toString()}`, {
+          const response = await fetch(`/menu/tips`, {
             headers: {
               Accept: "application/json",
             },
@@ -1976,10 +1920,13 @@
             throw new Error(`Tip fetch failed (${response.status})`);
           }
           const tips = await response.json();
-          if (!Array.isArray(tips) || !tips.length) {
+          const withImages = Array.isArray(tips)
+            ? tips.filter((tip) => tip && typeof tip.image_url === "string" && tip.image_url.length)
+            : [];
+          if (!withImages.length) {
             return;
           }
-          tipBuffer.push(...tips);
+          tipBuffer.push(...withImages);
           showTip(0);
           restartTipTimer();
         } catch (error) {
@@ -2010,22 +1957,74 @@
         }
       }
 
+      function hideTipImage() {
+        if (tipImage) {
+          tipImage.onload = null;
+          tipImage.onerror = null;
+          tipImage.removeAttribute("src");
+        }
+        if (tipImageContainer) {
+          tipImageContainer.dataset.visible = "false";
+        }
+      }
+
+      function displayTipPlaceholder() {
+        if (tipCard) {
+          tipCard.hidden = true;
+        }
+        if (tipPlaceholder) {
+          tipPlaceholder.hidden = false;
+        }
+      }
+
+      function removeTip(index) {
+        if (index < 0 || index >= tipBuffer.length) {
+          return;
+        }
+        tipBuffer.splice(index, 1);
+        if (tipRotationTimer) {
+          clearTimeout(tipRotationTimer);
+          tipRotationTimer = null;
+        }
+        if (!tipBuffer.length) {
+          displayTipPlaceholder();
+          return;
+        }
+        const nextIndex = index % tipBuffer.length;
+        showTip(nextIndex);
+        restartTipTimer();
+      }
+
       function showTip(index) {
         if (!tipBuffer.length || !tipCard || !tipTitle || !tipBody) {
+          displayTipPlaceholder();
           return;
         }
         const tip = tipBuffer[index % tipBuffer.length];
         activeTipIndex = index % tipBuffer.length;
+        const currentIndex = activeTipIndex;
         tipTitle.textContent = tip.title;
         tipBody.textContent = tip.body;
 
         if (tipImageContainer && tipImage) {
+          tipImage.onload = null;
+          tipImage.onerror = null;
+
           if (tip.image_url) {
-            tipImage.src = tip.image_url;
-            tipImageContainer.dataset.visible = "true";
-          } else {
-            tipImage.removeAttribute("src");
             tipImageContainer.dataset.visible = "false";
+            tipImage.onerror = () => {
+              hideTipImage();
+              removeTip(currentIndex);
+            };
+            tipImage.onload = () => {
+              tipImageContainer.dataset.visible = "true";
+              tipImage.onload = null;
+            };
+            tipImage.src = tip.image_url;
+          } else {
+            hideTipImage();
+            removeTip(currentIndex);
+            return;
           }
         }
 

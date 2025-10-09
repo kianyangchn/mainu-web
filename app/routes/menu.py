@@ -11,16 +11,7 @@ from typing import List, Tuple
 import segno
 from PIL import Image, UnidentifiedImageError
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    Query,
-    Request,
-    UploadFile,
-)
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 from sse_starlette.sse import EventSourceResponse
 
@@ -32,7 +23,6 @@ from app.schemas import (
     ShareMenuResponse,
 )
 from app.services.llm import LLMMenuService, MenuGenerationResult
-from app.services.location import LocationService, Place
 from app.services.tips import Tip, TipService
 from app.services.share import ShareService
 
@@ -43,7 +33,6 @@ logger = logging.getLogger(__name__)
 _menu_service = LLMMenuService()
 _share_service = ShareService()
 _tip_service = TipService()
-_location_service = LocationService()
 
 _MAX_IMAGE_DIMENSION = 1280
 _JPEG_QUALITY = 80
@@ -61,10 +50,6 @@ def get_share_service() -> ShareService:
 
 def get_tip_service() -> TipService:
     return _tip_service
-
-
-def get_location_service() -> LocationService:
-    return _location_service
 
 
 @router.post("/process", response_model=MenuProcessingResponse)
@@ -159,11 +144,9 @@ def _detect_language(request: Request) -> str:
 @router.get("/tips", name="stream_menu_tips")
 async def stream_menu_tips(
     request: Request,
-    cuisine: str | None = Query(default=None, alias="topic"),
-    lang: str | None = Query(default=None, alias="lang"),
     tip_service: TipService = Depends(get_tip_service),
 ):
-    tips = await tip_service.get_tips(cuisine, lang)
+    tips = await tip_service.get_tips()
     tip_count = len(tips)
 
     if request is not None and "text/event-stream" in request.headers.get("accept", ""):
@@ -186,20 +169,6 @@ async def stream_menu_tips(
         return EventSourceResponse(event_generator())
 
     return JSONResponse([_tip_to_dict(tip) for tip in tips])
-
-
-@router.get("/location/reverse", name="reverse_location")
-async def reverse_location(
-    lat: float = Query(..., alias="lat"),
-    lon: float = Query(..., alias="lon"),
-    location_service: LocationService = Depends(get_location_service),
-) -> JSONResponse:
-    place = await location_service.reverse_geocode(lat, lon)
-    payload = {
-        "city": place.city,
-        "country": place.country,
-    }
-    return JSONResponse(payload)
 
 
 def _tip_event(event: str, tip: Tip) -> dict[str, str]:
