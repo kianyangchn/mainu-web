@@ -276,15 +276,30 @@
 
       .dropzone {
         position: relative;
-        border: 2px dashed rgba(47, 123, 255, 0.28);
         border-radius: 16px;
-        padding: 32px 18px;
+        border: 1px dashed rgba(47, 123, 255, 0.32);
         background: rgba(247, 249, 255, 0.75);
-        text-align: center;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
         gap: 10px;
-        transition: border-color 0.18s ease, background 0.18s ease;
+        padding: 12px;
+        min-height: 140px;
+        transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        text-align: center;
+      }
+
+      .dropzone[data-mode="empty"] {
+        border: 2px dashed rgba(47, 123, 255, 0.28);
+        padding: 32px 18px;
+        min-height: 200px;
+      }
+
+      .dropzone[data-mode="compact"] {
+        border-radius: 14px;
+        padding: 0;
+        background: rgba(247, 249, 255, 0.44);
       }
 
       .dropzone[data-active="true"] {
@@ -292,8 +307,29 @@
         background: rgba(47, 123, 255, 0.08);
       }
 
-      .dropzone button {
+      .dropzone[data-mode="empty"] button {
         align-self: center;
+      }
+
+      .dropzone[data-mode="compact"] button.primary {
+        background: none;
+        color: var(--primary-dark);
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        height: 140px;
+        border-radius: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.95rem;
+      }
+
+      .dropzone[data-mode="compact"] button.primary:not(:disabled):hover,
+      .dropzone[data-mode="compact"] button.primary:not(:disabled):focus-visible {
+        transform: none;
+        background: rgba(47, 123, 255, 0.12);
       }
 
       .dropzone .note {
@@ -302,10 +338,18 @@
         font-size: 0.92rem;
       }
 
+      .dropzone[data-mode="compact"] .note {
+        display: none;
+      }
+
       .preview-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 14px;
+      }
+
+      .preview-grid[data-state="empty"] {
+        grid-template-columns: 1fr;
       }
 
       .preview-tile {
@@ -341,18 +385,6 @@
       .preview-remove:hover,
       .preview-remove:focus-visible {
         color: rgba(15, 27, 57, 0.9);
-      }
-
-      .preview-empty {
-        border-radius: 14px;
-        border: 1px dashed rgba(47, 123, 255, 0.3);
-        min-height: 140px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-muted);
-        font-weight: 500;
-        background: rgba(247, 249, 255, 0.44);
       }
 
       .warning {
@@ -1430,23 +1462,22 @@
             <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
             <input type="hidden" id="output-language" name="output_language" />
           </div>
-          <div class="dropzone" id="dropzone">
-            <input
-              id="menu-files"
-              type="file"
-              name="files"
-              accept="image/jpeg,image/png,image/heic"
-              multiple
-              hidden
-            />
-            <button type="button" class="primary" id="add-files-button">
-              <span aria-hidden="true">＋</span> Add menu photos
-            </button>
-            <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
-          </div>
           <div class="warning" id="upload-warning" hidden></div>
           <div class="preview-grid" id="preview-grid">
-            <div class="preview-empty" id="preview-empty"></div>
+            <div class="dropzone" id="dropzone" data-mode="empty">
+              <input
+                id="menu-files"
+                type="file"
+                name="files"
+                accept="image/jpeg,image/png,image/heic"
+                multiple
+                hidden
+              />
+              <button type="button" class="primary" id="add-files-button">
+                <span aria-hidden="true">＋</span> Add menu photos
+              </button>
+              <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
+            </div>
           </div>
         </form>
       </section>
@@ -1598,7 +1629,6 @@
       const addFilesButton = document.getElementById("add-files-button");
       const uploadWarning = document.getElementById("upload-warning");
       const previewGrid = document.getElementById("preview-grid");
-      const previewEmpty = document.getElementById("preview-empty");
       const languageChoices = document.getElementById("language-choices");
       const outputLanguageInput = document.getElementById("output-language");
 
@@ -1865,12 +1895,16 @@
 
       function renderPreview() {
         previewGrid.innerHTML = "";
+        previewGrid.dataset.state = state.files.length ? "filled" : "empty";
+
         if (!state.files.length) {
-          previewGrid.appendChild(previewEmpty);
-          previewEmpty.hidden = false;
+          dropzone.dataset.mode = "empty";
+          previewGrid.appendChild(dropzone);
           return;
         }
-        previewEmpty.hidden = true;
+
+        dropzone.dataset.mode = "compact";
+
         state.files.forEach((entry) => {
           const tile = document.createElement("div");
           tile.className = "preview-tile";
@@ -1887,15 +1921,19 @@
           tile.appendChild(remove);
           previewGrid.appendChild(tile);
         });
+
+        previewGrid.appendChild(dropzone);
       }
 
       function updateCaptureStatus() {
         if (!state.files.length) {
           captureStatus.textContent = "No photos yet";
           translateButton.disabled = true;
+          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add menu photos';
         } else {
           captureStatus.textContent = `${state.files.length} photo${state.files.length === 1 ? "" : "s"} ready`;
           translateButton.disabled = false;
+          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add another photo';
         }
       }
 
