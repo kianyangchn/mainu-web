@@ -276,15 +276,30 @@
 
       .dropzone {
         position: relative;
-        border: 2px dashed rgba(47, 123, 255, 0.28);
         border-radius: 16px;
-        padding: 32px 18px;
+        border: 1px dashed rgba(47, 123, 255, 0.32);
         background: rgba(247, 249, 255, 0.75);
-        text-align: center;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
         gap: 10px;
-        transition: border-color 0.18s ease, background 0.18s ease;
+        padding: 12px;
+        min-height: 140px;
+        transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        text-align: center;
+      }
+
+      .dropzone[data-mode="empty"] {
+        border: 2px dashed rgba(47, 123, 255, 0.28);
+        padding: 32px 18px;
+        min-height: 200px;
+      }
+
+      .dropzone[data-mode="compact"] {
+        border-radius: 14px;
+        padding: 0;
+        background: rgba(247, 249, 255, 0.44);
       }
 
       .dropzone[data-active="true"] {
@@ -292,8 +307,28 @@
         background: rgba(47, 123, 255, 0.08);
       }
 
-      .dropzone button {
-        align-self: center;
+      .dropzone button.primary {
+        background: linear-gradient(135deg, rgba(47, 123, 255, 0.14), rgba(29, 91, 219, 0.18));
+        color: var(--primary-dark);
+        box-shadow: none;
+        border: 1px solid rgba(47, 123, 255, 0.22);
+      }
+
+      .dropzone button.primary:not(:disabled):hover,
+      .dropzone button.primary:not(:disabled):focus-visible {
+        transform: none;
+        background: linear-gradient(135deg, rgba(47, 123, 255, 0.22), rgba(29, 91, 219, 0.26));
+      }
+
+      .dropzone[data-mode="compact"] button.primary {
+        width: 100%;
+        height: 140px;
+        border-radius: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.95rem;
       }
 
       .dropzone .note {
@@ -302,10 +337,18 @@
         font-size: 0.92rem;
       }
 
+      .dropzone[data-mode="compact"] .note {
+        display: none;
+      }
+
       .preview-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 14px;
+      }
+
+      .preview-grid[data-state="empty"] {
+        grid-template-columns: 1fr;
       }
 
       .preview-tile {
@@ -341,18 +384,6 @@
       .preview-remove:hover,
       .preview-remove:focus-visible {
         color: rgba(15, 27, 57, 0.9);
-      }
-
-      .preview-empty {
-        border-radius: 14px;
-        border: 1px dashed rgba(47, 123, 255, 0.3);
-        min-height: 140px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-muted);
-        font-weight: 500;
-        background: rgba(247, 249, 255, 0.44);
       }
 
       .warning {
@@ -549,20 +580,6 @@
 
       .tip-card-source[hidden] {
         display: none;
-      }
-
-      .tip-card-placeholder {
-        padding: 40px;
-        border-radius: 20px;
-        background: rgba(47, 123, 255, 0.08);
-        color: var(--primary-dark);
-        font-weight: 500;
-        font-size: 0.95rem;
-        min-height: 240px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
       }
 
       .progress-ring {
@@ -1430,23 +1447,22 @@
             <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
             <input type="hidden" id="output-language" name="output_language" />
           </div>
-          <div class="dropzone" id="dropzone">
-            <input
-              id="menu-files"
-              type="file"
-              name="files"
-              accept="image/jpeg,image/png,image/heic"
-              multiple
-              hidden
-            />
-            <button type="button" class="primary" id="add-files-button">
-              <span aria-hidden="true">＋</span> Add menu photos
-            </button>
-            <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
-          </div>
           <div class="warning" id="upload-warning" hidden></div>
           <div class="preview-grid" id="preview-grid">
-            <div class="preview-empty" id="preview-empty"></div>
+            <div class="dropzone" id="dropzone" data-mode="empty">
+              <input
+                id="menu-files"
+                type="file"
+                name="files"
+                accept="image/jpeg,image/png,image/heic"
+                multiple
+                hidden
+              />
+              <button type="button" class="primary" id="add-files-button">
+                <span aria-hidden="true">＋</span> Add menu photos
+              </button>
+              <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
+            </div>
           </div>
         </form>
       </section>
@@ -1470,9 +1486,6 @@
               <a class="tip-card-source" id="tip-source" href="#" rel="noopener" target="_blank" hidden>Source</a>
             </div>
           </article>
-          <div class="tip-card-placeholder" id="tip-placeholder">
-            Discover local dish stories and etiquette while we prepare your menu…
-          </div>
         </div>
       </section>
 
@@ -1598,7 +1611,6 @@
       const addFilesButton = document.getElementById("add-files-button");
       const uploadWarning = document.getElementById("upload-warning");
       const previewGrid = document.getElementById("preview-grid");
-      const previewEmpty = document.getElementById("preview-empty");
       const languageChoices = document.getElementById("language-choices");
       const outputLanguageInput = document.getElementById("output-language");
 
@@ -1631,7 +1643,6 @@
       const tipTitle = document.getElementById("tip-title");
       const tipBody = document.getElementById("tip-body");
       const tipSource = document.getElementById("tip-source");
-      const tipPlaceholder = document.getElementById("tip-placeholder");
 
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
@@ -1865,12 +1876,16 @@
 
       function renderPreview() {
         previewGrid.innerHTML = "";
+        previewGrid.dataset.state = state.files.length ? "filled" : "empty";
+
         if (!state.files.length) {
-          previewGrid.appendChild(previewEmpty);
-          previewEmpty.hidden = false;
+          dropzone.dataset.mode = "empty";
+          previewGrid.appendChild(dropzone);
           return;
         }
-        previewEmpty.hidden = true;
+
+        dropzone.dataset.mode = "compact";
+
         state.files.forEach((entry) => {
           const tile = document.createElement("div");
           tile.className = "preview-tile";
@@ -1887,15 +1902,19 @@
           tile.appendChild(remove);
           previewGrid.appendChild(tile);
         });
+
+        previewGrid.appendChild(dropzone);
       }
 
       function updateCaptureStatus() {
         if (!state.files.length) {
           captureStatus.textContent = "No photos yet";
           translateButton.disabled = true;
+          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add menu photos';
         } else {
           captureStatus.textContent = `${state.files.length} photo${state.files.length === 1 ? "" : "s"} ready`;
           translateButton.disabled = false;
+          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add another photo';
         }
       }
 
@@ -1917,12 +1936,7 @@
           clearTimeout(tipRotationTimer);
           tipRotationTimer = null;
         }
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = false;
-        }
-        if (tipCard) {
-          tipCard.hidden = true;
-        }
+        hideTipCard();
 
         try {
           const response = await fetch(`/menu/tips`, {
@@ -1955,12 +1969,7 @@
         }
         if (resetDisplay) {
           tipBuffer.length = 0;
-          if (tipPlaceholder) {
-            tipPlaceholder.hidden = false;
-          }
-          if (tipCard) {
-            tipCard.hidden = true;
-          }
+          hideTipCard();
         }
       }
 
@@ -1982,12 +1991,9 @@
         }
       }
 
-      function displayTipPlaceholder() {
+      function hideTipCard() {
         if (tipCard) {
           tipCard.hidden = true;
-        }
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = false;
         }
       }
 
@@ -2001,7 +2007,7 @@
           tipRotationTimer = null;
         }
         if (!tipBuffer.length) {
-          displayTipPlaceholder();
+          hideTipCard();
           return;
         }
         const nextIndex = index % tipBuffer.length;
@@ -2011,7 +2017,7 @@
 
       function showTip(index) {
         if (!tipBuffer.length || !tipCard || !tipTitle || !tipBody) {
-          displayTipPlaceholder();
+          hideTipCard();
           return;
         }
         const tip = tipBuffer[index % tipBuffer.length];
@@ -2058,9 +2064,6 @@
         }
 
         tipCard.hidden = false;
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = true;
-        }
       }
 
       function restartTipTimer() {
