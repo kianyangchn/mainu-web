@@ -48,6 +48,7 @@ _location_service = LocationService()
 _MAX_IMAGE_DIMENSION = 1280
 _JPEG_QUALITY = 80
 _PNG_COMPRESS_LEVEL = 6
+_TIP_STREAM_INTERVAL_SECONDS = 10.0
 
 
 def get_menu_service() -> LLMMenuService:
@@ -163,14 +164,16 @@ async def stream_menu_tips(
     tip_service: TipService = Depends(get_tip_service),
 ):
     tips = await tip_service.get_tips(cuisine, lang)
+    tip_count = len(tips)
 
     if request is not None and "text/event-stream" in request.headers.get("accept", ""):
 
         async def event_generator():
             try:
-                for tip in tips:
+                for index, tip in enumerate(tips):
                     yield _tip_event("tip", tip)
-                    await asyncio.sleep(0.05)
+                    if index < tip_count - 1:
+                        await asyncio.sleep(_TIP_STREAM_INTERVAL_SECONDS)
             except Exception as exc:  # pragma: no cover - defensive guard
                 logger.exception("Failed to stream tips: %s", exc)
                 yield {
