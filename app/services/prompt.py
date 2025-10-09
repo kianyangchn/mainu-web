@@ -35,7 +35,8 @@ SYSTEM_INSTRUCTIONS = (
     "preserve the original ordering even if the photos are low quality. "
     "You can understand regional dishes, can translate them into the requested language, "
     "and can summarise flavour, ingredients, and preparation details in a single approachable sentence. "
-    "Your final goal is to sutrcture the required menu information into desired json format."
+    "Your final goal is to sutrcture the required menu information into desired json format. "
+    "Some dishes can be on the side of the menu, do not miss any sections and dishes."
 )
 
 JSON_SCHEMA_NAME = "menu_items"
@@ -62,7 +63,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             },
             "description": {
                 "type": "string",
-                "description": "One sentence describing ingredients, preparation, and flavour.",
+                "description": "Translate of the original description or one sentence describing ingredients, preparation, and flavour.",
             },
             "price": {
                 "type": "number",
@@ -100,20 +101,23 @@ def build_prompt(
 
     transcription_rule = (
         "Then extract dishes information from ALL the pages. "
-        "keep the section, dish name and price of each dishes. "
+        "Keep the section, dish name, (description if there's any) and price of each dishes. "
         "If a section title is missing, use 'Menu'. Keep dish names in the original "
-        "language without translation. When prices are missing, write 'N/A'. Do not "
-        "prepend bullets or numbering and do not translate anything in this stage."
+        "language without translation. When prices are missing, write 'N/A'. "
+        "Sometimes the dish name can come with some description, keep it as it is."
+        " Do not prepend bullets or numbering and do not translate anything in this stage."
         "Do not miss any dish information."
     )
 
     structure_rule = (
         "Based on the extracted text, you can construct a structured menu. "
         f"Translate section names into {output_language}. "
-        f"Translate dish titles into {output_language} but keep the original "
-        "names available in the JSON. Write a natural one-sentence description in the "
+        f"Translate dish titles into {output_language} but keep the original names available in the JSON. "
+        f"If there's any description, translate it into the {output_language}. "
+        "But if there's no description on the menu, write a natural one-sentence description in the "
         f"{output_language} describing key ingredients, preparation details, and flavour. "
-        "If price is listed as 'N/A', keep it as 'N/A'. Make use of any language markers present "
+        "Do not overdescribe the dishes, do not add quality, quantity, or price details that are not present on the menu. "
+        "If price is listed as 'N/A', keep it as 'N/A'. "
     )
     json_rule = (
         "Last step, respond strictly with JSON that matches the provided schema. "
