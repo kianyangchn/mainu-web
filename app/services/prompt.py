@@ -65,8 +65,8 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
                 "description": "One sentence describing ingredients, preparation, and flavour.",
             },
             "price": {
-                "type": ["number", "string"],
-                "description": "Price exactly as seen (may be numeric, currency text, or 'N/A').",
+                "type": "number",
+                "description": "Price number exactly as seen without currency text.",
             },
         },
         "required": [
