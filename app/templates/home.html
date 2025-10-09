@@ -595,12 +595,26 @@
       @media (max-width: 620px) {
         .tip-card {
           flex-direction: column;
-          align-items: stretch;
+          align-items: center;
+          text-align: center;
+          padding: 22px;
+          min-height: auto;
         }
 
         .tip-card-figure {
           width: 100%;
           height: 260px;
+          margin: 0 0 18px;
+        }
+
+        .tip-card-content {
+          align-items: center;
+        }
+
+        .tip-card-label,
+        .tip-card-title,
+        .tip-card-body {
+          text-align: center;
         }
       }
 
