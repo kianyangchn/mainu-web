@@ -583,20 +583,6 @@
         display: none;
       }
 
-      .tip-card-placeholder {
-        padding: 40px;
-        border-radius: 20px;
-        background: rgba(47, 123, 255, 0.08);
-        color: var(--primary-dark);
-        font-weight: 500;
-        font-size: 0.95rem;
-        min-height: 240px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      }
-
       .progress-ring {
         width: 68px;
         height: 68px;
@@ -1501,9 +1487,6 @@
               <a class="tip-card-source" id="tip-source" href="#" rel="noopener" target="_blank" hidden>Source</a>
             </div>
           </article>
-          <div class="tip-card-placeholder" id="tip-placeholder">
-            Discover local dish stories and etiquette while we prepare your menu…
-          </div>
         </div>
       </section>
 
@@ -1661,7 +1644,6 @@
       const tipTitle = document.getElementById("tip-title");
       const tipBody = document.getElementById("tip-body");
       const tipSource = document.getElementById("tip-source");
-      const tipPlaceholder = document.getElementById("tip-placeholder");
 
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
@@ -1955,12 +1937,7 @@
           clearTimeout(tipRotationTimer);
           tipRotationTimer = null;
         }
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = false;
-        }
-        if (tipCard) {
-          tipCard.hidden = true;
-        }
+        hideTipCard();
 
         try {
           const response = await fetch(`/menu/tips`, {
@@ -1993,12 +1970,7 @@
         }
         if (resetDisplay) {
           tipBuffer.length = 0;
-          if (tipPlaceholder) {
-            tipPlaceholder.hidden = false;
-          }
-          if (tipCard) {
-            tipCard.hidden = true;
-          }
+          hideTipCard();
         }
       }
 
@@ -2020,12 +1992,9 @@
         }
       }
 
-      function displayTipPlaceholder() {
+      function hideTipCard() {
         if (tipCard) {
           tipCard.hidden = true;
-        }
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = false;
         }
       }
 
@@ -2039,7 +2008,7 @@
           tipRotationTimer = null;
         }
         if (!tipBuffer.length) {
-          displayTipPlaceholder();
+          hideTipCard();
           return;
         }
         const nextIndex = index % tipBuffer.length;
@@ -2049,7 +2018,7 @@
 
       function showTip(index) {
         if (!tipBuffer.length || !tipCard || !tipTitle || !tipBody) {
-          displayTipPlaceholder();
+          hideTipCard();
           return;
         }
         const tip = tipBuffer[index % tipBuffer.length];
@@ -2096,9 +2065,6 @@
         }
 
         tipCard.hidden = false;
-        if (tipPlaceholder) {
-          tipPlaceholder.hidden = true;
-        }
       }
 
       function restartTipTimer() {
