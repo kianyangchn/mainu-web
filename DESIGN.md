@@ -26,7 +26,7 @@
 
 ## 5. Screen Blueprints
 ### A. Welcome / Capture (replace `home.html`)
-- Compact brand hero with rotating taglines ("One menu, zero confusion").
+- Compact brand hero anchored by the primary headline; keep supporting copy minimal.
 - Upload module: large photo card with floating “+” icon; copy limited to “Add menu photos.” Secondary link “Tips for crisp shots” (modal or popover).
 - Language chips: horizontal pill carousel with top destinations plus “Auto-detect” default.
 - Optional “Recent menus” placeholder row for future history.
