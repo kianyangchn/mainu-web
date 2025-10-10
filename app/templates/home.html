@@ -4,34 +4,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         color-scheme: light;
-        font-family: "Inter", "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
+        font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", sans-serif;
-        --bg-gradient: linear-gradient(180deg, #e3f0ff 0%, #fff4ec 45%, #fff8f2 100%);
-        --bg-card: rgba(255, 255, 255, 0.94);
+        --page-bg: #f8f6f6;
+        --bg-card: #ffffff;
         --glass-card: rgba(255, 255, 255, 0.82);
-        --primary: #2f7bff;
-        --primary-dark: #1d5bdb;
-        --accent: #ff8360;
-        --surface: rgba(247, 249, 255, 0.78);
-        --border-soft: rgba(47, 123, 255, 0.18);
-        --border-strong: rgba(17, 42, 110, 0.12);
-        --text-strong: #0f1b39;
-        --text-muted: #5a6785;
-        --shadow-card: 0 18px 44px rgba(17, 42, 110, 0.14);
-        --shadow-soft: 0 10px 24px rgba(47, 123, 255, 0.14);
-        --radius-card: 18px;
+        --primary: #ea2a33;
+        --primary-dark: #d61f27;
+        --accent: #ff9f53;
+        --surface: #ffffff;
+        --border-soft: rgba(234, 42, 51, 0.12);
+        --border-strong: rgba(31, 26, 44, 0.14);
+        --text-strong: #1f1a2c;
+        --text-muted: #5b6070;
+        --shadow-card: 0 18px 48px rgba(31, 26, 44, 0.1);
+        --shadow-soft: 0 12px 28px rgba(234, 42, 51, 0.14);
+        --radius-card: 20px;
         --radius-pill: 999px;
-        --spacing: 18px;
-        --hero-height: 140px;
-        --hero-ring-inset: 24px;
-        --hero-ring-offset: 40px;
-        --hero-orbit-distance: 52px;
-        --hero-dot-size: 12px;
-        --hero-dot-radius: calc(var(--hero-dot-size) / 2);
-        background-color: #f5f9ff;
+        --spacing: 22px;
+        background-color: var(--page-bg);
       }
 
       * {
@@ -41,192 +41,172 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background: var(--bg-gradient);
+        background: var(--page-bg);
         color: var(--text-strong);
+        font-family: inherit;
+      }
+
+      .app-frame {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--page-bg);
+      }
+
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(31, 26, 44, 0.08);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .top-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: var(--primary);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 24px rgba(234, 42, 51, 0.28);
+      }
+
+      .brand-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .icon-button {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid rgba(31, 26, 44, 0.08);
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+
+      .icon-button:hover,
+      .icon-button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-soft);
+        color: var(--primary);
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(234, 42, 51, 0.12), rgba(234, 42, 51, 0.32));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--primary);
       }
 
       .app-shell {
-        max-width: 560px;
+        flex: 1;
+        width: 100%;
+        max-width: 960px;
         margin: 0 auto;
-        padding: 32px 20px 140px;
+        padding: 56px 24px 160px;
         display: flex;
         flex-direction: column;
-        gap: 24px;
-      }
-
-      header.hero {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        text-align: center;
+        gap: 32px;
       }
 
       .hero-back {
-        align-self: center;
+        align-self: flex-start;
         display: inline-flex;
         align-items: center;
         gap: 8px;
         font-weight: 600;
         color: var(--primary-dark);
-        background: rgba(47, 123, 255, 0.1);
+        background: rgba(234, 42, 51, 0.1);
         border: none;
-        padding: 8px 16px;
+        padding: 10px 18px;
         border-radius: var(--radius-pill);
         cursor: pointer;
         font-size: 0.95rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
       }
 
       .hero-back span[aria-hidden="true"] {
         font-size: 1.1rem;
       }
 
-      h1.hero-title {
+      .hero-back:hover,
+      .hero-back:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .capture-card-header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        align-items: center;
+      }
+
+      .capture-eyebrow {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      h1.capture-title {
         margin: 0;
-        font-size: clamp(2rem, 5vw, 2.7rem);
+        font-size: clamp(2.25rem, 6vw, 3rem);
         letter-spacing: -0.02em;
       }
 
-      p.hero-tagline {
+      p.capture-tagline {
         margin: 0;
         font-size: 1.05rem;
         color: var(--text-muted);
-        min-height: 1.4em;
+        max-width: 420px;
       }
 
       .card {
         background: var(--bg-card);
         border-radius: var(--radius-card);
-        padding: 28px 24px;
+        padding: 36px 32px;
         box-shadow: var(--shadow-card);
+        border: 1px solid rgba(31, 26, 44, 0.08);
         display: flex;
         flex-direction: column;
         gap: var(--spacing);
-        backdrop-filter: blur(10px);
-      }
-
-      .capture-card .hero-illustration {
-        position: relative;
-        height: var(--hero-height);
-        border-radius: 16px;
-        overflow: hidden;
-        background: linear-gradient(140deg, rgba(47, 123, 255, 0.12), rgba(255, 131, 96, 0.18));
-      }
-
-      .capture-card .hero-illustration::before,
-      .capture-card .hero-illustration::after {
-        content: "";
-        position: absolute;
-        border-radius: 999px;
-        filter: blur(2px);
-      }
-
-      .capture-card .hero-illustration::before {
-        width: 320px;
-        height: 320px;
-        background: radial-gradient(circle at 20% 30%, rgba(47, 123, 255, 0.55), rgba(47, 123, 255, 0));
-        top: -120px;
-        left: -110px;
-      }
-
-      .capture-card .hero-illustration::after {
-        width: 240px;
-        height: 240px;
-        background: radial-gradient(circle at 70% 80%, rgba(255, 131, 96, 0.55), rgba(255, 131, 96, 0));
-        bottom: -130px;
-        right: -120px;
-      }
-      .travel-ring {
-        position: absolute;
-        inset: var(--hero-ring-inset);
-        border-radius: 50%;
-        border: 1.5px dashed rgba(47, 123, 255, 0.38);
-        animation: rotateRing 16s linear infinite;
-      }
-
-      .travel-ring--offset {
-        inset: var(--hero-ring-offset);
-        border-style: solid;
-        border-color: rgba(255, 131, 96, 0.26);
-        opacity: 0.7;
-        animation-direction: reverse;
-      }
-
-      .travel-dot {
-        position: absolute;
-        top: calc(50% - var(--hero-dot-radius));
-        left: calc(50% - var(--hero-dot-radius));
-        width: var(--hero-dot-size);
-        height: var(--hero-dot-size);
-        border-radius: 50%;
-        background: linear-gradient(135deg, #2f7bff, #1d5bdb);
-        box-shadow: 0 0 0 4px rgba(47, 123, 255, 0.12), 0 6px 14px rgba(17, 42, 110, 0.25);
-        transform-origin: var(--hero-dot-radius) var(--hero-dot-radius);
-        animation: orbitDot 7s ease-in-out infinite;
-      }
-
-      .travel-dot::after {
-        content: "";
-        position: absolute;
-        inset: 3px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-      }
-
-      @media (max-width: 520px) {
-        :root {
-          --hero-height: 80px;
-          --hero-ring-inset: 12px;
-          --hero-ring-offset: 20px;
-          --hero-orbit-distance: 32px;
-          --hero-dot-size: 8px;
-          --hero-dot-radius: calc(var(--hero-dot-size) / 2);
-        }
-
-        .capture-card .hero-illustration::before {
-          width: 200px;
-          height: 200px;
-          top: -70px;
-          left: -70px;
-        }
-
-        .capture-card .hero-illustration::after {
-          width: 140px;
-          height: 140px;
-          bottom: -60px;
-          right: -60px;
-        }
-
-        .travel-ring {
-          border-width: 1.1px;
-        }
-
-        .travel-dot {
-          box-shadow: 0 0 0 2px rgba(47, 123, 255, 0.12), 0 3px 8px rgba(17, 42, 110, 0.18);
-        }
-      }
-
-      @keyframes rotateRing {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      @keyframes orbitDot {
-        0% {
-          transform: rotate(0deg) translateX(var(--hero-orbit-distance));
-          opacity: 0.5;
-        }
-        50% {
-          transform: rotate(180deg) translateX(var(--hero-orbit-distance));
-          opacity: 1;
-        }
-        100% {
-          transform: rotate(360deg) translateX(var(--hero-orbit-distance));
-          opacity: 0.5;
-        }
       }
 
       .capture-card h2 {
@@ -243,88 +223,113 @@
       .language-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
         padding: 4px 0;
         justify-content: center;
       }
 
       .language-chip {
         appearance: none;
-        border: 1px solid rgba(47, 123, 255, 0.18);
-        background: rgba(47, 123, 255, 0.08);
+        border: 1px solid rgba(234, 42, 51, 0.14);
+        background: rgba(234, 42, 51, 0.06);
         color: var(--primary-dark);
         border-radius: var(--radius-pill);
-        padding: 10px 16px;
+        padding: 10px 18px;
         font-size: 0.95rem;
         font-weight: 500;
         cursor: pointer;
-        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease,
+          color 0.18s ease, box-shadow 0.18s ease;
         white-space: nowrap;
       }
 
       .language-chip[data-active="true"] {
-        border-color: rgba(47, 123, 255, 0.42);
-        background: linear-gradient(135deg, rgba(47, 123, 255, 0.92), rgba(29, 91, 219, 0.92));
+        border-color: transparent;
+        background: var(--primary);
         color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(29, 91, 219, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 26px rgba(234, 42, 51, 0.22);
       }
 
       .dropzone {
         position: relative;
-        border-radius: 16px;
-        border: 1px dashed rgba(47, 123, 255, 0.32);
-        background: rgba(247, 249, 255, 0.75);
+        border-radius: 22px;
+        border: 2px dashed rgba(160, 170, 192, 0.5);
+        background: rgba(245, 247, 252, 0.86);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        padding: 12px;
-        min-height: 140px;
-        transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        gap: 16px;
+        padding: 32px 24px;
+        min-height: 200px;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
         text-align: center;
       }
 
       .dropzone[data-mode="empty"] {
-        border: 2px dashed rgba(47, 123, 255, 0.28);
-        padding: 32px 18px;
-        min-height: 200px;
+        padding: 44px 28px;
+        min-height: 240px;
       }
 
       .dropzone[data-mode="compact"] {
-        border-radius: 14px;
-        padding: 0;
-        background: rgba(247, 249, 255, 0.44);
+        border-radius: 18px;
+        padding: 16px;
+        min-height: 0;
       }
 
       .dropzone[data-active="true"] {
-        border-color: rgba(47, 123, 255, 0.48);
-        background: rgba(47, 123, 255, 0.08);
+        border-color: rgba(136, 148, 176, 0.6);
+        background: rgba(241, 244, 252, 0.98);
+        box-shadow: 0 16px 32px rgba(31, 26, 44, 0.08);
       }
 
-      .dropzone button.primary {
-        background: linear-gradient(135deg, rgba(47, 123, 255, 0.14), rgba(29, 91, 219, 0.18));
-        color: var(--primary-dark);
-        box-shadow: none;
-        border: 1px solid rgba(47, 123, 255, 0.22);
-      }
-
-      .dropzone button.primary:not(:disabled):hover,
-      .dropzone button.primary:not(:disabled):focus-visible {
-        transform: none;
-        background: linear-gradient(135deg, rgba(47, 123, 255, 0.22), rgba(29, 91, 219, 0.26));
-      }
-
-      .dropzone[data-mode="compact"] button.primary {
+      .dropzone-trigger {
         width: 100%;
-        height: 140px;
-        border-radius: inherit;
+        min-height: 200px;
+        border: none;
+        background: transparent;
+        padding: 0;
+        border-radius: 18px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        font-size: 0.95rem;
+        gap: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+
+      .dropzone-trigger:focus-visible {
+        outline: 2px solid rgba(136, 148, 176, 0.6);
+        outline-offset: 6px;
+      }
+
+      .dropzone[data-mode="compact"] .dropzone-trigger {
+        min-height: 140px;
+        border-radius: 16px;
+        aspect-ratio: 1 / 1;
+      }
+
+      .dropzone-icon {
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(96, 104, 126, 0.88);
+      }
+
+      .dropzone-icon svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .dropzone-text {
+        font-size: 1rem;
+        color: rgba(72, 80, 102, 0.96);
       }
 
       .dropzone .note {
@@ -340,7 +345,7 @@
       .preview-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 14px;
+        gap: 16px;
       }
 
       .preview-grid[data-state="empty"] {
@@ -349,10 +354,10 @@
 
       .preview-tile {
         position: relative;
-        border-radius: 14px;
+        border-radius: 16px;
         overflow: hidden;
-        background: rgba(47, 123, 255, 0.1);
-        box-shadow: 0 12px 24px rgba(15, 27, 57, 0.12);
+        background: rgba(234, 42, 51, 0.08);
+        box-shadow: 0 12px 24px rgba(31, 26, 44, 0.12);
       }
 
       .preview-tile img {
@@ -390,10 +395,29 @@
         font-weight: 500;
       }
 
+      .capture-card {
+        gap: 32px;
+        padding: 48px 44px;
+      }
+
       .capture-card form {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing);
+        gap: 28px;
+      }
+
+      .capture-language {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .capture-language-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-strong);
       }
 
       .sticky-bar {
@@ -402,8 +426,8 @@
         right: 0;
         bottom: 0;
         padding: 16px 24px calc(16px + env(safe-area-inset-bottom));
-        background: rgba(247, 249, 255, 0.92);
-        border-top: 1px solid rgba(17, 42, 110, 0.08);
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid rgba(31, 26, 44, 0.08);
         backdrop-filter: blur(12px);
         display: flex;
         justify-content: space-between;
@@ -417,11 +441,11 @@
 
       button {
         appearance: none;
-        border-radius: 18px;
-        border: 1px solid rgba(17, 42, 110, 0.12);
-        background: rgba(247, 249, 255, 0.88);
+        border-radius: 16px;
+        border: 1px solid transparent;
+        background: #ffffff;
         padding: 14px 18px;
-        font-size: 1rem;
+        font-size: 0.98rem;
         font-weight: 600;
         color: var(--text-strong);
         display: inline-flex;
@@ -429,11 +453,12 @@
         justify-content: center;
         gap: 8px;
         cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease,
+          border-color 0.18s ease, color 0.18s ease;
       }
 
       button:disabled {
-        opacity: 0.55;
+        opacity: 0.6;
         cursor: not-allowed;
         transform: none;
         box-shadow: none;
@@ -441,20 +466,27 @@
 
       button.primary {
         border-color: transparent;
-        background: linear-gradient(135deg, var(--primary), #1d5bdb);
-        color: white;
-        box-shadow: 0 16px 36px rgba(47, 123, 255, 0.32);
+        background: var(--primary);
+        color: #ffffff;
+        box-shadow: 0 18px 32px rgba(234, 42, 51, 0.26);
       }
 
       button.primary:not(:disabled):hover,
       button.primary:not(:disabled):focus-visible {
         transform: translateY(-1px);
+        box-shadow: 0 20px 36px rgba(234, 42, 51, 0.32);
       }
 
       button.secondary {
-        background: rgba(47, 123, 255, 0.08);
+        background: rgba(234, 42, 51, 0.08);
         color: var(--primary-dark);
-        border-color: rgba(47, 123, 255, 0.18);
+        border-color: rgba(234, 42, 51, 0.16);
+      }
+
+      button.secondary:not(:disabled):hover,
+      button.secondary:not(:disabled):focus-visible {
+        background: rgba(234, 42, 51, 0.14);
+        border-color: rgba(234, 42, 51, 0.24);
       }
 
       button.ghost {
@@ -472,6 +504,37 @@
         align-items: center;
         text-align: center;
         gap: 24px;
+      }
+
+      @media (max-width: 640px) {
+        .top-bar {
+          padding: 14px 18px;
+        }
+
+        .app-shell {
+          padding: 36px 18px 140px;
+        }
+
+        .capture-card {
+          padding: 32px 20px;
+          gap: 28px;
+        }
+
+        h1.capture-title {
+          font-size: clamp(1.9rem, 7vw, 2.4rem);
+        }
+
+        p.capture-tagline {
+          font-size: 0.95rem;
+        }
+
+        .language-row {
+          justify-content: center;
+        }
+
+        .dropzone[data-mode="empty"] {
+          padding: 32px 18px;
+        }
       }
 
       .processing-card p {
@@ -1380,42 +1443,91 @@
     </style>
   </head>
   <body>
-    <main class="app-shell">
-      <header class="hero">
+    <div class="app-frame">
+      <header class="top-bar">
+        <div class="top-brand">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span class="brand-name">Mainu</span>
+        </div>
+        <div class="top-actions">
+          <button type="button" class="icon-button" aria-label="How Mainu works">?</button>
+          <div class="avatar" aria-hidden="true">YY</div>
+        </div>
+      </header>
+      <main class="app-shell">
         <button type="button" class="hero-back" id="hero-back" hidden>
           <span aria-hidden="true">←</span>
           <span>Mainu on-the-go</span>
         </button>
-        <h1 class="hero-title">Make it easy to order</h1>
-        <p class="hero-tagline" id="hero-tagline">Order with ease, in the language you know best!</p>
-      </header>
 
-      <section class="card capture-card screen" data-screen="capture">
-        <form id="upload-form" novalidate>
-          <div>
-            <h3 style="margin: 0 0 8px; font-size: 1rem;">Read the menu in</h3>
-            <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
-            <input type="hidden" id="output-language" name="output_language" />
-          </div>
-          <div class="warning" id="upload-warning" hidden></div>
-          <div class="preview-grid" id="preview-grid">
-            <div class="dropzone" id="dropzone" data-mode="empty">
-              <input
-                id="menu-files"
-                type="file"
-                name="files"
-                accept="image/jpeg,image/png,image/heic"
-                multiple
-                hidden
-              />
-              <button type="button" class="primary" id="add-files-button">
-                <span aria-hidden="true">＋</span> Add menu photos
-              </button>
-              <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
+        <section class="card capture-card screen" data-screen="capture">
+          <header class="capture-card-header">
+            <span class="capture-eyebrow">Mainu on-the-go</span>
+            <h1 class="capture-title">Make it easy to order</h1>
+            <p class="capture-tagline" id="hero-tagline">Order with ease, in the language you know best!</p>
+          </header>
+
+          <form id="upload-form" novalidate>
+            <div class="capture-language">
+              <p class="capture-language-title">Read the menu in</p>
+              <div class="language-row" id="language-choices" role="listbox" aria-label="Output language"></div>
+              <input type="hidden" id="output-language" name="output_language" />
             </div>
-          </div>
-        </form>
-      </section>
+            <div class="warning" id="upload-warning" hidden></div>
+            <div class="preview-grid" id="preview-grid">
+              <div class="dropzone" id="dropzone" data-mode="empty">
+                <input
+                  id="menu-files"
+                  type="file"
+                  name="files"
+                  accept="image/jpeg,image/png,image/heic"
+                  multiple
+                  hidden
+                />
+                <button type="button" class="dropzone-trigger" id="add-files-button">
+                  <span class="dropzone-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" role="img">
+                      <path
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M30 10h-12l-2.4 4H10a4 4 0 0 0-4 4v16a4 4 0 0 0 4 4h28a4 4 0 0 0 4-4V18a4 4 0 0 0-4-4h-5.6Z"
+                      />
+                      <circle
+                        cx="24"
+                        cy="24"
+                        r="7"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M34 16v-5"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M31.5 13.5H36.5"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span class="dropzone-text" id="add-files-button-text">Add menu photos</span>
+                </button>
+                <p class="note">JPEG, PNG or HEIC · Add up to 10 pages per session.</p>
+              </div>
+            </div>
+          </form>
+        </section>
 
       <section class="card processing-card screen" data-screen="processing" hidden>
         <div class="progress-ring" aria-hidden="true"></div>
@@ -1503,6 +1615,7 @@
 
       <footer class="app-footer">Bon appétit • mainu on-the-go</footer>
     </main>
+    </div>
 
     <div class="sticky-bar" id="capture-actions">
       <span id="capture-status">No photos yet</span>
@@ -1578,6 +1691,7 @@
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
       const addFilesButton = document.getElementById("add-files-button");
+      const addFilesButtonText = document.getElementById("add-files-button-text");
       const uploadWarning = document.getElementById("upload-warning");
       const previewGrid = document.getElementById("preview-grid");
       const languageChoices = document.getElementById("language-choices");
@@ -1952,11 +2066,15 @@
         if (!state.files.length) {
           captureStatus.textContent = "No photos yet";
           translateButton.disabled = true;
-          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add menu photos';
+          if (addFilesButtonText) {
+            addFilesButtonText.textContent = "Add menu photos";
+          }
         } else {
           captureStatus.textContent = `${state.files.length} photo${state.files.length === 1 ? "" : "s"} ready`;
           translateButton.disabled = false;
-          addFilesButton.innerHTML = '<span aria-hidden="true">＋</span> Add another photo';
+          if (addFilesButtonText) {
+            addFilesButtonText.textContent = "Add more";
+          }
         }
       }
 
