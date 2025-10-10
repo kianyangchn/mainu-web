@@ -899,15 +899,29 @@
         background: none;
         font-weight: 600;
         color: rgba(72, 80, 102, 0.9);
-        border-bottom: 2px solid transparent;
         cursor: pointer;
         white-space: nowrap;
-        transition: color 0.18s ease, border-color 0.18s ease;
+        position: relative;
+        transition: color 0.18s ease;
+      }
+
+      .section-nav button::after {
+        content: "";
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 6px;
+        height: 2px;
+        background: transparent;
+        transition: background 0.18s ease;
       }
 
       .section-nav button[data-active="true"] {
         color: var(--primary);
-        border-color: var(--primary);
+      }
+
+      .section-nav button[data-active="true"]::after {
+        background: var(--primary);
       }
 
       .section-nav button:focus-visible {
