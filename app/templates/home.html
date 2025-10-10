@@ -697,102 +697,121 @@
       .menu-results {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 28px;
       }
 
-      .pill {
-        display: inline-flex;
+      .menu-header {
+        display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: var(--radius-pill);
-        background: rgba(47, 123, 255, 0.1);
-        color: var(--primary-dark);
-        font-weight: 600;
-        font-size: 0.88rem;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 4px;
       }
 
-      .summary-actions {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      .menu-title {
+        margin: 0;
+        font-size: 1.5rem;
+        letter-spacing: -0.01em;
+      }
+
+      .menu-header-actions {
+        display: flex;
+        align-items: center;
         gap: 12px;
       }
 
-      .summary-actions button[disabled] {
-        opacity: 0.45;
-      }
-
-      .share-fab {
-        position: fixed;
-        top: calc(18px + env(safe-area-inset-top, 0px));
-        right: calc(18px + env(safe-area-inset-right, 0px));
-        width: 58px;
-        height: 58px;
+      .menu-icon-button {
+        position: relative;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        border: none;
-        background: linear-gradient(135deg, rgba(47, 123, 255, 0.95), rgba(29, 91, 219, 0.95));
-        box-shadow: 0 18px 36px rgba(17, 42, 110, 0.22);
-        color: #ffffff;
+        border: 1px solid rgba(31, 26, 44, 0.08);
+        background: rgba(255, 255, 255, 0.92);
+        color: rgba(72, 80, 102, 0.92);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 18;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       }
 
-      .share-fab[hidden] {
+      .menu-icon-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .menu-icon-button:hover,
+      .menu-icon-button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(31, 26, 44, 0.14);
+        background: #ffffff;
+      }
+
+      .menu-icon-button svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .menu-icon-button span {
+        font-size: 22px;
+      }
+
+      .menu-cart-button {
+        padding: 0;
+      }
+
+      .menu-cart-count {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu-cart-count[hidden] {
         display: none;
       }
 
-      .share-fab:active {
-        transform: scale(0.97);
-      }
-
-      .share-fab svg {
-        width: 26px;
-        height: 26px;
-        fill: currentColor;
-      }
-
-      .share-fab[data-copied="true"] {
-        background: linear-gradient(135deg, rgba(47, 185, 136, 0.95), rgba(34, 145, 103, 0.95));
+      .share-fab {
+        padding: 0;
+        border: none;
       }
 
       .share-fab[data-loading="true"] {
-        pointer-events: none;
         opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .share-fab[data-copied="true"] {
+        background: rgba(47, 185, 136, 0.14);
+        border-color: rgba(47, 185, 136, 0.28);
+        color: rgba(34, 145, 103, 0.92);
       }
 
       .share-fab-panel {
         position: fixed;
-        top: calc(90px + env(safe-area-inset-top, 0px));
-        right: calc(16px + env(safe-area-inset-right, 0px));
-        width: min(280px, calc(100% - 32px));
-        background: var(--bg-card);
-        border-radius: 22px;
-        box-shadow: 0 28px 60px rgba(17, 42, 110, 0.22);
-        padding: 22px 22px 26px;
-        z-index: 17;
+        top: calc(120px + env(safe-area-inset-top, 0px));
+        right: calc(20px + env(safe-area-inset-right, 0px));
+        width: min(320px, calc(100% - 40px));
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(160, 170, 192, 0.24);
+        box-shadow: 0 28px 64px rgba(31, 26, 44, 0.18);
+        padding: 24px;
         display: flex;
         flex-direction: column;
         gap: 16px;
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(47, 123, 255, 0.12);
-      }
-
-      .share-fab-panel::before {
-        content: "";
-        position: absolute;
-        top: -12px;
-        right: 28px;
-        width: 22px;
-        height: 22px;
-        background: var(--bg-card);
-        transform: rotate(45deg);
-        border-top: 1px solid rgba(47, 123, 255, 0.12);
-        border-left: 1px solid rgba(47, 123, 255, 0.12);
-        box-shadow: -4px -4px 12px rgba(17, 42, 110, 0.06);
+        z-index: 30;
       }
 
       .share-fab-panel[hidden] {
@@ -808,7 +827,7 @@
 
       .share-fab-heading {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 600;
       }
 
@@ -816,19 +835,16 @@
         margin: 0;
         color: var(--text-muted);
         font-size: 0.92rem;
-        line-height: 1.5;
+        line-height: 1.45;
       }
 
       .share-fab-close {
-        border: none;
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(47, 123, 255, 0.12);
-        color: var(--primary-dark);
+        border: none;
+        background: rgba(160, 170, 192, 0.14);
+        color: rgba(72, 80, 102, 0.92);
         cursor: pointer;
       }
 
@@ -837,8 +853,8 @@
         align-items: center;
         justify-content: center;
         padding: 12px;
-        border-radius: 16px;
-        background: rgba(47, 123, 255, 0.08);
+        border-radius: 14px;
+        background: rgba(245, 247, 252, 0.9);
       }
 
       .share-fab-qr img {
@@ -849,96 +865,104 @@
       .menu-results-layout {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 28px;
       }
 
       .menu-results-content {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 28px;
         width: 100%;
       }
 
       .section-nav {
         position: sticky;
-        top: env(safe-area-inset-top, 0px);
-        z-index: 6;
+        top: calc(76px + env(safe-area-inset-top, 0px));
+        z-index: 12;
         display: flex;
-        gap: 10px;
+        gap: 12px;
+        padding: 0 4px;
+        border-bottom: 1px solid rgba(31, 26, 44, 0.08);
+        background: var(--page-bg);
         overflow-x: auto;
-        width: calc(100% + 40px);
-        justify-content: flex-start;
-        margin: -16px -20px 0;
-        padding: 18px 20px;
-        background: rgba(247, 249, 255, 0.95);
-        backdrop-filter: blur(6px);
-        border-bottom: 1px solid rgba(29, 91, 219, 0.08);
-        box-shadow: 0 12px 32px rgba(17, 42, 110, 0.12);
+        scrollbar-width: none;
+      }
+
+      .section-nav::-webkit-scrollbar {
+        display: none;
       }
 
       .section-nav button {
-        border-radius: var(--radius-pill);
-        padding: 10px 16px;
+        padding: 12px 18px;
         border: none;
-        background: rgba(47, 123, 255, 0.08);
-        color: var(--primary-dark);
+        background: none;
         font-weight: 600;
+        color: rgba(72, 80, 102, 0.9);
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
         white-space: nowrap;
+        transition: color 0.18s ease, border-color 0.18s ease;
       }
 
       .section-nav button[data-active="true"] {
-        background: linear-gradient(135deg, var(--primary), #1d5bdb);
-        color: #fff;
+        color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .section-nav button:focus-visible {
+        outline: 3px solid rgba(234, 42, 51, 0.3);
+        outline-offset: 2px;
       }
 
       .sections {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 32px;
+        padding: 0 4px 40px;
       }
 
       .section-card {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 20px;
       }
 
       .section-title {
         margin: 0;
-        font-size: 1.22rem;
-        font-weight: 600;
+        font-size: 1.4rem;
+        letter-spacing: -0.01em;
       }
 
       .dish-list {
-        display: grid;
-        gap: 16px;
-        padding: 0;
-        margin: 0;
         list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
       }
 
       .dish-card {
-        position: relative;
         display: flex;
         flex-direction: column;
         gap: 14px;
         padding: 20px 18px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 246, 255, 0.8));
-        border: 1px solid rgba(47, 123, 255, 0.14);
-        box-shadow: 0 16px 32px rgba(29, 91, 219, 0.12);
-        transition: transform 0.18s ease, border-color 0.18s ease;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(160, 170, 192, 0.24);
+        box-shadow: 0 18px 36px rgba(31, 26, 44, 0.08);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
 
       .dish-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(47, 123, 255, 0.32);
+        border-color: rgba(234, 42, 51, 0.24);
+        box-shadow: 0 22px 44px rgba(31, 26, 44, 0.12);
       }
 
       .dish-headline {
         display: flex;
         justify-content: space-between;
-        gap: 12px;
+        gap: 16px;
       }
 
       .dish-name {
@@ -954,44 +978,57 @@
 
       .original-name {
         font-size: 0.82rem;
-        padding: 4px 10px;
-        align-self: flex-start;
-        border-radius: var(--radius-pill);
-        background: rgba(29, 91, 219, 0.12);
-        color: var(--primary-dark);
-        font-weight: 600;
+        color: rgba(96, 104, 126, 0.72);
+        font-weight: 500;
       }
 
       .price-tag {
         font-weight: 600;
-        color: var(--primary-dark);
+        color: var(--primary);
       }
 
       .dish-description {
         margin: 0;
-        color: var(--text-muted);
+        color: rgba(72, 80, 102, 0.85);
         line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
       }
 
       .dish-actions {
         display: flex;
         justify-content: flex-end;
-        gap: 12px;
+        gap: 10px;
         align-items: center;
+      }
+
+      .add-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: var(--primary);
+        color: #ffffff;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+
+      .add-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 20px rgba(234, 42, 51, 0.28);
+      }
+
+      .add-button:active {
+        transform: translateY(0);
       }
 
       .quantity-controls {
         display: none;
         align-items: center;
-        gap: 4px;
-        border-radius: 10px;
-        background: none;
-        padding: 1px 6px;
-        border: 1px solid rgba(47, 123, 255, 0.18);
+        gap: 8px;
+        border-radius: 999px;
+        background: rgba(160, 170, 192, 0.16);
+        padding: 4px 10px;
       }
 
       .quantity-controls[data-active="true"] {
@@ -999,130 +1036,41 @@
       }
 
       .quantity-display {
-        min-width: 14px;
+        min-width: 16px;
         text-align: center;
         font-weight: 600;
       }
 
-      .add-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: none;
-        background: linear-gradient(135deg, #e6efff, #cfe0ff);
-        color: var(--primary-dark);
-        font-size: 1.25rem;
-        font-weight: 700;
-        line-height: 1;
-        padding: 0;
-        cursor: pointer;
-        transition: transform 0.12s ease, background 0.12s ease;
-      }
-
-      .add-button:hover {
-        transform: translateY(-1px);
-        background: linear-gradient(135deg, #dae6ff, #c7d9ff);
-      }
-
-      .add-button:active {
-        transform: translateY(0);
-        background: linear-gradient(135deg, #ccdafe, #bfd0ff);
-      }
-
       .quantity-controls button {
         border: none;
-        background: none;
-        font-size: 0.9rem;
-        color: var(--primary-dark);
+        background: rgba(255, 255, 255, 0.9);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 1rem;
+        font-weight: 600;
+        color: rgba(72, 80, 102, 0.9);
         cursor: pointer;
-        padding: 2px 4px;
-        line-height: 1;
-        min-width: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
       }
 
       .quantity-controls button:focus-visible,
       .add-button:focus-visible {
-        outline: 3px solid rgba(47, 123, 255, 0.45);
+        outline: 3px solid rgba(234, 42, 51, 0.3);
         outline-offset: 2px;
       }
 
-      .menu-actions {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-        background: rgba(15, 27, 57, 0.92);
-        color: #f8fafc;
-        display: none;
-        align-items: center;
-        gap: 12px;
+      .summary-actions {
+        display: flex;
         flex-wrap: wrap;
-        backdrop-filter: blur(8px);
-        border-top: 1px solid rgba(148, 163, 184, 0.16);
-      }
-
-      .menu-actions-summary {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-        padding: 0;
-        border: none;
-        background: none;
-        color: inherit;
-        cursor: pointer;
-      }
-
-      .menu-actions-summary:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-      }
-
-      .menu-actions-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(248, 250, 252, 0.12);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-      }
-
-      .menu-actions-summary-text {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        text-align: left;
-      }
-
-      .menu-actions-summary-text strong {
-        font-weight: 600;
-      }
-
-      .menu-actions-summary-text span {
-        font-size: 0.88rem;
-        color: rgba(248, 250, 252, 0.75);
-      }
-
-      .menu-actions-buttons {
-        display: flex;
         gap: 12px;
-        flex: 1;
-        justify-content: flex-end;
-        flex-wrap: wrap;
       }
 
-      .menu-actions-buttons button {
-        min-width: 120px;
-        padding: 12px 16px;
+      .summary-actions button {
+        flex: 1 1 160px;
+      }
+
+      .summary-actions button[disabled] {
+        opacity: 0.45;
       }
 
       .order-card {
@@ -1146,38 +1094,56 @@
       }
 
       dialog::backdrop {
-        background: rgba(15, 27, 57, 0.35);
+        background: rgba(31, 26, 44, 0.4);
       }
 
       dialog.cart-dialog {
         border: none;
-        border-radius: 18px;
-        width: min(520px, calc(100vw - 32px));
+        border-radius: 24px 24px 0 0;
+        width: min(520px, calc(100% - 24px));
         max-width: 560px;
-        max-height: 85vh;
         padding: 0;
-        box-shadow: var(--shadow-card);
+        margin: 0;
+        position: fixed;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        box-shadow: 0 -12px 48px rgba(31, 26, 44, 0.22);
+        background: #ffffff;
       }
 
       .cart-dialog-content {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 24px;
-        max-height: inherit;
-        overflow-y: auto;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 20px;
+        padding: 28px 24px 32px;
+        max-height: min(80vh, 620px);
       }
 
       .cart-dialog-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
       }
 
       .cart-dialog-header h2 {
         margin: 0;
-        font-size: 1.2rem;
+        font-size: 1.25rem;
+        letter-spacing: -0.01em;
+      }
+
+      .cart-dialog-summary {
+        margin: 8px 0 0;
+        color: rgba(72, 80, 102, 0.86);
+        font-size: 0.92rem;
+      }
+
+      .cart-dialog-body {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
       }
 
       .cart-dialog-list {
@@ -1193,8 +1159,8 @@
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(160, 170, 192, 0.24);
       }
 
       .cart-dialog-item:last-child {
@@ -1208,49 +1174,68 @@
       }
 
       .cart-dialog-item span {
-        color: var(--text-muted);
+        color: rgba(96, 104, 126, 0.78);
         font-size: 0.9rem;
       }
 
+      .cart-dialog-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .cart-dialog-quantity {
+        font-weight: 600;
+        color: rgba(72, 80, 102, 0.95);
+      }
+
+      .cart-dialog-price {
+        color: rgba(96, 104, 126, 0.78);
+        font-size: 0.9rem;
+      }
+
+      .cart-dialog-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .cart-dialog-total {
+        font-weight: 600;
+        color: rgba(72, 80, 102, 0.95);
+        font-size: 0.95rem;
+      }
+
+      .cart-dialog-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .cart-dialog-actions button {
+        min-width: 0;
+        flex: 1 1 140px;
+      }
+
       .dialog-close {
-        align-self: flex-end;
         border: none;
         background: none;
-        color: var(--primary-dark);
+        color: rgba(72, 80, 102, 0.8);
         font-weight: 600;
         cursor: pointer;
-        padding: 8px 0;
+        padding: 6px 0;
       }
 
-      @media (max-width: 640px) {
-        .menu-actions-buttons {
-          flex: 1 1 100%;
-          justify-content: stretch;
-        }
-        .menu-actions-buttons button {
-          flex: 1;
-          min-width: 0;
-        }
-      }
-
-      @media (min-width: 900px) {
-        .menu-actions {
-          padding: 18px 48px calc(18px + env(safe-area-inset-bottom));
-          gap: 16px;
-        }
-        .menu-actions-summary {
-          gap: 12px;
-          min-width: 200px;
-        }
-        .menu-actions-buttons button {
-        min-width: 150px;
-      }
-      }
 
       .menu-celebration {
         position: fixed;
         left: 50%;
-        bottom: calc(112px + env(safe-area-inset-bottom));
+        bottom: calc(96px + env(safe-area-inset-bottom));
         transform: translateX(-50%);
         pointer-events: none;
         z-index: 50;
@@ -1552,20 +1537,50 @@
       </section>
 
       <section class="menu-results screen" data-screen="menu" hidden>
-        <button
-          type="button"
-          class="share-fab"
-          id="share-fab"
-          aria-label="Share this menu"
-          aria-expanded="false"
-          hidden
-        >
-          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-            <path
-              d="M18 16a2 2 0 0 0-1.444.63l-7.433-3.553a2 2 0 0 0 0-2.154l7.433-3.553A2 2 0 1 0 15 6a1.99 1.99 0 0 0 .051.443L7.618 9.996a2 2 0 1 0 0 4.008l7.433 3.553A2 2 0 1 0 18 16Z"
-            />
-          </svg>
-        </button>
+        <div class="menu-header">
+          <h2 class="menu-title" id="menu-header-title">Interactive menu</h2>
+          <div class="menu-header-actions">
+            <button
+              type="button"
+              class="menu-icon-button share-fab"
+              id="share-fab"
+              aria-label="Share this menu"
+              aria-expanded="false"
+              hidden
+            >
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M18 16a2.99 2.99 0 0 0-2.296 1.061l-6.23-3.357A3 3 0 0 0 9 12a3 3 0 0 0-.527-1.704l6.223-3.337A3 3 0 1 0 14 5a2.99 2.99 0 0 0 .173 1.002l-6.235 3.343A3 3 0 1 0 9 15c0-.386-.075-.754-.204-1.095l6.23 3.357A3 3 0 1 0 18 16Z"
+                />
+              </svg>
+            </button>
+            <button type="button" class="menu-icon-button" id="menu-search-button" aria-label="Search dishes">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="m20.3 19.29-3.385-3.386A7.45 7.45 0 0 0 18 10.5 7.5 7.5 0 1 0 10.5 18a7.45 7.45 0 0 0 5.404-2.086l3.386 3.384a1 1 0 0 0 1.414-1.414ZM5 10.5a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="menu-icon-button menu-cart-button"
+              id="cart-summary-button"
+              disabled
+              aria-label="Cart empty"
+              title="Cart empty"
+            >
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M7.25 6h13.058a1 1 0 0 1 .976 1.217l-1.8 7.5A1.5 1.5 0 0 1 18.022 16H9.228l-.336 1.347A1.5 1.5 0 0 1 7.431 18H4a1 1 0 1 1 0-2h2.764l2.262-9.047A1.5 1.5 0 0 1 10.486 6H11a1 1 0 1 1 0 2h-.45l-.375 1.5h8.23l.36-1.5H9.944l-.75 3h8.87l-.75 3H8.494l-.445 1.781.01.008-.028.111-.12.48-.161.64H18a3.5 3.5 0 0 0 3.4-2.693l1.8-7.5A3 3 0 0 0 20.308 4H7.25a1 1 0 1 1 0-2h.25a1 1 0 1 1 0 2h-.25Z"
+                />
+              </svg>
+              <span class="menu-cart-count" id="menu-summary-count" hidden aria-hidden="true">0</span>
+            </button>
+          </div>
+        </div>
         <aside
           class="share-fab-panel"
           id="share-fab-panel"
@@ -1607,7 +1622,7 @@
           <p style="margin: 4px 0 0; color: var(--text-muted);">Share this summary with the staff so everyone’s meal is just right.</p>
         </div>
         <div class="order-note" id="order-note"></div>
-        <div class="summary-actions" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
+        <div class="summary-actions">
           <button type="button" class="primary" id="copy-order">Copy note</button>
           <button type="button" class="secondary" id="back-to-menu">Back to menu</button>
         </div>
@@ -1620,20 +1635,6 @@
     <div class="sticky-bar" id="capture-actions">
       <span id="capture-status">No photos yet</span>
       <button type="button" class="primary" id="translate-button" disabled>Transfer menu</button>
-    </div>
-
-    <div class="menu-actions" id="menu-actions" aria-hidden="true">
-      <button type="button" class="menu-actions-summary" id="cart-summary-button" disabled>
-        <span class="menu-actions-icon" aria-hidden="true">🛒</span>
-        <span class="menu-actions-summary-text">
-          <strong id="menu-summary-count">No dishes selected</strong>
-          <span id="menu-summary-price"></span>
-        </span>
-      </button>
-      <div class="menu-actions-buttons">
-          <button type="button" class="primary" id="generate-order" disabled>🛎️ Order please!</button>
-          <button type="button" class="secondary" id="clear-cart" disabled>🔄️ Clear</button>
-      </div>
     </div>
 
     <div class="menu-celebration" id="menu-celebration" data-active="false" aria-hidden="true">
@@ -1650,11 +1651,23 @@
     <dialog class="cart-dialog" id="cart-dialog" aria-modal="true">
       <form method="dialog" class="cart-dialog-content">
         <header class="cart-dialog-header">
-          <h2>Table picks</h2>
+          <div>
+            <h2>Table picks</h2>
+            <p class="cart-dialog-summary">Review dishes for the table before sharing the note.</p>
+          </div>
           <button type="button" id="close-cart-dialog" aria-label="Close" class="dialog-close">Close</button>
         </header>
-        <p id="cart-dialog-empty" style="margin:0; color: var(--text-muted);">Select dishes to see them here.</p>
-        <ul class="cart-dialog-list" id="cart-dialog-list"></ul>
+        <div class="cart-dialog-body">
+          <p id="cart-dialog-empty" style="margin:0; color: var(--text-muted);">Select dishes to see them here.</p>
+          <ul class="cart-dialog-list" id="cart-dialog-list"></ul>
+        </div>
+        <footer class="cart-dialog-footer">
+          <span class="cart-dialog-total" id="menu-summary-price"></span>
+          <div class="cart-dialog-actions">
+            <button type="button" class="secondary" id="clear-cart" disabled>Clear</button>
+            <button type="button" class="primary" id="generate-order" disabled>Generate note</button>
+          </div>
+        </footer>
       </form>
     </dialog>
 
@@ -1705,8 +1718,7 @@
       const sectionNav = document.getElementById("section-nav");
       const sectionsContainer = document.getElementById("sections");
       const emptyState = document.getElementById("empty-state");
-
-      const menuActions = document.getElementById("menu-actions");
+      const menuHeaderTitle = document.getElementById("menu-header-title");
       const cartSummaryButton = document.getElementById("cart-summary-button");
       const menuSummaryCount = document.getElementById("menu-summary-count");
       const menuSummaryPrice = document.getElementById("menu-summary-price");
@@ -1797,9 +1809,6 @@
         captureActions.setAttribute("aria-hidden", showCapture ? "false" : "true");
 
         const showMenu = name === "menu";
-        menuActions.hidden = !showMenu;
-        menuActions.style.display = showMenu ? "flex" : "none";
-        menuActions.setAttribute("aria-hidden", showMenu ? "false" : "true");
         if (showMenu && state.shouldCelebrateMenu) {
           playMenuCelebration();
           state.shouldCelebrateMenu = false;
@@ -2288,7 +2297,18 @@
         state.menu = payload.template;
         resetShareState();
 
-        menuTitleText = (menuTitleText || "").trim() || "Order please";
+        const rawTitle =
+          payload?.template?.menu_title ??
+          payload?.template?.title ??
+          payload?.template?.name ??
+          payload?.template?.restaurant ??
+          payload?.template?.metadata?.title ??
+          "";
+        menuTitleText = (typeof rawTitle === "string" && rawTitle.trim().length ? rawTitle : "Order please").trim();
+        if (menuHeaderTitle) {
+          const headerLabel = menuTitleText === "Order please" ? "Interactive menu" : menuTitleText;
+          menuHeaderTitle.textContent = headerLabel;
+        }
 
         renderSections();
         clearSelections();
@@ -2550,21 +2570,48 @@
         const items = Array.from(cart.values());
         const total = items.reduce((sum, item) => sum + item.quantity, 0);
         if (!items.length) {
-          cartSummaryButton.disabled = true;
-          menuSummaryCount.textContent = "No dishes selected";
-          menuSummaryPrice.textContent = "";
-          generateOrderButton.disabled = true;
-          clearCartButton.disabled = true;
+          if (cartSummaryButton) {
+            cartSummaryButton.disabled = true;
+            cartSummaryButton.setAttribute("aria-label", "Cart empty");
+            cartSummaryButton.title = "Cart empty";
+            cartSummaryButton.removeAttribute("data-count");
+          }
+          if (menuSummaryCount) {
+            menuSummaryCount.textContent = "0";
+            menuSummaryCount.hidden = true;
+          }
+          if (menuSummaryPrice) {
+            menuSummaryPrice.textContent = "";
+          }
+          if (generateOrderButton) {
+            generateOrderButton.disabled = true;
+          }
+          if (clearCartButton) {
+            clearCartButton.disabled = true;
+          }
           if (cartDialog?.open) {
             renderCartDialog();
           }
           return;
         }
 
-        cartSummaryButton.disabled = false;
-        menuSummaryCount.textContent = `${total} ${total === 1 ? "dish" : "dishes"}`;
-        generateOrderButton.disabled = false;
-        clearCartButton.disabled = false;
+        if (cartSummaryButton) {
+          cartSummaryButton.disabled = false;
+          const cartLabel = `Cart with ${total} ${total === 1 ? "dish" : "dishes"}`;
+          cartSummaryButton.setAttribute("aria-label", cartLabel);
+          cartSummaryButton.title = cartLabel;
+          cartSummaryButton.dataset.count = String(total);
+        }
+        if (menuSummaryCount) {
+          menuSummaryCount.textContent = String(total);
+          menuSummaryCount.hidden = false;
+        }
+        if (generateOrderButton) {
+          generateOrderButton.disabled = false;
+        }
+        if (clearCartButton) {
+          clearCartButton.disabled = false;
+        }
         let totalPriceValue = 0;
         let hasPrice = false;
         let currencySymbol = null;
@@ -2591,11 +2638,13 @@
           currencySymbol = "";
         }
 
-        if (hasPrice && totalPriceValue > 0) {
-          const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
-          menuSummaryPrice.textContent = `Estimated price: ${formatted}`;
-        } else {
-          menuSummaryPrice.textContent = "";
+        if (menuSummaryPrice) {
+          if (hasPrice && totalPriceValue > 0) {
+            const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
+            menuSummaryPrice.textContent = `Estimated total · ${formatted}`;
+          } else {
+            menuSummaryPrice.textContent = "";
+          }
         }
 
         if (cartDialog?.open) {
@@ -2617,7 +2666,7 @@
         cartDialogList.innerHTML = items
           .map((item) => {
             const priceHtml = item.priceDisplay
-              ? `<span>${escapeHtml(item.priceDisplay)}</span>`
+              ? `<span class="cart-dialog-price">${escapeHtml(item.priceDisplay)}</span>`
               : "";
             return `
               <li class="cart-dialog-item">
@@ -2625,8 +2674,8 @@
                   <strong>${escapeHtml(item.translatedName)}</strong>
                   <span>${escapeHtml(item.sectionTitle)}</span>
                 </div>
-                <div style="text-align:right; white-space:nowrap; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
-                  <span>${item.quantity}×</span>
+                <div class="cart-dialog-meta">
+                  <span class="cart-dialog-quantity">${item.quantity}×</span>
                   ${priceHtml}
                 </div>
               </li>`;
@@ -2655,10 +2704,10 @@
         }
         sectionsContainer.innerHTML = "";
         sectionNav.innerHTML = "";
-        menuActions.hidden = true;
-        menuActions.style.display = "none";
-        menuActions.setAttribute("aria-hidden", "true");
         clearSelections();
+        if (menuHeaderTitle) {
+          menuHeaderTitle.textContent = "Interactive menu";
+        }
       }
 
       function resetCapture() {
@@ -2668,6 +2717,9 @@
         renderPreview();
         updateCaptureStatus();
         menuTitleText = "Order please";
+        if (menuHeaderTitle) {
+          menuHeaderTitle.textContent = "Interactive menu";
+        }
       }
 
       addFilesButton.addEventListener("click", () => fileInput.click());
@@ -2791,7 +2843,7 @@
       });
 
       cartSummaryButton.addEventListener("click", () => {
-        if (!cart.size) {
+        if (!cart.size || !cartDialog) {
           return;
         }
         renderCartDialog();
@@ -2819,6 +2871,7 @@
         }
         const summary = buildOrderSummary();
         orderNote.textContent = `${menuTitleText}\n\n${summary}`;
+        cartDialog?.close();
         showScreen("order");
       });
 
