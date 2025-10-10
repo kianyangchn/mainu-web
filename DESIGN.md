@@ -26,7 +26,7 @@
 
 ## 5. Screen Blueprints
 ### A. Welcome / Capture (replace `home.html`)
-- Compact brand hero with rotating taglines ("One menu, zero confusion").
+- Compact brand hero anchored by the primary headline; keep supporting copy minimal.
 - Upload module: large photo card with floating “+” icon; copy limited to “Add menu photos.” Secondary link “Tips for crisp shots” (modal or popover).
 - Language chips: horizontal pill carousel with top destinations plus “Auto-detect” default.
 - Optional “Recent menus” placeholder row for future history.
@@ -40,7 +40,8 @@
 - Full-bleed card featuring animated airplane trail spinner, single message “We’re unpacking the menu…” and dotted progress estimate.
 
 ### D. Result / Planner Hub
-- Summary card: editable restaurant name, detected language chip, share pill showing TTL countdown (24h).
+- Streamlined hero (no summary card) so the menu list sits higher; title editing deferred.
+- Floating share bubble triggers link copy + QR overlay; keeps hub layout tidy while preserving quick access.
 - Section navigation: sticky horizontal tabs; tapping scrolls to section list.
 - Dish cards: gradient border, translated name prominent, original name chip, description truncating at 2 lines, price badge right-aligned. Reserve icon slots for spice/veg indicators.
 - Collaboration row: buttons for “Save picks” (future), “Share link” primary, “Download PDF” secondary (future-ready). Share CTA mirrored in bottom sticky bar.
