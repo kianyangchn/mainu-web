@@ -637,38 +637,6 @@
         gap: 24px;
       }
 
-      .summary-card {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 24px;
-        border-radius: 18px;
-        background: var(--glass-card);
-        border: 1px solid rgba(29, 91, 219, 0.08);
-      }
-
-      .summary-header {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .summary-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin: 0;
-        border: none;
-        background: none;
-        padding: 0;
-        text-align: left;
-      }
-
-      .summary-title[contenteditable="true"]:focus {
-        outline: 2px solid rgba(47, 123, 255, 0.28);
-        border-radius: 12px;
-        padding: 6px;
-      }
-
       .pill {
         display: inline-flex;
         align-items: center;
@@ -691,133 +659,128 @@
         opacity: 0.45;
       }
 
-      .summary-share {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 12px;
-        align-items: stretch;
-      }
-
-      .summary-share .share-link-btn,
-      .summary-share .share-qr {
-        width: 100%;
-      }
-
-      .summary-share > .share-link-btn {
+      .share-fab {
+        position: fixed;
+        top: calc(18px + env(safe-area-inset-top, 0px));
+        right: calc(18px + env(safe-area-inset-right, 0px));
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, rgba(47, 123, 255, 0.95), rgba(29, 91, 219, 0.95));
+        box-shadow: 0 18px 36px rgba(17, 42, 110, 0.22);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
         justify-content: center;
+        cursor: pointer;
+        z-index: 18;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
       }
 
-      .share-qr {
-        display: grid;
-        place-items: center;
-        background: rgba(29, 91, 219, 0.06);
-        border-radius: 14px;
-        padding: 14px;
-        min-height: 152px;
-        position: relative;
+      .share-fab[hidden] {
+        display: none;
       }
 
-      .share-qr img {
-        width: 120px;
-        height: 120px;
-        border-radius: 12px;
-        background: white;
-        padding: 8px;
-        box-shadow: 0 6px 16px rgba(14, 31, 86, 0.08);
+      .share-fab:active {
+        transform: scale(0.97);
       }
 
-      .share-qr-placeholder {
-        width: 120px;
-        height: 120px;
-        border-radius: 12px;
-        background: linear-gradient(145deg, rgba(29, 91, 219, 0.1), rgba(29, 91, 219, 0.02));
-        border: 2px solid rgba(29, 91, 219, 0.18);
-        display: grid;
-        place-items: center;
-        position: relative;
-        overflow: hidden;
+      .share-fab svg {
+        width: 26px;
+        height: 26px;
+        fill: currentColor;
       }
 
-      .share-qr-placeholder::before {
+      .share-fab[data-copied="true"] {
+        background: linear-gradient(135deg, rgba(47, 185, 136, 0.95), rgba(34, 145, 103, 0.95));
+      }
+
+      .share-fab[data-loading="true"] {
+        pointer-events: none;
+        opacity: 0.6;
+      }
+
+      .share-fab-panel {
+        position: fixed;
+        top: calc(90px + env(safe-area-inset-top, 0px));
+        right: calc(16px + env(safe-area-inset-right, 0px));
+        width: min(280px, calc(100% - 32px));
+        background: var(--bg-card);
+        border-radius: 22px;
+        box-shadow: 0 28px 60px rgba(17, 42, 110, 0.22);
+        padding: 22px 22px 26px;
+        z-index: 17;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(47, 123, 255, 0.12);
+      }
+
+      .share-fab-panel::before {
         content: "";
         position: absolute;
+        top: -12px;
+        right: 28px;
         width: 22px;
         height: 22px;
-        border: 2px solid rgba(29, 91, 219, 0.35);
-        border-radius: 4px;
-        top: 16px;
-        left: 16px;
-        box-shadow:
-          0 0 0 0 rgba(29, 91, 219, 0.35),
-          0 44px 0 0 rgba(29, 91, 219, 0.35),
-          44px 0 0 0 rgba(29, 91, 219, 0.35);
+        background: var(--bg-card);
+        transform: rotate(45deg);
+        border-top: 1px solid rgba(47, 123, 255, 0.12);
+        border-left: 1px solid rgba(47, 123, 255, 0.12);
+        box-shadow: -4px -4px 12px rgba(17, 42, 110, 0.06);
       }
 
-      .share-qr-placeholder::after {
-        content: "";
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        background: rgba(29, 91, 219, 0.25);
-        border-radius: 3px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        box-shadow:
-          -26px -26px 0 0 rgba(29, 91, 219, 0.18),
-          26px -26px 0 0 rgba(29, 91, 219, 0.18),
-          -26px 26px 0 0 rgba(29, 91, 219, 0.18);
-      }
-
-      .share-qr[data-state="placeholder"] img {
+      .share-fab-panel[hidden] {
         display: none;
       }
 
-      .share-qr[data-state="ready"] .share-qr-placeholder {
-        display: none;
-      }
-
-      .share-link-btn {
-        display: inline-flex;
-        justify-content: center;
+      .share-fab-panel-header {
+        display: flex;
         align-items: center;
-        padding: 12px 16px;
-        border-radius: 14px;
-        border: 1px solid rgba(29, 91, 219, 0.18);
-        background: rgba(29, 91, 219, 0.08);
-        color: var(--primary-dark);
-        font-weight: 600;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .share-fab-heading {
+        margin: 0;
         font-size: 1rem;
-        cursor: pointer;
-        transition: transform 0.18s ease;
-        position: relative;
+        font-weight: 600;
       }
 
-      .share-link-btn:hover,
-      .share-link-btn:focus-visible {
-        transform: translateY(-1px);
+      .share-fab-message {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.5;
       }
 
-      .share-link-btn[data-loading="true"] {
-        pointer-events: none;
-      }
-
-      .share-link-btn[data-loading="true"]::after {
-        content: "";
-        position: absolute;
-        right: 16px;
-        width: 18px;
-        height: 18px;
+      .share-fab-close {
+        border: none;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        border: 2px solid currentColor;
-        border-top-color: transparent;
-        animation: share-spin 0.9s linear infinite;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(47, 123, 255, 0.12);
+        color: var(--primary-dark);
+        cursor: pointer;
       }
 
-      @keyframes share-spin {
-        to {
-          transform: rotate(360deg);
-        }
+      .share-fab-qr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(47, 123, 255, 0.08);
+      }
+
+      .share-fab-qr img {
+        width: 160px;
+        height: 160px;
       }
 
       .menu-results-layout {
@@ -1482,20 +1445,39 @@
       </section>
 
       <section class="menu-results screen" data-screen="menu" hidden>
-        <article class="summary-card">
-          <div class="summary-header">
-            <p class="summary-title" id="menu-title" aria-label="Menu name" spellcheck="false">
-              Order please
-            </p>
+        <button
+          type="button"
+          class="share-fab"
+          id="share-fab"
+          aria-label="Share this menu"
+          aria-expanded="false"
+          hidden
+        >
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path
+              d="M18 16a2 2 0 0 0-1.444.63l-7.433-3.553a2 2 0 0 0 0-2.154l7.433-3.553A2 2 0 1 0 15 6a1.99 1.99 0 0 0 .051.443L7.618 9.996a2 2 0 1 0 0 4.008l7.433 3.553A2 2 0 1 0 18 16Z"
+            />
+          </svg>
+        </button>
+        <aside
+          class="share-fab-panel"
+          id="share-fab-panel"
+          role="dialog"
+          aria-modal="false"
+          aria-live="polite"
+          aria-labelledby="share-fab-heading share-fab-message"
+          tabindex="-1"
+          hidden
+        >
+          <div class="share-fab-panel-header">
+            <h2 class="share-fab-heading" id="share-fab-heading">Share this menu</h2>
+            <button type="button" class="share-fab-close" id="share-fab-close" aria-label="Close share options">×</button>
           </div>
-        <div class="summary-share" id="summary-share">
-          <button type="button" class="share-link-btn" id="share-menu-button">Share the menu</button>
-          <div class="share-qr" id="share-qr" data-state="placeholder" aria-live="polite">
-            <div class="share-qr-placeholder" id="share-qr-placeholder" aria-hidden="true"></div>
-            <img id="share-qr-image" alt="QR code to open this menu" />
+          <p class="share-fab-message" id="share-fab-message">Generate a link to share and scan the QR to join in.</p>
+          <div class="share-fab-qr">
+            <img src="" alt="QR code to open this menu" id="share-fab-qr" hidden />
           </div>
-        </div>
-        </article>
+        </aside>
         <div class="menu-results-layout">
           <div class="menu-results-content">
             <nav class="section-nav" id="section-nav" aria-label="Menu sections"></nav>
@@ -1606,10 +1588,11 @@
       const languageChoices = document.getElementById("language-choices");
       const outputLanguageInput = document.getElementById("output-language");
 
-      const menuTitle = document.getElementById("menu-title");
-      const shareMenuButton = document.getElementById("share-menu-button");
-      const shareQrContainer = document.getElementById("share-qr");
-      const shareQrImage = document.getElementById("share-qr-image");
+      const shareFab = document.getElementById("share-fab");
+      const shareFabPanel = document.getElementById("share-fab-panel");
+      const shareFabMessage = document.getElementById("share-fab-message");
+      const shareFabQrImage = document.getElementById("share-fab-qr");
+      const shareFabClose = document.getElementById("share-fab-close");
       const sectionNav = document.getElementById("section-nav");
       const sectionsContainer = document.getElementById("sections");
       const emptyState = document.getElementById("empty-state");
@@ -1680,11 +1663,15 @@
         isSharing: false,
       };
 
+      let menuTitleText = "Order please";
       const cart = new Map();
       let celebrationTimer = null;
-      let shareButtonResetTimer = null;
-      const SHARE_BUTTON_DEFAULT_LABEL = "Share the menu";
-      const SHARE_BUTTON_SUCCESS_LABEL = "Link copied";
+      let shareMessageResetTimer = null;
+      let shareCopiedResetTimer = null;
+      const SHARE_MESSAGE_DEFAULT = "Generate a link to share and scan the QR to join in.";
+      const SHARE_MESSAGE_READY = "Share link ready. Scan the QR or copy again.";
+      const SHARE_MESSAGE_COPIED = "Link copied! Scan the QR to open on another device.";
+      const SHARE_MESSAGE_ERROR = "We couldn't copy that. Tap again to retry.";
       const tipBuffer = [];
       let tipRotationTimer = null;
       let activeTipIndex = 0;
@@ -1707,6 +1694,16 @@
         if (showMenu && state.shouldCelebrateMenu) {
           playMenuCelebration();
           state.shouldCelebrateMenu = false;
+        }
+        if (shareFab) {
+          const shouldShowShareFab = showMenu && !!state.menu;
+          shareFab.hidden = !shouldShowShareFab;
+          if (!shouldShowShareFab) {
+            shareFab.removeAttribute("data-copied");
+            shareFab.dataset.loading = "false";
+            shareFab.setAttribute("aria-expanded", "false");
+            closeSharePanel();
+          }
         }
         heroBackButton.hidden = showCapture;
 
@@ -1738,22 +1735,37 @@
       function resetShareState() {
         state.share = null;
         state.isSharing = false;
-        if (shareButtonResetTimer) {
-          clearTimeout(shareButtonResetTimer);
-          shareButtonResetTimer = null;
+        if (shareMessageResetTimer) {
+          clearTimeout(shareMessageResetTimer);
+          shareMessageResetTimer = null;
         }
-        shareMenuButton.dataset.loading = "false";
-        shareMenuButton.disabled = false;
-        shareMenuButton.setAttribute("aria-busy", "false");
-        shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
-        shareQrImage.removeAttribute("src");
-        shareQrContainer.dataset.state = "placeholder";
+        if (shareCopiedResetTimer) {
+          clearTimeout(shareCopiedResetTimer);
+          shareCopiedResetTimer = null;
+        }
+        if (shareFab) {
+          shareFab.dataset.loading = "false";
+          shareFab.removeAttribute("data-copied");
+          shareFab.setAttribute("aria-busy", "false");
+        }
+        if (shareFabMessage) {
+          shareFabMessage.textContent = SHARE_MESSAGE_DEFAULT;
+        }
+        if (shareFabPanel) {
+          shareFabPanel.hidden = true;
+        }
+        if (shareFabQrImage) {
+          shareFabQrImage.hidden = true;
+          shareFabQrImage.removeAttribute("src");
+        }
       }
 
-      function setShareButtonLoading(isLoading) {
-        shareMenuButton.dataset.loading = isLoading ? "true" : "false";
-        shareMenuButton.setAttribute("aria-busy", isLoading ? "true" : "false");
-        shareMenuButton.disabled = isLoading;
+      function setShareFabLoading(isLoading) {
+        if (!shareFab) {
+          return;
+        }
+        shareFab.dataset.loading = isLoading ? "true" : "false";
+        shareFab.setAttribute("aria-busy", isLoading ? "true" : "false");
       }
 
       function applySharePayload(payload) {
@@ -1764,29 +1776,48 @@
           qr: payload.share_qr,
         };
 
-        if (state.share.qr) {
-          shareQrImage.src = state.share.qr;
-          shareQrContainer.dataset.state = "ready";
-        } else {
-          shareQrImage.removeAttribute("src");
-          shareQrContainer.dataset.state = "placeholder";
+        if (!shareFabQrImage) {
+          return;
         }
 
+        if (state.share.qr) {
+          shareFabQrImage.src = state.share.qr;
+          shareFabQrImage.hidden = false;
+        } else {
+          shareFabQrImage.removeAttribute("src");
+          shareFabQrImage.hidden = true;
+        }
       }
 
-      function setShareButtonTemporaryLabel(label, duration = 2000) {
-        shareMenuButton.textContent = label;
-        if (shareButtonResetTimer) {
-          clearTimeout(shareButtonResetTimer);
+      function setShareMessage(message, duration = 0) {
+        if (!shareFabMessage) {
+          return;
         }
-        shareButtonResetTimer = window.setTimeout(() => {
-          shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
-          shareButtonResetTimer = null;
-        }, duration);
+        shareFabMessage.textContent = message;
+        if (shareMessageResetTimer) {
+          clearTimeout(shareMessageResetTimer);
+          shareMessageResetTimer = null;
+        }
+        if (duration > 0) {
+          shareMessageResetTimer = window.setTimeout(() => {
+            shareFabMessage.textContent = SHARE_MESSAGE_DEFAULT;
+            shareMessageResetTimer = null;
+          }, duration);
+        }
       }
 
       function showShareCopiedFeedback() {
-        setShareButtonTemporaryLabel(SHARE_BUTTON_SUCCESS_LABEL);
+        if (shareFab) {
+          shareFab.dataset.copied = "true";
+          if (shareCopiedResetTimer) {
+            clearTimeout(shareCopiedResetTimer);
+          }
+          shareCopiedResetTimer = window.setTimeout(() => {
+            shareFab?.removeAttribute("data-copied");
+            shareCopiedResetTimer = null;
+          }, 4000);
+        }
+        setShareMessage(SHARE_MESSAGE_COPIED, 4000);
       }
 
       async function writeShareLinkToClipboard(url) {
@@ -1799,6 +1830,30 @@
         } catch (error) {
           console.error(error);
           return false;
+        }
+      }
+
+      function openSharePanel(message) {
+        if (!shareFabPanel) {
+          return;
+        }
+        if (typeof message === "string") {
+          setShareMessage(message);
+        }
+        shareFabPanel.hidden = false;
+        shareFabPanel.focus({ preventScroll: true });
+        if (shareFab) {
+          shareFab.setAttribute("aria-expanded", "true");
+        }
+      }
+
+      function closeSharePanel() {
+        if (!shareFabPanel) {
+          return;
+        }
+        shareFabPanel.hidden = true;
+        if (shareFab) {
+          shareFab.setAttribute("aria-expanded", "false");
         }
       }
 
@@ -2120,7 +2175,7 @@
         state.menu = payload.template;
         resetShareState();
 
-        menuTitle.textContent = menuTitle.textContent?.trim() || "Order please";
+        menuTitleText = (menuTitleText || "").trim() || "Order please";
 
         renderSections();
         clearSelections();
@@ -2476,6 +2531,11 @@
         state.menu = null;
         resetShareState();
         state.shouldCelebrateMenu = false;
+        if (shareFab) {
+          shareFab.hidden = true;
+          shareFab.setAttribute("aria-expanded", "false");
+        }
+        closeSharePanel();
         if (state.sectionObserver) {
           state.sectionObserver.disconnect();
           state.sectionObserver = null;
@@ -2494,7 +2554,7 @@
         syncFileInput();
         renderPreview();
         updateCaptureStatus();
-        menuTitle.textContent = "Order please";
+        menuTitleText = "Order please";
       }
 
       addFilesButton.addEventListener("click", () => fileInput.click());
@@ -2530,56 +2590,90 @@
 
       translateButton.addEventListener("click", submitUpload);
 
-      shareMenuButton.addEventListener("click", async () => {
-        if (!state.menu) {
-          return;
+      async function ensureShareLink() {
+        if (state.share) {
+          return true;
         }
-        if (state.isSharing) {
-          return;
+        if (!state.menu || state.isSharing) {
+          return false;
         }
-
-        if (!state.share) {
-          state.isSharing = true;
-          setShareButtonLoading(true);
-          shareMenuButton.textContent = SHARE_BUTTON_DEFAULT_LABEL;
-
-          try {
-            const response = await fetch("/menu/share", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ template: state.menu }),
-            });
-
-            if (!response.ok) {
-              throw new Error(`Share failed with status ${response.status}`);
-            }
-
-            const payload = await response.json();
-            applySharePayload(payload);
-
-            const copied = await writeShareLinkToClipboard(state.share?.url);
-            if (copied) {
-              showShareCopiedFeedback();
-            } else {
-              setShareButtonTemporaryLabel("Share link ready");
-            }
-          } catch (error) {
-            console.error(error);
-            setShareButtonTemporaryLabel("Tap to retry", 2500);
-          } finally {
-            state.isSharing = false;
-            setShareButtonLoading(false);
+        state.isSharing = true;
+        setShareFabLoading(true);
+        setShareMessage("Preparing your share link…");
+        try {
+          const response = await fetch("/menu/share", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ template: state.menu }),
+          });
+          if (!response.ok) {
+            throw new Error(`Share failed with status ${response.status}`);
           }
+          const payload = await response.json();
+          applySharePayload(payload);
+          setShareMessage(SHARE_MESSAGE_READY, 3000);
+          return true;
+        } catch (error) {
+          console.error(error);
+          setShareMessage("We couldn't create the link. Tap again to retry.", 4000);
+          return false;
+        } finally {
+          state.isSharing = false;
+          setShareFabLoading(false);
+        }
+      }
+
+      if (shareFab) {
+        shareFab.addEventListener("click", async () => {
+          if (!state.menu) {
+            setShareMessage("Translate a menu to share it with your group.", 3000);
+            return;
+          }
+          if (state.isSharing) {
+            return;
+          }
+          if (!state.share) {
+            const created = await ensureShareLink();
+            if (!created || !state.share) {
+              openSharePanel();
+              return;
+            }
+          }
+          const copied = await writeShareLinkToClipboard(state.share?.url);
+          if (copied) {
+            showShareCopiedFeedback();
+          } else {
+            setShareMessage(SHARE_MESSAGE_READY, 4000);
+          }
+          openSharePanel();
+        });
+      }
+
+      if (shareFabClose) {
+        shareFabClose.addEventListener("click", () => {
+          closeSharePanel();
+          shareFab?.focus();
+        });
+      }
+
+      document.addEventListener("pointerdown", (event) => {
+        if (!shareFabPanel || shareFabPanel.hidden) {
           return;
         }
+        if (shareFab && (shareFab === event.target || shareFab.contains(event.target))) {
+          return;
+        }
+        if (!shareFabPanel.contains(event.target)) {
+          closeSharePanel();
+        }
+      });
 
-        const copied = await writeShareLinkToClipboard(state.share.url);
-        if (copied) {
-          showShareCopiedFeedback();
-        } else {
-          setShareButtonTemporaryLabel("Share link ready");
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && shareFabPanel && !shareFabPanel.hidden) {
+          closeSharePanel();
+          shareFab?.focus();
         }
       });
 
@@ -2611,7 +2705,7 @@
           return;
         }
         const summary = buildOrderSummary();
-        orderNote.textContent = `${menuTitle.textContent}\n\n${summary}`;
+        orderNote.textContent = `${menuTitleText}\n\n${summary}`;
         showScreen("order");
       });
 
