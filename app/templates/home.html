@@ -1002,13 +1002,17 @@
       }
 
       .add-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         width: 40px;
         height: 40px;
         border-radius: 50%;
         border: none;
         background: var(--primary);
         color: #ffffff;
-        font-size: 1.2rem;
+        font-size: 0;
         font-weight: 700;
         cursor: pointer;
         transition: transform 0.12s ease, box-shadow 0.12s ease;
@@ -1021,6 +1025,17 @@
 
       .add-button:active {
         transform: translateY(0);
+      }
+
+      .add-button::before {
+        content: "+";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -56%);
+        font-size: 1.2rem;
+        line-height: 1;
+        color: #ffffff;
       }
 
       .quantity-controls {
