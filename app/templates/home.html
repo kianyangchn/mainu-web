@@ -143,31 +143,27 @@
         gap: 32px;
       }
 
-      .hero-back {
-        align-self: flex-start;
+      .top-back {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid rgba(31, 26, 44, 0.08);
+        background: rgba(255, 255, 255, 0.92);
+        color: rgba(72, 80, 102, 0.92);
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        color: var(--primary-dark);
-        background: rgba(234, 42, 51, 0.1);
-        border: none;
-        padding: 10px 18px;
-        border-radius: var(--radius-pill);
+        justify-content: center;
         cursor: pointer;
-        font-size: 0.95rem;
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       }
 
-      .hero-back span[aria-hidden="true"] {
-        font-size: 1.1rem;
-      }
-
-      .hero-back:hover,
-      .hero-back:focus-visible {
+      .top-back:hover,
+      .top-back:focus-visible {
         transform: translateY(-1px);
-        box-shadow: var(--shadow-soft);
+        box-shadow: 0 12px 24px rgba(31, 26, 44, 0.14);
+        background: #ffffff;
       }
+
 
       .capture-card-header {
         display: flex;
@@ -701,11 +697,16 @@
       }
 
       .menu-header {
+        position: sticky;
+        top: calc(64px + env(safe-area-inset-top, 0px));
+        z-index: 12;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        padding: 0 4px;
+        padding: 18px 4px 12px;
+        background: var(--page-bg);
+        border-bottom: 1px solid rgba(31, 26, 44, 0.08);
       }
 
       .menu-title {
@@ -877,7 +878,7 @@
 
       .section-nav {
         position: sticky;
-        top: calc(76px + env(safe-area-inset-top, 0px));
+        top: calc(132px + env(safe-area-inset-top, 0px));
         z-index: 12;
         display: flex;
         gap: 12px;
@@ -1431,6 +1432,9 @@
     <div class="app-frame">
       <header class="top-bar">
         <div class="top-brand">
+          <button type="button" class="top-back" id="hero-back" aria-label="Back to start" hidden>
+            <span aria-hidden="true">←</span>
+          </button>
           <span class="brand-mark" aria-hidden="true">M</span>
           <span class="brand-name">Mainu</span>
         </div>
@@ -1440,11 +1444,6 @@
         </div>
       </header>
       <main class="app-shell">
-        <button type="button" class="hero-back" id="hero-back" hidden>
-          <span aria-hidden="true">←</span>
-          <span>Mainu on-the-go</span>
-        </button>
-
         <section class="card capture-card screen" data-screen="capture">
           <header class="capture-card-header">
             <span class="capture-eyebrow">Mainu on-the-go</span>
@@ -1552,14 +1551,6 @@
                 <path
                   fill="currentColor"
                   d="M18 16a2.99 2.99 0 0 0-2.296 1.061l-6.23-3.357A3 3 0 0 0 9 12a3 3 0 0 0-.527-1.704l6.223-3.337A3 3 0 1 0 14 5a2.99 2.99 0 0 0 .173 1.002l-6.235 3.343A3 3 0 1 0 9 15c0-.386-.075-.754-.204-1.095l6.23 3.357A3 3 0 1 0 18 16Z"
-                />
-              </svg>
-            </button>
-            <button type="button" class="menu-icon-button" id="menu-search-button" aria-label="Search dishes">
-              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="m20.3 19.29-3.385-3.386A7.45 7.45 0 0 0 18 10.5 7.5 7.5 0 1 0 10.5 18a7.45 7.45 0 0 0 5.404-2.086l3.386 3.384a1 1 0 0 0 1.414-1.414ZM5 10.5a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z"
                 />
               </svg>
             </button>
