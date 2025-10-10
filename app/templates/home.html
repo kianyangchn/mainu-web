@@ -1002,40 +1002,26 @@
       }
 
       .add-button {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
         width: 40px;
         height: 40px;
         border-radius: 50%;
         border: none;
-        background: var(--primary);
-        color: #ffffff;
-        font-size: 0;
-        font-weight: 700;
+        padding: 0;
+        background: none;
         cursor: pointer;
-        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        transition: transform 0.12s ease;
       }
 
       .add-button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 12px 20px rgba(234, 42, 51, 0.28);
       }
 
       .add-button:active {
         transform: translateY(0);
       }
 
-      .add-button::before {
-        content: "+";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -56%);
-        font-size: 1.2rem;
-        line-height: 1;
-        color: #ffffff;
+      .add-button img {
+        pointer-events: none;
       }
 
       .quantity-controls {
@@ -1696,7 +1682,15 @@
         </div>
         <p class="dish-description"></p>
         <div class="dish-actions">
-          <button type="button" class="add-button" data-action="add" aria-label="Add dish">+</button>
+          <button type="button" class="add-button" data-action="add" aria-label="Add dish">
+            <img
+              src="https://img.icons8.com/cotton/64/add--v2.png"
+              alt="Add dish"
+              width="40"
+              height="40"
+              style="display:block;"
+            />
+          </button>
           <div class="quantity-controls" data-active="false">
             <button type="button" data-action="decrement" aria-label="Remove one">−</button>
             <span class="quantity-display">0</span>
@@ -2655,7 +2649,7 @@
         if (menuSummaryPrice) {
           if (hasPrice && totalPriceValue > 0) {
             const formatted = formatTotalPrice(totalPriceValue, currencySymbol, currencyPosition);
-            menuSummaryPrice.textContent = `Estimated total · ${formatted}`;
+            menuSummaryPrice.textContent = `Estimated price · ${formatted}`;
           } else {
             menuSummaryPrice.textContent = "";
           }
