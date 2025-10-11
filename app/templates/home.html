@@ -72,24 +72,15 @@
         gap: 12px;
       }
 
-      .brand-mark {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 14px;
-        background: var(--primary);
-        color: #ffffff;
-        font-weight: 700;
-        font-size: 1.1rem;
-        box-shadow: 0 10px 24px rgba(234, 42, 51, 0.28);
-      }
-
       .brand-name {
         font-size: 1.15rem;
         font-weight: 700;
         letter-spacing: -0.01em;
+        color: #0f172a;
+      }
+
+      .brand-name-highlight {
+        color: var(--primary);
       }
 
       .top-actions {
@@ -118,24 +109,6 @@
         transform: translateY(-1px);
         box-shadow: var(--shadow-soft);
         color: var(--primary);
-      }
-
-      .avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(234, 42, 51, 0.12), rgba(234, 42, 51, 0.32));
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-
-      .avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
       }
 
       .app-shell {
@@ -1462,19 +1435,10 @@
               style="display:block;"
             />
           </button>
-          <span class="brand-mark" aria-hidden="true">M</span>
-          <span class="brand-name">Mainu</span>
+          <span class="brand-name"><span class="brand-name-highlight">M</span>ainu</span>
         </div>
         <div class="top-actions">
           <button type="button" class="icon-button" aria-label="How Mainu works">?</button>
-          <div class="avatar" aria-hidden="true">
-            <img
-              width="100"
-              height="100"
-              src="https://img.icons8.com/bubbles/100/restaurant.png"
-              alt="restaurant"
-            />
-          </div>
         </div>
       </header>
       <main class="app-shell">
