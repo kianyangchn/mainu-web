@@ -49,7 +49,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "section": {
                 "type": "string",
                 "description": (
-                    "Translated section label such as appetisers, mains, desserts. "
+                    "Translate section name into the output language. "
                     "Fallback to 'Menu' when no grouping is provided."
                 ),
             },
@@ -174,4 +174,4 @@ def build_text_config() -> dict[str, object]:
 def build_reasoning_config() -> dict[str, object]:
     """Return reasoning configuration for the OpenAI Responses API."""
 
-    return {"effort": "low"}
+    return {"effort": "minimal"}

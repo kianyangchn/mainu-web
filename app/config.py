@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     openai_api_key: Optional[str] = None
-    openai_model: str = "gpt-5-mini"
+    openai_model: str = "gpt-5-nano"
     default_output_language: str = "English"
     share_token_ttl_minutes: int = 240  # 4 hours default
     database_url: Optional[str] = None
