@@ -1,3 +1,4 @@
+import asyncio
 from io import BytesIO
 
 import pytest
@@ -147,7 +148,7 @@ def test_share_view_renders_html():
 
 
 def test_process_menu_respects_manual_language_selection():
-    menu_routes._expected_output_language = "fr"
+    menu_routes._expected_output_language = "Français"
     response = client.post(
         "/menu/process",
         files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
@@ -158,6 +159,38 @@ def test_process_menu_respects_manual_language_selection():
     assert response.status_code == 200
     payload = response.json()
     assert payload["detected_language"] is None
+
+
+def test_process_menu_times_out(monkeypatch):
+    async def slow_generate_menu_template(
+        images,
+        filenames,
+        content_types=None,
+        *,
+        output_language=None,
+    ):
+        await asyncio.sleep(0.05)
+        return MenuGenerationResult(
+            template=MenuTemplate(sections=[]),
+        )
+
+    monkeypatch.setattr(
+        menu_routes, "_MENU_PROCESSING_TIMEOUT_SECONDS", 0.01, raising=False
+    )
+    monkeypatch.setattr(
+        menu_routes._menu_service,
+        "generate_menu_template",
+        slow_generate_menu_template,
+    )
+
+    response = client.post(
+        "/menu/process",
+        files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
+    )
+
+    assert response.status_code == 504
+    assert response.json()["detail"] == "Menu processing took too long. Please try again."
 
 
 def test_process_menu_downscales_large_images():

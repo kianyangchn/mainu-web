@@ -29,14 +29,26 @@ class PromptRequest:
     content: List[dict[str, str]]
 
 
+# SYSTEM_INSTRUCTIONS = (
+#     "You are a meticulous transcription assistant for restaurant menus. "
+#     "You can recognize the menu language, remember dish names exactly as written, and "
+#     "preserve the original ordering even if the photos are low quality. "
+#     "You can understand regional dishes, can translate them into the requested language, "
+#     "and can summarise flavour, ingredients, and preparation details in a single approachable sentence. "
+#     "Your final goal is to sutrcture the required menu information into desired json format. "
+#     "Some dishes can be on the side of the menu, do not miss any sections and dishes."
+# )
+
 SYSTEM_INSTRUCTIONS = (
-    "You are a meticulous transcription assistant for restaurant menus. "
-    "You can recognize the menu language, remember dish names exactly as written, and "
-    "preserve the original ordering even if the photos are low quality. "
-    "You can understand regional dishes, can translate them into the requested language, "
-    "and can summarise flavour, ingredients, and preparation details in a single approachable sentence. "
-    "Your final goal is to sutrcture the required menu information into desired json format. "
-    "Some dishes can be on the side of the menu, do not miss any sections and dishes."
+    "You are a meticulous transcription assistant for restaurant menus. Your responsibilities are to: "
+    "- Accurately recognize the original language of the menu. "
+    "- Transcribe all dishes information exactly as written, preserving the original ordering even if the photos are of low quality. "
+    "- Identify and transcribe every section, dish and price, including those listed on the sides of the menu image, ensuring that no sections or dishes are omitted. "
+    "- Understand regional and specialty dishes, offering translations into any requested language(s). "
+    "- For each dish, provide a single, approachable sentence summarizing its flavor, ingredients, and preparation details using contextual clues. "
+    
+    "After transcribing and producing the output, validate that all menu items and sections are present, fields contain appropriate placeholder values where necessary, and ordering is preserved. If any inconsistency or probable omission is detected, self-correct before returning the final output. "
+    "Your final goal is to represent the menu information as an array of explicit JSON objects, each detailing a menu item while preserving its original order as displayed in the menu image. "
 )
 
 JSON_SCHEMA_NAME = "menu_items"
@@ -49,7 +61,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "section": {
                 "type": "string",
                 "description": (
-                    "Translated section label such as appetisers, mains, desserts. "
+                    "Translate section name into the output language. "
                     "Fallback to 'Menu' when no grouping is provided."
                 ),
             },
@@ -95,24 +107,26 @@ def build_prompt(
 
     language_hint = (
         "First, detect the primary language used throughout the menu. "
+        "If there's english information, use it as the primary language. "
         "Remember the menu is written in this language. "
-        "This language is an important information to further processing the menu"
+        "This language is an important information to further processing the menu. "
     )
 
     transcription_rule = (
         "Then extract dishes information from ALL the pages. "
-        "Keep the section, dish name, (description if there's any) and price of each dishes. "
+        "Keep the section, dish name and price of each items. "
         "If a section title is missing, use 'Menu'. Keep dish names in the original "
-        "language without translation. When prices are missing, write 'N/A'. "
+        "language without translation. When prices are missing, uses 'N/A'. "
         "Sometimes the dish name can come with some description, keep it as it is."
         " Do not prepend bullets or numbering and do not translate anything in this stage."
-        "Do not miss any dish information."
+        "Don't miss any drinks, sides, sauces, desserts, etc. They can be on the side of the menu. "
     )
 
     structure_rule = (
         "Based on the extracted text, you can construct a structured menu. "
         f"Translate section names into {output_language}. "
-        f"Translate dish titles into {output_language} but keep the original names available in the JSON. "
+        "Keep the original name as written on the menu in the original_name field in the JSON. "
+        f"Translate dish titles into {output_language} and keep it in the translated_name field in the JSON. "
         f"If there's any description, translate it into the {output_language}. "
         "But if there's no description on the menu, write a natural one-sentence description in the "
         f"{output_language} describing key ingredients, preparation details, and flavour. "
@@ -123,12 +137,19 @@ def build_prompt(
         "Last step, respond strictly with JSON that matches the provided schema. "
         "Do not include any explanatory text before or after the JSON."
     )
+    double_check = (
+        "Double check the language in the output json. "
+        "original_name should be in the original language. "
+        f"translated_name should be in the {output_language}. "
+        f"description should be in the {output_language}. "
+    )
 
     content: List[dict[str, str]] = [
         {"type": "input_text", "text": language_hint},
         {"type": "input_text", "text": transcription_rule},
         {"type": "input_text", "text": structure_rule},
         {"type": "input_text", "text": json_rule},
+        {"type": "input_text", "text": double_check},
     ]
     for file_id in file_ids:
         content.append({"type": "input_image", "file_id": file_id})
@@ -174,4 +195,4 @@ def build_text_config() -> dict[str, object]:
 def build_reasoning_config() -> dict[str, object]:
     """Return reasoning configuration for the OpenAI Responses API."""
 
-    return {"effort": "low"}
+    return {"effort": "minimal"}

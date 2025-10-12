@@ -38,6 +38,18 @@ _MAX_IMAGE_DIMENSION = 1280
 _JPEG_QUALITY = 80
 _PNG_COMPRESS_LEVEL = 6
 _TIP_STREAM_INTERVAL_SECONDS = 10.0
+_MENU_PROCESSING_TIMEOUT_SECONDS = 120.0
+_LANGUAGE_CODE_TO_LABEL = {
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "English": "English",
+    "es": "Español",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
+}
 
 
 def get_menu_service() -> LLMMenuService:
@@ -78,14 +90,27 @@ async def process_menu(
         filenames.append(upload.filename or "menu-page")
         content_types.append(content_type)
 
-    output_language = requested_output_language or _detect_language(request)
+    resolved_language = _resolve_output_language(requested_output_language)
+    output_language = resolved_language or _detect_language(request)
     logger.debug("Processing menu with output language: %s", output_language)
-    generation_result: MenuGenerationResult = await menu_service.generate_menu_template(
-        contents,
-        filenames,
-        content_types,
-        output_language=output_language,
-    )
+    try:
+        generation_result: MenuGenerationResult = await asyncio.wait_for(
+            menu_service.generate_menu_template(
+                contents,
+                filenames,
+                content_types,
+                output_language=output_language,
+            ),
+            timeout=_MENU_PROCESSING_TIMEOUT_SECONDS,
+        )
+    except asyncio.TimeoutError as exc:
+        logger.warning(
+            "Menu processing timed out after %s seconds", _MENU_PROCESSING_TIMEOUT_SECONDS
+        )
+        raise HTTPException(
+            status_code=504,
+            detail="Menu processing took too long. Please try again.",
+        ) from exc
     return MenuProcessingResponse(
         template=generation_result.template,
         detected_language=None,
@@ -129,6 +154,19 @@ async def get_shared_menu(
     if template is None:
         raise HTTPException(status_code=404, detail="Share link expired or invalid")
     return template
+
+
+def _resolve_output_language(selection: str | None) -> str | None:
+    """Convert a submitted language code into its display label."""
+
+    if selection is None:
+        return None
+
+    code = selection.strip()
+    if not code:
+        return None
+
+    return _LANGUAGE_CODE_TO_LABEL.get(code, selection)
 
 
 def _detect_language(request: Request) -> str:
