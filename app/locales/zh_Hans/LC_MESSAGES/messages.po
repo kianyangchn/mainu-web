@@ -1,0 +1,385 @@
+# Chinese (Simplified) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-13 22:39+0200\n"
+"PO-Revision-Date: 2025-10-13 21:55+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_Hans <LL@li.org>\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/i18n.py:19
+msgid "English"
+msgstr "英语"
+
+#: app/i18n.py:20
+msgid "简体中文"
+msgstr "简体中文"
+
+#: app/i18n.py:21
+msgid "繁體中文"
+msgstr "繁體中文"
+
+#: app/templates/home.html:6 app/templates/home.html:1566
+msgid "Mainu on-the-go"
+msgstr "Mainu 随行"
+
+#: app/templates/home.html:1505
+msgid "Back to start"
+msgstr "返回开始"
+
+#: app/templates/home.html:1510 app/templates/share.html:934
+#: app/templates/share.html:937
+msgid "Back"
+msgstr "返回"
+
+#: app/templates/home.html:1519
+msgid "How Mainu works"
+msgstr "Mainu 如何运作"
+
+#: app/templates/home.html:1525 app/templates/home.html:1533
+#: app/templates/share.html:952 app/templates/share.html:960
+#, fuzzy
+msgid "Change language"
+msgstr "切换语言"
+
+#: app/templates/home.html:1540 app/templates/home.html:1543
+#: app/templates/share.html:967 app/templates/share.html:970
+#, fuzzy
+msgid "Choose language"
+msgstr "选择语言"
+
+#: app/templates/home.html:1567
+msgid "Make it easy to order"
+msgstr "点单更轻松"
+
+#: app/templates/home.html:1569 app/templates/home.html:1947
+msgid "Order with ease, in the language you know best!"
+msgstr "用熟悉的语言轻松点餐！"
+
+#: app/templates/home.html:1575
+msgid "Read the menu in"
+msgstr "把菜单翻译成"
+
+#: app/templates/home.html:1580
+msgid "Output language"
+msgstr "输出语言"
+
+#: app/templates/home.html:1604 app/templates/home.html:1953
+msgid "Add menu photos"
+msgstr "添加菜单照片"
+
+#: app/templates/home.html:1607
+msgid "JPEG, PNG or HEIC · Add up to 10 pages per session."
+msgstr "支持 JPEG、PNG 或 HEIC · 每次最多上传 10 页。"
+
+#: app/templates/home.html:1617
+msgid "AI concierge is unpacking the menu…"
+msgstr "AI正在为您准备菜单…"
+
+#: app/templates/home.html:1627
+msgid "While you wait"
+msgstr "稍等片刻"
+
+#: app/templates/home.html:1638 app/templates/home.html:1988
+msgid "Source"
+msgstr "来源"
+
+#: app/templates/home.html:1647 app/templates/home.html:1949
+#: app/templates/share.html:1007 app/templates/share.html:1274
+msgid "Menu Ready 🍾"
+msgstr "菜单准备就绪 🍾"
+
+#: app/templates/home.html:1653 app/templates/home.html:1695
+#: app/templates/share.html:1081
+msgid "Share this menu"
+msgstr "分享此菜单"
+
+#: app/templates/home.html:1659 app/templates/share.html:1018
+msgid "share menu"
+msgstr "分享菜单"
+
+#: app/templates/home.html:1670 app/templates/home.html:1671
+#: app/templates/home.html:1979 app/templates/share.html:1029
+#: app/templates/share.html:1030 app/templates/share.html:1277
+msgid "Cart empty"
+msgstr "购物车为空"
+
+#: app/templates/home.html:1675 app/templates/share.html:1034
+msgid "shopping cart"
+msgstr "购物车"
+
+#: app/templates/home.html:1700 app/templates/share.html:1086
+msgid "Close share options"
+msgstr "关闭分享选项"
+
+#: app/templates/home.html:1706 app/templates/home.html:1963
+msgid "Generate a link to share and scan the QR to join in."
+msgstr "生成分享链接，扫描二维码即可加入。"
+
+#: app/templates/home.html:1709 app/templates/share.html:1095
+msgid "QR code to open this menu"
+msgstr "打开此菜单的二维码"
+
+#: app/templates/home.html:1714 app/templates/share.html:1044
+msgid "Menu sections"
+msgstr "菜单分区"
+
+#: app/templates/home.html:1718
+msgid "No dishes yet"
+msgstr "暂时没有菜品"
+
+#: app/templates/home.html:1720
+msgid ""
+"Try uploading a sharper angle or different page so we can translate every "
+"item."
+msgstr "请尝试上传更清晰的角度或不同页面，以便翻译每一道菜"
+
+#: app/templates/home.html:1730 app/templates/share.html:1057
+msgid "Waiter note"
+msgstr "我的订单"
+
+#: app/templates/home.html:1732 app/templates/share.html:1059
+msgid "Share this summary with the staff so everyone’s meal is just right."
+msgstr "把点好的菜肴给服务员看吧"
+
+#: app/templates/home.html:1737 app/templates/home.html:1986
+#: app/templates/share.html:1064 app/templates/share.html:1284
+msgid "Copy note"
+msgstr "复制"
+
+#: app/templates/home.html:1738 app/templates/share.html:1065
+msgid "Back to menu"
+msgstr "返回菜单"
+
+#: app/templates/home.html:1743
+msgid "Bon appétit • mainu on-the-go • Icons by"
+msgstr "Bon appétit • mainu on-the-go • Icons by"
+
+#: app/templates/home.html:1750 app/templates/home.html:1952
+msgid "No photos yet"
+msgstr "尚未上传照片"
+
+#: app/templates/home.html:1752
+msgid "Transfer menu"
+msgstr "AI处理菜单"
+
+#: app/templates/home.html:1771 app/templates/share.html:1103
+msgid "Table picks"
+msgstr "已选餐点"
+
+#: app/templates/home.html:1773
+msgid "Review dishes for the table before sharing the note."
+msgstr "请核对要点的菜"
+
+#: app/templates/home.html:1779 app/templates/home.html:1782
+#: app/templates/share.html:1109
+msgid "Close"
+msgstr "关闭"
+
+#: app/templates/home.html:1787 app/templates/share.html:1114
+msgid "Select dishes to see them here."
+msgstr "选择菜品即可在此查看"
+
+#: app/templates/home.html:1795 app/templates/share.html:1122
+msgid "Clear"
+msgstr "清空"
+
+#: app/templates/home.html:1798 app/templates/share.html:1125
+msgid "Generate note"
+msgstr "点单！"
+
+#: app/templates/home.html:1820 app/templates/home.html:1824
+#: app/templates/share.html:1147 app/templates/share.html:1151
+msgid "Add dish"
+msgstr "添加菜品"
+
+#: app/templates/home.html:1831 app/templates/share.html:1158
+msgid "Remove one"
+msgstr "减一份"
+
+#: app/templates/home.html:1833 app/templates/share.html:1160
+msgid "Add one"
+msgstr "加一份"
+
+#: app/templates/home.html:1946
+msgid "Auto-detect"
+msgstr "自动检测"
+
+#: app/templates/home.html:1948 app/templates/share.html:1275
+msgid "Order please"
+msgstr "请点餐"
+
+#: app/templates/home.html:1950
+msgid "Interactive menu"
+msgstr "互动菜单"
+
+#: app/templates/home.html:1954
+msgid "Add more"
+msgstr "继续添加"
+
+#: app/templates/home.html:1955
+#, python-brace-format
+msgid "We skipped {count} file(s). Use JPEG, PNG, or HEIC under 10 items."
+msgstr "已跳过 {count} 个文件。请使用 10 个以内的 JPEG、PNG 或 HEIC 文件。"
+
+#: app/templates/home.html:1956
+#, python-brace-format
+msgid "{count} photo ready"
+msgstr "{count} 张照片就绪"
+
+#: app/templates/home.html:1957
+#, python-brace-format
+msgid "{count} photos ready"
+msgstr "{count} 张照片就绪"
+
+#: app/templates/home.html:1958
+msgid "Add at least one menu photo to continue."
+msgstr "请至少添加一张菜单照片以继续"
+
+#: app/templates/home.html:1959
+msgid "Menu page preview"
+msgstr "菜单页预览"
+
+#: app/templates/home.html:1960
+msgid "Remove photo"
+msgstr "移除照片"
+
+#: app/templates/home.html:1964
+msgid "Share link ready. Scan the QR or copy again."
+msgstr "分享链接已就绪，扫描二维码或再次复制即可。"
+
+#: app/templates/home.html:1965 app/templates/share.html:1266
+msgid "Link copied! Scan the QR to open on another device."
+msgstr "链接已复制！扫描二维码即可在其他设备查看。"
+
+#: app/templates/home.html:1966
+msgid "We couldn't copy that. Tap again to retry."
+msgstr "复制失败，请再试一次"
+
+#: app/templates/home.html:1967
+msgid "Preparing your share link…"
+msgstr "正在生成分享链接…"
+
+#: app/templates/home.html:1968
+msgid "We couldn't create the link. Tap again to retry."
+msgstr "生成链接失败，请稍后重试"
+
+#: app/templates/home.html:1969
+msgid "Translate a menu to share it with your group."
+msgstr "先翻译菜单，再与同桌分享"
+
+#: app/templates/home.html:1972
+msgid "Add dishes to your table before creating an order."
+msgstr "请先为餐桌选择菜品，再生成订单"
+
+#: app/templates/home.html:1973
+msgid "We couldn't prepare that menu just now."
+msgstr "暂时无法处理该菜单"
+
+#: app/templates/home.html:1976
+msgid "Unknown error"
+msgstr "未知错误"
+
+#: app/templates/home.html:1980 app/templates/share.html:1278
+#, python-brace-format
+msgid "Cart with {count} dish"
+msgstr "清单含 {count} 道菜"
+
+#: app/templates/home.html:1981 app/templates/share.html:1279
+#, python-brace-format
+msgid "Cart with {count} dishes"
+msgstr "清单含 {count} 道菜"
+
+#: app/templates/home.html:1982 app/templates/share.html:1280
+#, python-brace-format
+msgid "Estimated price · {amount}"
+msgstr "预估金额 · {amount}"
+
+#: app/templates/home.html:1985 app/templates/share.html:1283
+msgid "Copied"
+msgstr "已复制"
+
+#: app/templates/share.html:6
+msgid "Mainu on-the-go • make it easy to order"
+msgstr "Mainu 随行 • 轻松点餐"
+
+#: app/templates/share.html:922
+msgid "This menu link has ended its trip."
+msgstr "该链接已失效"
+
+#: app/templates/share.html:924
+msgid "Ask your host to resend the link or start a fresh menu capture."
+msgstr "请重新生成链接，或重新扫描菜单。"
+
+#: app/templates/share.html:927
+msgid "Start a new menu"
+msgstr "开始新菜单"
+
+#: app/templates/share.html:992
+msgid "Browse together"
+msgstr "一起点单吧！"
+
+#: app/templates/share.html:993 app/templates/share.html:1262
+msgid "Invite your table to explore every dish in their own language."
+msgstr "今天来点儿什么？"
+
+#: app/templates/share.html:995
+msgid "Share code"
+msgstr "分享代码"
+
+#: app/templates/share.html:1002
+msgid "Expires soon"
+msgstr "即将过期"
+
+#: app/templates/share.html:1013
+msgid "Copy menu link and open share options"
+msgstr "复制菜单链接并打开分享选项"
+
+#: app/templates/share.html:1047
+msgid "No dishes available yet."
+msgstr "暂无可选菜品"
+
+#: app/templates/share.html:1051
+msgid "Bon appétit! • mainu shared menu • Icons by"
+msgstr "Bon appétit! • mainu shared menu • Icons by"
+
+#: app/templates/share.html:1092 app/templates/share.html:1265
+msgid "Scan or share the menu instantly with the QR code."
+msgstr "扫描二维码，即刻分享菜单"
+
+#: app/templates/share.html:1105
+msgid "Double-check the dishes before sharing the note with staff."
+msgstr "让服务员下单前，请再次确认菜品"
+
+#: app/templates/share.html:1263
+#, python-brace-format
+msgid "Invite your table to explore {title}."
+msgstr "邀请朋友一起探索 {title}"
+
+#: app/templates/share.html:1267
+msgid "Scan the QR or press and hold to copy the link."
+msgstr "扫描二维码或长按复制链接"
+
+#: app/templates/share.html:1270
+msgid "Link active"
+msgstr "链接有效"
+
+#: app/templates/share.html:1271
+msgid "Link expired"
+msgstr "链接已失效"
+
+#: app/templates/share.html:1272
+#, python-brace-format
+msgid "Expires in {hours}h {minutes}m"
+msgstr "{hours} 小时 {minutes} 分后到期"

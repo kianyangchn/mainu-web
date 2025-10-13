@@ -1,0 +1,387 @@
+# English translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-10-13 22:39+0200\n"
+"PO-Revision-Date: 2025-10-13 21:55+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/i18n.py:19
+msgid "English"
+msgstr "English"
+
+#: app/i18n.py:20
+msgid "简体中文"
+msgstr "简体中文"
+
+#: app/i18n.py:21
+msgid "繁體中文"
+msgstr "繁體中文"
+
+#: app/templates/home.html:6 app/templates/home.html:1566
+msgid "Mainu on-the-go"
+msgstr "Mainu on-the-go"
+
+#: app/templates/home.html:1505
+msgid "Back to start"
+msgstr "Back to start"
+
+#: app/templates/home.html:1510 app/templates/share.html:934
+#: app/templates/share.html:937
+msgid "Back"
+msgstr "Back"
+
+#: app/templates/home.html:1519
+msgid "How Mainu works"
+msgstr "How Mainu works"
+
+#: app/templates/home.html:1525 app/templates/home.html:1533
+#: app/templates/share.html:952 app/templates/share.html:960
+#, fuzzy
+msgid "Change language"
+msgstr "Change language"
+
+#: app/templates/home.html:1540 app/templates/home.html:1543
+#: app/templates/share.html:967 app/templates/share.html:970
+#, fuzzy
+msgid "Choose language"
+msgstr "Choose language"
+
+#: app/templates/home.html:1567
+msgid "Make it easy to order"
+msgstr "Make it easy to order"
+
+#: app/templates/home.html:1569 app/templates/home.html:1947
+msgid "Order with ease, in the language you know best!"
+msgstr "Order with ease, in the language you know best!"
+
+#: app/templates/home.html:1575
+msgid "Read the menu in"
+msgstr "Read the menu in"
+
+#: app/templates/home.html:1580
+msgid "Output language"
+msgstr "Output language"
+
+#: app/templates/home.html:1604 app/templates/home.html:1953
+msgid "Add menu photos"
+msgstr "Add menu photos"
+
+#: app/templates/home.html:1607
+msgid "JPEG, PNG or HEIC · Add up to 10 pages per session."
+msgstr "JPEG, PNG or HEIC · Add up to 10 pages per session."
+
+#: app/templates/home.html:1617
+msgid "AI concierge is unpacking the menu…"
+msgstr "AI concierge is unpacking the menu…"
+
+#: app/templates/home.html:1627
+msgid "While you wait"
+msgstr "While you wait"
+
+#: app/templates/home.html:1638 app/templates/home.html:1988
+msgid "Source"
+msgstr "Source"
+
+#: app/templates/home.html:1647 app/templates/home.html:1949
+#: app/templates/share.html:1007 app/templates/share.html:1274
+msgid "Menu Ready 🍾"
+msgstr "Menu Ready 🍾"
+
+#: app/templates/home.html:1653 app/templates/home.html:1695
+#: app/templates/share.html:1081
+msgid "Share this menu"
+msgstr "Share this menu"
+
+#: app/templates/home.html:1659 app/templates/share.html:1018
+msgid "share menu"
+msgstr "share menu"
+
+#: app/templates/home.html:1670 app/templates/home.html:1671
+#: app/templates/home.html:1979 app/templates/share.html:1029
+#: app/templates/share.html:1030 app/templates/share.html:1277
+msgid "Cart empty"
+msgstr "Cart empty"
+
+#: app/templates/home.html:1675 app/templates/share.html:1034
+msgid "shopping cart"
+msgstr "shopping cart"
+
+#: app/templates/home.html:1700 app/templates/share.html:1086
+msgid "Close share options"
+msgstr "Close share options"
+
+#: app/templates/home.html:1706 app/templates/home.html:1963
+msgid "Generate a link to share and scan the QR to join in."
+msgstr "Generate a link to share and scan the QR to join in."
+
+#: app/templates/home.html:1709 app/templates/share.html:1095
+msgid "QR code to open this menu"
+msgstr "QR code to open this menu"
+
+#: app/templates/home.html:1714 app/templates/share.html:1044
+msgid "Menu sections"
+msgstr "Menu sections"
+
+#: app/templates/home.html:1718
+msgid "No dishes yet"
+msgstr "No dishes yet"
+
+#: app/templates/home.html:1720
+msgid ""
+"Try uploading a sharper angle or different page so we can translate every "
+"item."
+msgstr ""
+"Try uploading a sharper angle or different page so we can translate every "
+"item."
+
+#: app/templates/home.html:1730 app/templates/share.html:1057
+msgid "Waiter note"
+msgstr "Waiter note"
+
+#: app/templates/home.html:1732 app/templates/share.html:1059
+msgid "Share this summary with the staff so everyone’s meal is just right."
+msgstr "Share this summary with the staff so everyone’s meal is just right."
+
+#: app/templates/home.html:1737 app/templates/home.html:1986
+#: app/templates/share.html:1064 app/templates/share.html:1284
+msgid "Copy note"
+msgstr "Copy note"
+
+#: app/templates/home.html:1738 app/templates/share.html:1065
+msgid "Back to menu"
+msgstr "Back to menu"
+
+#: app/templates/home.html:1743
+msgid "Bon appétit • mainu on-the-go • Icons by"
+msgstr "Bon appétit • mainu on-the-go • Icons by"
+
+#: app/templates/home.html:1750 app/templates/home.html:1952
+msgid "No photos yet"
+msgstr "No photos yet"
+
+#: app/templates/home.html:1752
+msgid "Transfer menu"
+msgstr "Transfer menu"
+
+#: app/templates/home.html:1771 app/templates/share.html:1103
+msgid "Table picks"
+msgstr "Table picks"
+
+#: app/templates/home.html:1773
+msgid "Review dishes for the table before sharing the note."
+msgstr "Review dishes for the table before sharing the note."
+
+#: app/templates/home.html:1779 app/templates/home.html:1782
+#: app/templates/share.html:1109
+msgid "Close"
+msgstr "Close"
+
+#: app/templates/home.html:1787 app/templates/share.html:1114
+msgid "Select dishes to see them here."
+msgstr "Select dishes to see them here."
+
+#: app/templates/home.html:1795 app/templates/share.html:1122
+msgid "Clear"
+msgstr "Clear"
+
+#: app/templates/home.html:1798 app/templates/share.html:1125
+msgid "Generate note"
+msgstr "Generate note"
+
+#: app/templates/home.html:1820 app/templates/home.html:1824
+#: app/templates/share.html:1147 app/templates/share.html:1151
+msgid "Add dish"
+msgstr "Add dish"
+
+#: app/templates/home.html:1831 app/templates/share.html:1158
+msgid "Remove one"
+msgstr "Remove one"
+
+#: app/templates/home.html:1833 app/templates/share.html:1160
+msgid "Add one"
+msgstr "Add one"
+
+#: app/templates/home.html:1946
+msgid "Auto-detect"
+msgstr "Auto-detect"
+
+#: app/templates/home.html:1948 app/templates/share.html:1275
+msgid "Order please"
+msgstr "Order please"
+
+#: app/templates/home.html:1950
+msgid "Interactive menu"
+msgstr "Interactive menu"
+
+#: app/templates/home.html:1954
+msgid "Add more"
+msgstr "Add more"
+
+#: app/templates/home.html:1955
+#, python-brace-format
+msgid "We skipped {count} file(s). Use JPEG, PNG, or HEIC under 10 items."
+msgstr "We skipped {count} file(s). Use JPEG, PNG, or HEIC under 10 items."
+
+#: app/templates/home.html:1956
+#, python-brace-format
+msgid "{count} photo ready"
+msgstr "{count} photo ready"
+
+#: app/templates/home.html:1957
+#, python-brace-format
+msgid "{count} photos ready"
+msgstr "{count} photos ready"
+
+#: app/templates/home.html:1958
+msgid "Add at least one menu photo to continue."
+msgstr "Add at least one menu photo to continue."
+
+#: app/templates/home.html:1959
+msgid "Menu page preview"
+msgstr "Menu page preview"
+
+#: app/templates/home.html:1960
+msgid "Remove photo"
+msgstr "Remove photo"
+
+#: app/templates/home.html:1964
+msgid "Share link ready. Scan the QR or copy again."
+msgstr "Share link ready. Scan the QR or copy again."
+
+#: app/templates/home.html:1965 app/templates/share.html:1266
+msgid "Link copied! Scan the QR to open on another device."
+msgstr "Link copied! Scan the QR to open on another device."
+
+#: app/templates/home.html:1966
+msgid "We couldn't copy that. Tap again to retry."
+msgstr "We couldn't copy that. Tap again to retry."
+
+#: app/templates/home.html:1967
+msgid "Preparing your share link…"
+msgstr "Preparing your share link…"
+
+#: app/templates/home.html:1968
+msgid "We couldn't create the link. Tap again to retry."
+msgstr "We couldn't create the link. Tap again to retry."
+
+#: app/templates/home.html:1969
+msgid "Translate a menu to share it with your group."
+msgstr "Translate a menu to share it with your group."
+
+#: app/templates/home.html:1972
+msgid "Add dishes to your table before creating an order."
+msgstr "Add dishes to your table before creating an order."
+
+#: app/templates/home.html:1973
+msgid "We couldn't prepare that menu just now."
+msgstr "We couldn't prepare that menu just now."
+
+#: app/templates/home.html:1976
+msgid "Unknown error"
+msgstr "Unknown error"
+
+#: app/templates/home.html:1980 app/templates/share.html:1278
+#, python-brace-format
+msgid "Cart with {count} dish"
+msgstr "Cart with {count} dish"
+
+#: app/templates/home.html:1981 app/templates/share.html:1279
+#, python-brace-format
+msgid "Cart with {count} dishes"
+msgstr "Cart with {count} dishes"
+
+#: app/templates/home.html:1982 app/templates/share.html:1280
+#, python-brace-format
+msgid "Estimated price · {amount}"
+msgstr "Estimated price · {amount}"
+
+#: app/templates/home.html:1985 app/templates/share.html:1283
+msgid "Copied"
+msgstr "Copied"
+
+#: app/templates/share.html:6
+msgid "Mainu on-the-go • make it easy to order"
+msgstr "Mainu on-the-go • make it easy to order"
+
+#: app/templates/share.html:922
+msgid "This menu link has ended its trip."
+msgstr "This menu link has ended its trip."
+
+#: app/templates/share.html:924
+msgid "Ask your host to resend the link or start a fresh menu capture."
+msgstr "Ask your host to resend the link or start a fresh menu capture."
+
+#: app/templates/share.html:927
+msgid "Start a new menu"
+msgstr "Start a new menu"
+
+#: app/templates/share.html:992
+msgid "Browse together"
+msgstr "Browse together"
+
+#: app/templates/share.html:993 app/templates/share.html:1262
+msgid "Invite your table to explore every dish in their own language."
+msgstr "Invite your table to explore every dish in their own language."
+
+#: app/templates/share.html:995
+msgid "Share code"
+msgstr "Share code"
+
+#: app/templates/share.html:1002
+msgid "Expires soon"
+msgstr "Expires soon"
+
+#: app/templates/share.html:1013
+msgid "Copy menu link and open share options"
+msgstr "Copy menu link and open share options"
+
+#: app/templates/share.html:1047
+msgid "No dishes available yet."
+msgstr "No dishes available yet."
+
+#: app/templates/share.html:1051
+msgid "Bon appétit! • mainu shared menu • Icons by"
+msgstr "Bon appétit! • mainu shared menu • Icons by"
+
+#: app/templates/share.html:1092 app/templates/share.html:1265
+msgid "Scan or share the menu instantly with the QR code."
+msgstr "Scan or share the menu instantly with the QR code."
+
+#: app/templates/share.html:1105
+msgid "Double-check the dishes before sharing the note with staff."
+msgstr "Double-check the dishes before sharing the note with staff."
+
+#: app/templates/share.html:1263
+#, python-brace-format
+msgid "Invite your table to explore {title}."
+msgstr "Invite your table to explore {title}."
+
+#: app/templates/share.html:1267
+msgid "Scan the QR or press and hold to copy the link."
+msgstr "Scan the QR or press and hold to copy the link."
+
+#: app/templates/share.html:1270
+msgid "Link active"
+msgstr "Link active"
+
+#: app/templates/share.html:1271
+msgid "Link expired"
+msgstr "Link expired"
+
+#: app/templates/share.html:1272
+#, python-brace-format
+msgid "Expires in {hours}h {minutes}m"
+msgstr "Expires in {hours}h {minutes}m"
