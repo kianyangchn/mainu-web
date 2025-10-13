@@ -147,6 +147,28 @@ def test_share_view_renders_html():
     assert "Spicy Mapo Tofu" in viewer.text
 
 
+def test_share_view_respects_browser_language():
+    process = client.post(
+        "/menu/process",
+        files=[("files", ("menu.jpg", BytesIO(b"fake-image"), "image/jpeg"))],
+        headers={"accept-language": "zh-CN"},
+    )
+    assert process.status_code == 200
+
+    share_response = client.post(
+        "/menu/share",
+        json={"template": process.json()["template"]},
+    )
+    token = share_response.json()["share_token"]
+
+    viewer = client.get(
+        f"/share/{token}", headers={"Accept-Language": "zh-CN,zh;q=0.9"}
+    )
+    assert viewer.status_code == 200
+    assert "菜单准备就绪" in viewer.text
+    assert "分享此菜单" in viewer.text
+
+
 def test_process_menu_respects_manual_language_selection():
     menu_routes._expected_output_language = "Français"
     response = client.post(
