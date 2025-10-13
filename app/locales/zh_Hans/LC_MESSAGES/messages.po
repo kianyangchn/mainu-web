@@ -143,11 +143,11 @@ msgstr "暂时没有菜品"
 msgid ""
 "Try uploading a sharper angle or different page so we can translate every "
 "item."
-msgstr "请尝试上传更清晰的角度或不同页面，以便翻译每一道菜。"
+msgstr "请尝试上传更清晰的角度或不同页面，以便翻译每一道菜"
 
 #: app/templates/home.html:1730 app/templates/share.html:1057
 msgid "Waiter note"
-msgstr "给服务员的备注"
+msgstr "我的订单"
 
 #: app/templates/home.html:1732 app/templates/share.html:1059
 msgid "Share this summary with the staff so everyone’s meal is just right."
@@ -180,7 +180,7 @@ msgstr "已选餐点"
 
 #: app/templates/home.html:1773
 msgid "Review dishes for the table before sharing the note."
-msgstr "请核对要点的菜。"
+msgstr "请核对要点的菜"
 
 #: app/templates/home.html:1779 app/templates/home.html:1782
 #: app/templates/share.html:1109
@@ -189,7 +189,7 @@ msgstr "关闭"
 
 #: app/templates/home.html:1787 app/templates/share.html:1114
 msgid "Select dishes to see them here."
-msgstr "选择菜品即可在此查看。"
+msgstr "选择菜品即可在此查看"
 
 #: app/templates/home.html:1795 app/templates/share.html:1122
 msgid "Clear"
@@ -245,7 +245,7 @@ msgstr "{count} 张照片就绪"
 
 #: app/templates/home.html:1958
 msgid "Add at least one menu photo to continue."
-msgstr "请至少添加一张菜单照片以继续。"
+msgstr "请至少添加一张菜单照片以继续"
 
 #: app/templates/home.html:1959
 msgid "Menu page preview"
@@ -265,7 +265,7 @@ msgstr "链接已复制！扫描二维码即可在其他设备查看。"
 
 #: app/templates/home.html:1966
 msgid "We couldn't copy that. Tap again to retry."
-msgstr "复制失败，请再试一次。"
+msgstr "复制失败，请再试一次"
 
 #: app/templates/home.html:1967
 msgid "Preparing your share link…"
@@ -273,19 +273,19 @@ msgstr "正在生成分享链接…"
 
 #: app/templates/home.html:1968
 msgid "We couldn't create the link. Tap again to retry."
-msgstr "生成链接失败，请稍后重试。"
+msgstr "生成链接失败，请稍后重试"
 
 #: app/templates/home.html:1969
 msgid "Translate a menu to share it with your group."
-msgstr "先翻译菜单，再与同桌分享。"
+msgstr "先翻译菜单，再与同桌分享"
 
 #: app/templates/home.html:1972
 msgid "Add dishes to your table before creating an order."
-msgstr "请先为餐桌选择菜品，再生成备注。"
+msgstr "请先为餐桌选择菜品，再生成订单"
 
 #: app/templates/home.html:1973
 msgid "We couldn't prepare that menu just now."
-msgstr "暂时无法处理该菜单。"
+msgstr "暂时无法处理该菜单"
 
 #: app/templates/home.html:1976
 msgid "Unknown error"
@@ -316,11 +316,11 @@ msgstr "Mainu 随行 • 轻松点餐"
 
 #: app/templates/share.html:922
 msgid "This menu link has ended its trip."
-msgstr "该链接已失效。"
+msgstr "该链接已失效"
 
 #: app/templates/share.html:924
 msgid "Ask your host to resend the link or start a fresh menu capture."
-msgstr "请联系主办方重新发送链接，或重新扫描菜单。"
+msgstr "请重新生成链接，或重新扫描菜单。"
 
 #: app/templates/share.html:927
 msgid "Start a new menu"
@@ -348,7 +348,7 @@ msgstr "复制菜单链接并打开分享选项"
 
 #: app/templates/share.html:1047
 msgid "No dishes available yet."
-msgstr "暂无可选菜品。"
+msgstr "暂无可选菜品"
 
 #: app/templates/share.html:1051
 msgid "Bon appétit! • mainu shared menu • Icons by"
@@ -356,20 +356,20 @@ msgstr "Bon appétit! • mainu shared menu • Icons by"
 
 #: app/templates/share.html:1092 app/templates/share.html:1265
 msgid "Scan or share the menu instantly with the QR code."
-msgstr "扫描二维码，即刻分享菜单。"
+msgstr "扫描二维码，即刻分享菜单"
 
 #: app/templates/share.html:1105
 msgid "Double-check the dishes before sharing the note with staff."
-msgstr "让服务员下单前，请再次确认菜品。"
+msgstr "让服务员下单前，请再次确认菜品"
 
 #: app/templates/share.html:1263
 #, python-brace-format
 msgid "Invite your table to explore {title}."
-msgstr "邀请朋友一起探索 {title}。"
+msgstr "邀请朋友一起探索 {title}"
 
 #: app/templates/share.html:1267
 msgid "Scan the QR or press and hold to copy the link."
-msgstr "扫描二维码或长按复制链接。"
+msgstr "扫描二维码或长按复制链接"
 
 #: app/templates/share.html:1270
 msgid "Link active"
