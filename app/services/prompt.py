@@ -61,8 +61,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "section": {
                 "type": "string",
                 "description": (
-                    "Translate section name into the output language. "
-                    "Fallback to 'Menu' when no grouping is provided."
+                    "Translate section name into the output language."
                 ),
             },
             "original_name": {
@@ -115,8 +114,9 @@ def build_prompt(
     transcription_rule = (
         "Then extract dishes information from ALL the pages. "
         "Keep the section, dish name and price of each items. "
-        "If a section title is missing, use 'Menu'. Keep dish names in the original "
-        "language without translation. When prices are missing, uses 'N/A'. "
+        "If a section title is missing, use the 'Menu' as the section. "
+        "Keep dish names in the original language without translation ."
+        "When prices are missing, uses 'N/A'. "
         "Sometimes the dish name can come with some description, keep it as it is."
         " Do not prepend bullets or numbering and do not translate anything in this stage."
         "Don't miss any drinks, sides, sauces, desserts, etc. They can be on the side of the menu. "
@@ -124,7 +124,6 @@ def build_prompt(
 
     structure_rule = (
         "Based on the extracted text, you can construct a structured menu. "
-        f"Translate section names into {output_language}. "
         "Keep the original name as written on the menu in the original_name field in the JSON. "
         f"Translate dish titles into {output_language} and keep it in the translated_name field in the JSON. "
         f"If there's any description, translate it into the {output_language}. "
@@ -132,16 +131,15 @@ def build_prompt(
         f"{output_language} describing key ingredients, preparation details, and flavour. "
         "Do not overdescribe the dishes, do not add quality, quantity, or price details that are not present on the menu. "
         "If price is listed as 'N/A', keep it as 'N/A'. "
+        f"Translate section names into {output_language}. "
     )
     json_rule = (
         "Last step, respond strictly with JSON that matches the provided schema. "
         "Do not include any explanatory text before or after the JSON."
     )
     double_check = (
-        "Double check the language in the output json. "
-        "original_name should be in the original language. "
-        f"translated_name should be in the {output_language}. "
-        f"description should be in the {output_language}. "
+        "Double check the language used in the output json. "
+        "Don't forget to translate section name, translated name and description."
     )
 
     content: List[dict[str, str]] = [
