@@ -177,13 +177,14 @@ class LLMMenuService:
         instructions = (
             f"You are a local resident and I'm your friend."
             f"Any recommendations in this menu? answer using {output_language} "
-            "Use emoji to make it more engaging. Don't ask me any questions in the end. "
+            "Use emoji to make it more engaging. "
+            f"In the end, presenting the meaning of `Wait a second, AI is preparing the menu` using {output_language}."
         )
 
         content: List[dict[str, str]] = [
             {
                 "type": "input_text",
-                "text": f"answer using {output_language}",
+                "text": f"answer everything using {output_language}",
             }
         ]
         for file_id in file_ids:
@@ -193,7 +194,7 @@ class LLMMenuService:
             model="gpt-5-nano",  # fast, low-latency model for side-call
             instructions=instructions,
             input=[{"role": "user", "content": content}],
-            text={"verbosity": "medium"},
+            text={"verbosity": "low"},
             reasoning={"effort": "minimal"},
         )
 

@@ -722,30 +722,50 @@
         line-height: 1.55;
         color: var(--text-strong);
         min-height: 96px;
-        display: block;
+        display: flex;
+        flex-direction: column;
         position: relative;
         overflow: auto;
       }
 
-      .terminal-pane[data-termynal] {
-        width: 100% !important;
-        min-height: 96px !important;
+      .terminal-header {
+        margin: 0 0 12px;
+        white-space: pre-wrap;
+        font: inherit;
+        color: inherit;
       }
 
+      .termynal {
+        flex: 1 1 auto;
+      }
+
+      .termynal[data-termynal] {
+        width: 100% !important;
+        min-height: 96px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        color: inherit !important;
+        font-size: inherit !important;
+        font-family: inherit !important;
+        border-radius: 0 !important;
+      }
+
+      .termynal[data-termynal]::before,
+      .termynal[data-termynal]::after,
       .terminal-pane::before,
       .terminal-pane::after {
         display: none !important;
       }
 
-      .terminal-pane [data-ty][data-ty-prompt=""]:before {
+      .termynal [data-ty][data-ty-prompt=""]:before {
         margin-right: 0;
       }
 
-      .terminal-pane [data-ty] {
+      .termynal [data-ty] {
         white-space: pre-wrap;
       }
 
-      .terminal-pane [data-ty-cursor]:after {
+      .termynal [data-ty-cursor]:after {
         color: var(--text-strong);
         margin-left: 0.15em;
       }
@@ -1689,12 +1709,10 @@
           <div class="tip-card-content">
             <p class="tip-card-label">{{ _("While you wait") }}</p>
             <h3 class="tip-card-title">{{ _("From your menu") }}</h3>
-            <div
-              class="terminal-pane termynal"
-              id="suggest-terminal"
-              aria-live="polite"
-              role="log"
-            ></div>
+            <div class="terminal-pane" id="suggest-terminal" aria-live="polite" role="log">
+              <pre class="terminal-header" id="suggest-header"></pre>
+              <div class="termynal" id="suggest-body"></div>
+            </div>
           </div>
         </article>
       </section>
@@ -1904,6 +1922,8 @@
       const heroBackButton = document.getElementById("hero-back");
       const suggestCard = document.getElementById("suggest-card");
       const suggestTerminal = document.getElementById("suggest-terminal");
+      const suggestHeader = document.getElementById("suggest-header");
+      const suggestBody = document.getElementById("suggest-body");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -2083,7 +2103,7 @@
       let celebrationTimer = null;
       let shareMessageResetTimer = null;
       let shareCopiedResetTimer = null;
-      const SUGGESTION_HEADER = "🤖✨ ===  🍣 🍜 🥟 🍢 🧋 🌮 🍗 🍟 🍰 🍩 🍫 🍡 === 🤖✨";
+      const SUGGESTION_HEADER = "🤖✨ === 🍣 🍜 🌮 🍰 🍡";
       let suggestionTermynal = null;
       let suggestionCursorObserver = null;
 
@@ -2095,11 +2115,16 @@
         if (suggestionTermynal) {
           suggestionTermynal = null;
         }
+        if (suggestBody) {
+          suggestBody.innerHTML = "";
+          suggestBody.removeAttribute("data-termynal");
+          suggestBody.style.width = "";
+          suggestBody.style.minHeight = "";
+        }
+        if (suggestHeader) {
+          suggestHeader.textContent = "";
+        }
         if (suggestTerminal) {
-          suggestTerminal.innerHTML = "";
-          suggestTerminal.removeAttribute("data-termynal");
-          suggestTerminal.style.width = "";
-          suggestTerminal.style.minHeight = "";
           suggestTerminal.setAttribute("aria-busy", "false");
         }
       }
@@ -2142,66 +2167,45 @@
         }
       }
 
-      function renderSuggestionHeader() {
-        if (!suggestTerminal) {
-          return;
-        }
-        clearSuggestionTerminal();
-        if (suggestCard) {
-          suggestCard.hidden = false;
-        }
-        if (typeof Termynal === "function") {
-          suggestionTermynal = new Termynal(suggestTerminal, {
-            noInit: true,
-            lineData: [
-              {
-                type: "input",
-                prompt: ">>>",
-                value: SUGGESTION_HEADER,
-                delay: 1400,
-              },
-            ],
-            startDelay: 80,
-            typeDelay: 45,
-            lineDelay: 1200,
-            cursor: "|",
-          });
-          suggestionTermynal.init();
-          attachCursorGuard(suggestionTermynal);
-        } else {
-          const pre = document.createElement("pre");
-          pre.className = "terminal-fallback";
-          pre.textContent = `>>> ${SUGGESTION_HEADER}`;
-          suggestTerminal.appendChild(pre);
-        }
-      }
-
       function renderSuggestionText(text) {
         if (!suggestTerminal) {
           return;
         }
-        clearSuggestionTerminal();
-        if (!text.trim()) {
+        const trimmed = typeof text === "string" ? text.trim() : "";
+        if (!trimmed) {
           resetSuggestionDisplay();
           return;
         }
         if (suggestCard) {
           suggestCard.hidden = false;
         }
+        if (suggestHeader) {
+          suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
+        }
+        if (suggestionCursorObserver) {
+          suggestionCursorObserver.disconnect();
+          suggestionCursorObserver = null;
+        }
+        suggestionTermynal = null;
+        if (suggestBody) {
+          suggestBody.innerHTML = "";
+          suggestBody.removeAttribute("data-termynal");
+          suggestBody.style.width = "";
+          suggestBody.style.minHeight = "";
+        }
         if (typeof Termynal === "function") {
-          const lines = text
+          const lines = trimmed
             .split(/\r?\n/)
             .map((line) => line.trim())
             .filter((line) => line.length);
-          const sourceLines = lines.length ? lines : [text.trim()];
-          const allLines = [SUGGESTION_HEADER, ...sourceLines];
-          const lineData = allLines.map((value, index) => ({
+          const sourceLines = lines.length ? lines : [trimmed];
+          const lineData = sourceLines.map((value, index) => ({
             type: "input",
             prompt: ">>>",
             value,
-            delay: index === allLines.length - 1 ? 3200 : 1500,
+            delay: index === sourceLines.length - 1 ? 3200 : 1500,
           }));
-          suggestionTermynal = new Termynal(suggestTerminal, {
+          suggestionTermynal = new Termynal(suggestBody, {
             noInit: true,
             lineData,
             startDelay: 200,
@@ -2214,11 +2218,11 @@
         } else {
           const pre = document.createElement("pre");
           pre.className = "terminal-fallback";
-          const fallbackLines = [SUGGESTION_HEADER, ...text.split(/\r?\n/)];
-          pre.textContent = fallbackLines
+          pre.textContent = trimmed
+            .split(/\r?\n/)
             .map((line) => `>>> ${line.trim()}`)
             .join("\n");
-          suggestTerminal.appendChild(pre);
+          suggestBody.appendChild(pre);
         }
         suggestTerminal.setAttribute("aria-busy", "false");
       }
@@ -2228,7 +2232,19 @@
           return;
         }
         try {
-          renderSuggestionHeader();
+          clearSuggestionTerminal();
+          if (suggestCard) {
+            suggestCard.hidden = false;
+          }
+          if (suggestHeader) {
+            suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
+          }
+          if (suggestBody) {
+            suggestBody.innerHTML = "";
+            suggestBody.removeAttribute("data-termynal");
+            suggestBody.style.width = "";
+            suggestBody.style.minHeight = "";
+          }
           suggestTerminal.setAttribute("aria-busy", "true");
           const response = await fetch("/menu/suggest", {
             method: "POST",
