@@ -175,9 +175,10 @@ class LLMMenuService:
 
         # Keep this lightweight: a short instruction and the images.
         instructions = (
-            f"You are a local resident and I'm your friend."
-            f"Any recommendations in this menu? answer using {output_language} "
-            "Use emoji to make it more engaging. "
+            f"You are a local resident and I'm your friend. "
+            "Start with a brief understanding of the menu and dishes. "
+            f"Then any recommendations for the order? answer using {output_language} "
+            "Use emoji to make it more engaging. Tell joke if you can."
             f"In the end, let me know in {output_language} that AI is preparing the menu, should be finish very soon."
         )
 

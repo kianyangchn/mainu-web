@@ -1469,9 +1469,25 @@
 
           const navButtons = [];
           const setActiveNav = (targetId) => {
+            let activeButton = null;
             navButtons.forEach((button) => {
-              button.dataset.active = button.dataset.target === targetId ? "true" : "false";
+              const isActive = button.dataset.target === targetId;
+              button.dataset.active = isActive ? "true" : "false";
+              if (isActive) {
+                activeButton = button;
+              }
             });
+            if (activeButton) {
+              const navBounds = sectionNav.getBoundingClientRect();
+              const buttonBounds = activeButton.getBoundingClientRect();
+              const buffer = 24;
+              if (
+                buttonBounds.left < navBounds.left + buffer ||
+                buttonBounds.right > navBounds.right - buffer
+              ) {
+                activeButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }
+            }
           };
 
           state.menu.sections.forEach((section, index) => {
