@@ -178,7 +178,7 @@ class LLMMenuService:
             f"You are a local resident and I'm your friend."
             f"Any recommendations in this menu? answer using {output_language} "
             "Use emoji to make it more engaging. "
-            f"In the end, let me know that AI is preparing the menu, should be finish very soon, using {output_language}."
+            f"In the end, let me know in {output_language} that AI is preparing the menu, should be finish very soon."
         )
 
         content: List[dict[str, str]] = [

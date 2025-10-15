@@ -2365,6 +2365,12 @@
           playMenuCelebration();
           state.shouldCelebrateMenu = false;
         }
+        if (showMenu) {
+          // Ensure the interactive menu opens at the top after loading finishes.
+          window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+          });
+        }
         if (shareFab) {
           const shouldShowShareFab = showMenu && !!state.menu;
           shareFab.hidden = !shouldShowShareFab;
