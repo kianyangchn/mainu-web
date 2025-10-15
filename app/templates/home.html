@@ -2096,6 +2096,7 @@
         selectedLanguage: "",
         shouldCelebrateMenu: false,
         isSharing: false,
+        pendingMenuPayload: null,
       };
 
       let menuTitleText = uiText.defaultMenuTitle;
@@ -2103,9 +2104,18 @@
       let celebrationTimer = null;
       let shareMessageResetTimer = null;
       let shareCopiedResetTimer = null;
-      const SUGGESTION_HEADER = "🤖✨ === 🍣 🍜 🌮 🍰 🍡";
+      const SUGGESTION_HEADER = "🤖✨ 🍣 🍜 🍰";
+      const SUGGESTION_TYPE_DELAY_MS = 45;
+      const SUGGESTION_INTER_DELAY_MS = 1500;
+      const SUGGESTION_FINAL_DELAY_MS = 600;
+      const SUGGESTION_START_DELAY_MS = 200;
+      const MENU_READY_DELAY_MS = 3000;
       let suggestionTermynal = null;
       let suggestionCursorObserver = null;
+      let suggestionAnimationTimer = null;
+      let suggestionCompleted = false;
+      let finalizeMenuTimer = null;
+      let finalizeMenuInFlight = false;
 
       function clearSuggestionTerminal() {
         if (suggestionCursorObserver) {
@@ -2123,6 +2133,10 @@
         }
         if (suggestHeader) {
           suggestHeader.textContent = "";
+        }
+        if (suggestionAnimationTimer) {
+          window.clearTimeout(suggestionAnimationTimer);
+          suggestionAnimationTimer = null;
         }
         if (suggestTerminal) {
           suggestTerminal.setAttribute("aria-busy", "false");
@@ -2167,20 +2181,33 @@
         }
       }
 
+      const computeSuggestionDuration = (lines) => {
+        if (!Array.isArray(lines) || !lines.length) {
+          return 0;
+        }
+        const lastIndex = lines.length - 1;
+        return (
+          SUGGESTION_START_DELAY_MS +
+          lines.reduce((total, line, index) => {
+            const length = Array.from(line).length;
+            const typingTime = length * SUGGESTION_TYPE_DELAY_MS;
+            const pause = index === lastIndex ? SUGGESTION_FINAL_DELAY_MS : SUGGESTION_INTER_DELAY_MS;
+            return total + typingTime + pause;
+          }, 0)
+        );
+      };
+
       function renderSuggestionText(text) {
         if (!suggestTerminal) {
-          return;
+          return Promise.resolve();
         }
         const trimmed = typeof text === "string" ? text.trim() : "";
         if (!trimmed) {
           resetSuggestionDisplay();
-          return;
+          return Promise.resolve();
         }
         if (suggestCard) {
           suggestCard.hidden = false;
-        }
-        if (suggestHeader) {
-          suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
         }
         if (suggestionCursorObserver) {
           suggestionCursorObserver.disconnect();
@@ -2193,38 +2220,67 @@
           suggestBody.style.width = "";
           suggestBody.style.minHeight = "";
         }
-        if (typeof Termynal === "function") {
-          const lines = trimmed
-            .split(/\r?\n/)
-            .map((line) => line.trim())
-            .filter((line) => line.length);
-          const sourceLines = lines.length ? lines : [trimmed];
-          const lineData = sourceLines.map((value, index) => ({
-            type: "input",
-            prompt: ">>>",
-            value,
-            delay: index === sourceLines.length - 1 ? 3200 : 1500,
-          }));
-          suggestionTermynal = new Termynal(suggestBody, {
-            noInit: true,
-            lineData,
-            startDelay: 200,
-            typeDelay: 45,
-            lineDelay: 1200,
-            cursor: "|",
-          });
-          suggestionTermynal.init();
-          attachCursorGuard(suggestionTermynal);
-        } else {
-          const pre = document.createElement("pre");
-          pre.className = "terminal-fallback";
-          pre.textContent = trimmed
-            .split(/\r?\n/)
-            .map((line) => `>>> ${line.trim()}`)
-            .join("\n");
-          suggestBody.appendChild(pre);
+
+        const sourceLines = trimmed
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length);
+        if (!sourceLines.length) {
+          return Promise.resolve();
         }
-        suggestTerminal.setAttribute("aria-busy", "false");
+
+        if (suggestHeader) {
+          suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
+        }
+
+        const totalDuration = computeSuggestionDuration(sourceLines);
+        if (suggestionAnimationTimer) {
+          window.clearTimeout(suggestionAnimationTimer);
+          suggestionAnimationTimer = null;
+        }
+
+        return new Promise((resolve) => {
+          const finish = () => {
+            if (suggestionAnimationTimer) {
+              window.clearTimeout(suggestionAnimationTimer);
+              suggestionAnimationTimer = null;
+            }
+            if (suggestTerminal) {
+              suggestTerminal.setAttribute("aria-busy", "false");
+            }
+            resolve();
+          };
+
+          if (typeof Termynal === "function") {
+            const lineData = sourceLines.map((value, index) => ({
+              type: "input",
+              prompt: ">>>",
+              value,
+              delay: index === sourceLines.length - 1 ? SUGGESTION_FINAL_DELAY_MS : SUGGESTION_INTER_DELAY_MS,
+            }));
+            suggestionTermynal = new Termynal(suggestBody, {
+              noInit: true,
+              lineData,
+              startDelay: SUGGESTION_START_DELAY_MS,
+              typeDelay: SUGGESTION_TYPE_DELAY_MS,
+              lineDelay: SUGGESTION_INTER_DELAY_MS,
+              cursor: "|",
+            });
+            suggestionTermynal.init();
+            attachCursorGuard(suggestionTermynal);
+          } else {
+            const pre = document.createElement("pre");
+            pre.className = "terminal-fallback";
+            pre.textContent = sourceLines.map((line) => `>>> ${line}`).join("\n");
+            suggestBody.appendChild(pre);
+          }
+
+          if (totalDuration > 0) {
+            suggestionAnimationTimer = window.setTimeout(finish, totalDuration);
+          } else {
+            finish();
+          }
+        });
       }
 
       async function startMenuSuggestions(formData) {
@@ -2233,17 +2289,12 @@
         }
         try {
           clearSuggestionTerminal();
+          suggestionCompleted = false;
           if (suggestCard) {
             suggestCard.hidden = false;
           }
           if (suggestHeader) {
             suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
-          }
-          if (suggestBody) {
-            suggestBody.innerHTML = "";
-            suggestBody.removeAttribute("data-termynal");
-            suggestBody.style.width = "";
-            suggestBody.style.minHeight = "";
           }
           suggestTerminal.setAttribute("aria-busy", "true");
           const response = await fetch("/menu/suggest", {
@@ -2252,18 +2303,51 @@
           });
           if (!response.ok) {
             resetSuggestionDisplay();
+            suggestionCompleted = true;
+            finalizeMenuIfReady();
             return;
           }
           const payload = await response.json();
           const text = typeof payload?.text === "string" ? payload.text.trim() : "";
           if (!text) {
             resetSuggestionDisplay();
+            suggestionCompleted = true;
+            finalizeMenuIfReady();
             return;
           }
-          renderSuggestionText(text);
+          await renderSuggestionText(text);
+          suggestionCompleted = true;
+          finalizeMenuIfReady();
         } catch (_) {
           resetSuggestionDisplay();
+          suggestionCompleted = true;
+          finalizeMenuIfReady();
         }
+      }
+
+      function finalizeMenuIfReady() {
+        if (finalizeMenuInFlight) {
+          return;
+        }
+        if (!suggestionCompleted || !state.pendingMenuPayload) {
+          return;
+        }
+        finalizeMenuInFlight = true;
+        if (finalizeMenuTimer) {
+          window.clearTimeout(finalizeMenuTimer);
+        }
+        finalizeMenuTimer = window.setTimeout(() => {
+          finalizeMenuTimer = null;
+          finalizeMenuInFlight = false;
+          const payload = state.pendingMenuPayload;
+          state.pendingMenuPayload = null;
+          if (!payload) {
+            return;
+          }
+          state.shouldCelebrateMenu = true;
+          renderResults(payload);
+          showScreen("menu");
+        }, MENU_READY_DELAY_MS);
       }
 
       function showScreen(name) {
@@ -2294,6 +2378,19 @@
         heroBackButton.hidden = showCapture;
 
         resetSuggestionDisplay();
+        if (name !== "processing") {
+          state.pendingMenuPayload = null;
+          suggestionCompleted = false;
+          finalizeMenuInFlight = false;
+          if (finalizeMenuTimer) {
+            window.clearTimeout(finalizeMenuTimer);
+            finalizeMenuTimer = null;
+          }
+          if (suggestionAnimationTimer) {
+            window.clearTimeout(suggestionAnimationTimer);
+            suggestionAnimationTimer = null;
+          }
+        }
       }
 
       function playMenuCelebration() {
@@ -2578,6 +2675,19 @@
           formData.append("output_language", state.selectedLanguage);
         }
 
+        state.pendingMenuPayload = null;
+        state.shouldCelebrateMenu = false;
+        suggestionCompleted = false;
+        finalizeMenuInFlight = false;
+        if (finalizeMenuTimer) {
+          window.clearTimeout(finalizeMenuTimer);
+          finalizeMenuTimer = null;
+        }
+        if (suggestionAnimationTimer) {
+          window.clearTimeout(suggestionAnimationTimer);
+          suggestionAnimationTimer = null;
+        }
+
         // Fire quick suggestions in parallel for a nicer waiting experience.
         startMenuSuggestions(formData).catch(() => {});
 
@@ -2593,13 +2703,20 @@
             return response.json();
           })
           .then((payload) => {
-            renderResults(payload);
-            state.shouldCelebrateMenu = true;
-            showScreen("menu");
+            state.pendingMenuPayload = payload;
+            finalizeMenuIfReady();
           })
           .catch((error) => {
             showScreen("capture");
             setWarning(error.message || uiText.warnings.prepareFailed);
+            state.pendingMenuPayload = null;
+            state.shouldCelebrateMenu = false;
+            if (finalizeMenuTimer) {
+              window.clearTimeout(finalizeMenuTimer);
+              finalizeMenuTimer = null;
+            }
+            finalizeMenuInFlight = false;
+            suggestionCompleted = false;
           })
           .finally(() => {
             translateButton.disabled = false;
