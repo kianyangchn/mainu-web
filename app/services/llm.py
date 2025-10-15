@@ -68,6 +68,37 @@ class LLMMenuService:
         template = _build_menu_template(payload)
         return MenuGenerationResult(template=template)
 
+    async def generate_quick_suggestions(
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None = None,
+        content_types: Sequence[str] | None = None,
+        *,
+        output_language: str | None = None,
+    ) -> str:
+        """Produce a short, friendly intro of dishes quickly.
+
+        Uses a fast, lightweight model with minimal reasoning to surface
+        a handful of dish suggestions while the full extraction runs.
+        Returns a plain text snippet suitable for inline display.
+        """
+
+        if not images:
+            raise ValueError("At least one image is required")
+
+        file_ids = await self._upload_images(images, filenames, content_types)
+        try:
+            text = await self._run_quick_suggest_request(
+                file_ids,
+                output_language or settings.default_output_language,
+            )
+        except OpenAIError as exc:  # pragma: no cover - network failure path
+            raise RuntimeError("Failed to call OpenAI API for suggestions") from exc
+        finally:
+            await self._delete_files(file_ids)
+
+        return text
+
     async def _upload_images(
         self,
         images: Sequence[bytes],
@@ -131,6 +162,42 @@ class LLMMenuService:
         )
 
         return _extract_json_payload(response)
+
+    async def _run_quick_suggest_request(
+        self, file_ids: Sequence[str], output_language: str
+    ) -> str:
+        """Call fast model to produce a brief textual suggestion.
+
+        Keeps the prompt small and uses minimal reasoning for latency.
+        """
+        if not file_ids:
+            return ""
+
+        # Keep this lightweight: a short instruction and the images.
+        instructions = (
+            f"You are a local resident and I'm your friend."
+            f"Any recommendations in this menu? answer using {output_language} "
+            "Use emoji to make it more engaging. Don't ask me any questions in the end. "
+        )
+
+        content: List[dict[str, str]] = [
+            {
+                "type": "input_text",
+                "text": f"answer using {output_language}",
+            }
+        ]
+        for file_id in file_ids:
+            content.append({"type": "input_image", "file_id": file_id})
+
+        response = await self.client.responses.create(
+            model="gpt-5-nano",  # fast, low-latency model for side-call
+            instructions=instructions,
+            input=[{"role": "user", "content": content}],
+            text={"verbosity": "medium"},
+            reasoning={"effort": "minimal"},
+        )
+
+        return _extract_output_text(response)
 
 
 def _extract_json_payload(response: object) -> dict:

@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ _("Mainu on-the-go") }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='vendor/termynal.css') }}" />
     
     <style>
       :root {
@@ -680,6 +681,78 @@
 
       .tip-card-source[hidden] {
         display: none;
+      }
+
+      #suggest-card {
+        background: #ffffff;
+        border: 1px solid var(--border-strong);
+        box-shadow: var(--shadow-soft);
+        color: var(--text-strong);
+        flex-direction: column;
+        gap: 16px;
+        min-height: 0;
+        padding: 24px;
+      }
+
+      #suggest-card .tip-card-label {
+        color: var(--text-muted);
+      }
+
+      #suggest-card .tip-card-title {
+        color: var(--primary);
+      }
+
+      #suggest-card .tip-card-body {
+        color: var(--text-muted);
+      }
+
+      #suggest-card .tip-card-content {
+        gap: 12px;
+      }
+
+      .terminal-pane {
+        margin-top: 12px;
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--border-strong);
+        background: #ffffff;
+        padding: 18px 16px;
+        font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.95rem;
+        line-height: 1.55;
+        color: var(--text-strong);
+        min-height: 96px;
+        display: block;
+        position: relative;
+        overflow: auto;
+      }
+
+      .terminal-pane[data-termynal] {
+        width: 100% !important;
+        min-height: 96px !important;
+      }
+
+      .terminal-pane::before,
+      .terminal-pane::after {
+        display: none !important;
+      }
+
+      .terminal-pane [data-ty][data-ty-prompt=""]:before {
+        margin-right: 0;
+      }
+
+      .terminal-pane [data-ty] {
+        white-space: pre-wrap;
+      }
+
+      .terminal-pane [data-ty-cursor]:after {
+        color: var(--text-strong);
+        margin-left: 0.15em;
+      }
+
+      .terminal-fallback {
+        margin: 0;
+        white-space: pre-wrap;
       }
 
       .progress-ring {
@@ -1612,28 +1685,18 @@
           <!-- <p>Our AI concierge is reading every page, translating dishes, and organising sections for your group.</p> -->
         </div>
         <!-- <p style="font-size: 0.9rem;">Grab a sip – we’ll ping you in a moment.</p> -->
-        <div class="tip-rail" id="tip-rail" aria-live="polite">
-          <article class="tip-card" id="tip-card" hidden>
-            <figure class="tip-card-figure" id="tip-image-container" data-visible="false">
-              <img id="tip-image" alt="" />
-            </figure>
-            <div class="tip-card-content">
-              <p class="tip-card-label">{{ _("While you wait") }}</p>
-              <h3 class="tip-card-title" id="tip-title"></h3>
-              <p class="tip-card-body" id="tip-body"></p>
-              <a
-                class="tip-card-source"
-                id="tip-source"
-                href="#"
-                rel="noopener"
-                target="_blank"
-                hidden
-              >
-                {{ _("Source") }}
-              </a>
-            </div>
-          </article>
-        </div>
+        <article class="tip-card" id="suggest-card" hidden>
+          <div class="tip-card-content">
+            <p class="tip-card-label">{{ _("While you wait") }}</p>
+            <h3 class="tip-card-title">{{ _("From your menu") }}</h3>
+            <div
+              class="terminal-pane termynal"
+              id="suggest-terminal"
+              aria-live="polite"
+              role="log"
+            ></div>
+          </div>
+        </article>
       </section>
 
       <section class="menu-results screen" data-screen="menu" hidden>
@@ -1830,6 +1893,7 @@
       </li>
     </template>
 
+    <script src="{{ url_for('static', path='vendor/termynal.js') }}"></script>
     <script>
       const screens = new Map(
         Array.from(document.querySelectorAll(".screen"), (node) => [node.dataset.screen, node])
@@ -1838,6 +1902,8 @@
       const translateButton = document.getElementById("translate-button");
       const captureStatus = document.getElementById("capture-status");
       const heroBackButton = document.getElementById("hero-back");
+      const suggestCard = document.getElementById("suggest-card");
+      const suggestTerminal = document.getElementById("suggest-terminal");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -1870,13 +1936,6 @@
       const cartDialogEmpty = document.getElementById("cart-dialog-empty");
       const closeCartDialogButton = document.getElementById("close-cart-dialog");
       const menuCelebration = document.getElementById("menu-celebration");
-      const tipRail = document.getElementById("tip-rail");
-      const tipCard = document.getElementById("tip-card");
-      const tipImageContainer = document.getElementById("tip-image-container");
-      const tipImage = document.getElementById("tip-image");
-      const tipTitle = document.getElementById("tip-title");
-      const tipBody = document.getElementById("tip-body");
-      const tipSource = document.getElementById("tip-source");
       const uiLanguageButton = document.getElementById("ui-language-button");
       const uiLanguageMenu = document.getElementById("ui-language-menu");
       let uiLanguageMenuOpen = false;
@@ -1979,7 +2038,6 @@
           copied: {{ _("Copied") | tojson }},
           copyNote: {{ _("Copy note") | tojson }},
         },
-        tipSourceFallback: {{ _("Source") | tojson }},
       };
 
       const SHARE_MESSAGES = uiText.share;
@@ -2025,10 +2083,172 @@
       let celebrationTimer = null;
       let shareMessageResetTimer = null;
       let shareCopiedResetTimer = null;
-      const tipBuffer = [];
-      let tipRotationTimer = null;
-      let activeTipIndex = 0;
-      const TIP_ROTATION_MS = 10000;
+      const SUGGESTION_HEADER = "🤖✨ ===  🍣 🍜 🥟 🍢 🧋 🌮 🍗 🍟 🍰 🍩 🍫 🍡 === 🤖✨";
+      let suggestionTermynal = null;
+      let suggestionCursorObserver = null;
+
+      function clearSuggestionTerminal() {
+        if (suggestionCursorObserver) {
+          suggestionCursorObserver.disconnect();
+          suggestionCursorObserver = null;
+        }
+        if (suggestionTermynal) {
+          suggestionTermynal = null;
+        }
+        if (suggestTerminal) {
+          suggestTerminal.innerHTML = "";
+          suggestTerminal.removeAttribute("data-termynal");
+          suggestTerminal.style.width = "";
+          suggestTerminal.style.minHeight = "";
+          suggestTerminal.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function attachCursorGuard(term) {
+        if (suggestionCursorObserver) {
+          suggestionCursorObserver.disconnect();
+          suggestionCursorObserver = null;
+        }
+        if (!term || !Array.isArray(term.lines) || !term.lines.length) {
+          return;
+        }
+        const lastLine = term.lines[term.lines.length - 1];
+        if (!lastLine) {
+          return;
+        }
+        const ensureCursor = () => {
+          if (!lastLine.hasAttribute("data-ty-cursor")) {
+            lastLine.setAttribute("data-ty-cursor", "|");
+          }
+        };
+        ensureCursor();
+        suggestionCursorObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === "attributes" && mutation.attributeName === "data-ty-cursor") {
+              ensureCursor();
+            }
+          }
+        });
+        suggestionCursorObserver.observe(lastLine, {
+          attributes: true,
+          attributeFilter: ["data-ty-cursor"],
+        });
+      }
+
+      function resetSuggestionDisplay() {
+        clearSuggestionTerminal();
+        if (suggestCard) {
+          suggestCard.hidden = true;
+        }
+      }
+
+      function renderSuggestionHeader() {
+        if (!suggestTerminal) {
+          return;
+        }
+        clearSuggestionTerminal();
+        if (suggestCard) {
+          suggestCard.hidden = false;
+        }
+        if (typeof Termynal === "function") {
+          suggestionTermynal = new Termynal(suggestTerminal, {
+            noInit: true,
+            lineData: [
+              {
+                type: "input",
+                prompt: ">>>",
+                value: SUGGESTION_HEADER,
+                delay: 1400,
+              },
+            ],
+            startDelay: 80,
+            typeDelay: 45,
+            lineDelay: 1200,
+            cursor: "|",
+          });
+          suggestionTermynal.init();
+          attachCursorGuard(suggestionTermynal);
+        } else {
+          const pre = document.createElement("pre");
+          pre.className = "terminal-fallback";
+          pre.textContent = `>>> ${SUGGESTION_HEADER}`;
+          suggestTerminal.appendChild(pre);
+        }
+      }
+
+      function renderSuggestionText(text) {
+        if (!suggestTerminal) {
+          return;
+        }
+        clearSuggestionTerminal();
+        if (!text.trim()) {
+          resetSuggestionDisplay();
+          return;
+        }
+        if (suggestCard) {
+          suggestCard.hidden = false;
+        }
+        if (typeof Termynal === "function") {
+          const lines = text
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line.length);
+          const sourceLines = lines.length ? lines : [text.trim()];
+          const allLines = [SUGGESTION_HEADER, ...sourceLines];
+          const lineData = allLines.map((value, index) => ({
+            type: "input",
+            prompt: ">>>",
+            value,
+            delay: index === allLines.length - 1 ? 3200 : 1500,
+          }));
+          suggestionTermynal = new Termynal(suggestTerminal, {
+            noInit: true,
+            lineData,
+            startDelay: 200,
+            typeDelay: 45,
+            lineDelay: 1200,
+            cursor: "|",
+          });
+          suggestionTermynal.init();
+          attachCursorGuard(suggestionTermynal);
+        } else {
+          const pre = document.createElement("pre");
+          pre.className = "terminal-fallback";
+          const fallbackLines = [SUGGESTION_HEADER, ...text.split(/\r?\n/)];
+          pre.textContent = fallbackLines
+            .map((line) => `>>> ${line.trim()}`)
+            .join("\n");
+          suggestTerminal.appendChild(pre);
+        }
+        suggestTerminal.setAttribute("aria-busy", "false");
+      }
+
+      async function startMenuSuggestions(formData) {
+        if (!suggestTerminal) {
+          return;
+        }
+        try {
+          renderSuggestionHeader();
+          suggestTerminal.setAttribute("aria-busy", "true");
+          const response = await fetch("/menu/suggest", {
+            method: "POST",
+            body: formData,
+          });
+          if (!response.ok) {
+            resetSuggestionDisplay();
+            return;
+          }
+          const payload = await response.json();
+          const text = typeof payload?.text === "string" ? payload.text.trim() : "";
+          if (!text) {
+            resetSuggestionDisplay();
+            return;
+          }
+          renderSuggestionText(text);
+        } catch (_) {
+          resetSuggestionDisplay();
+        }
+      }
 
       function showScreen(name) {
         activeScreen = name;
@@ -2057,11 +2277,7 @@
         }
         heroBackButton.hidden = showCapture;
 
-        if (name === "processing") {
-          loadTips();
-        } else {
-          stopTipRotation(false);
-        }
+        resetSuggestionDisplay();
       }
 
       function playMenuCelebration() {
@@ -2327,161 +2543,6 @@
         languageChoices.querySelectorAll(".language-chip").forEach((chip) => {
           chip.dataset.active = chip.dataset.lang === code ? "true" : "false";
         });
-        if (activeScreen === "processing") {
-          reloadTips();
-        }
-      }
-
-      async function loadTips() {
-        tipBuffer.length = 0;
-        activeTipIndex = 0;
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        hideTipCard();
-
-        try {
-          const response = await fetch(`/menu/tips`, {
-            headers: {
-              Accept: "application/json",
-            },
-          });
-          if (!response.ok) {
-            throw new Error(`Tip fetch failed (${response.status})`);
-          }
-          const tips = await response.json();
-          const withImages = Array.isArray(tips)
-            ? tips.filter((tip) => tip && typeof tip.image_url === "string" && tip.image_url.length)
-            : [];
-          if (!withImages.length) {
-            return;
-          }
-          tipBuffer.push(...withImages);
-          showTip(0);
-          restartTipTimer();
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      function stopTipRotation(resetDisplay = true) {
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        if (resetDisplay) {
-          tipBuffer.length = 0;
-          hideTipCard();
-        }
-      }
-
-      function reloadTips() {
-        stopTipRotation(true);
-        if (activeScreen === "processing") {
-          loadTips();
-        }
-      }
-
-      function hideTipImage() {
-        if (tipImage) {
-          tipImage.onload = null;
-          tipImage.onerror = null;
-          tipImage.removeAttribute("src");
-        }
-        if (tipImageContainer) {
-          tipImageContainer.dataset.visible = "false";
-        }
-      }
-
-      function hideTipCard() {
-        if (tipCard) {
-          tipCard.hidden = true;
-        }
-      }
-
-      function removeTip(index) {
-        if (index < 0 || index >= tipBuffer.length) {
-          return;
-        }
-        tipBuffer.splice(index, 1);
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        if (!tipBuffer.length) {
-          hideTipCard();
-          return;
-        }
-        const nextIndex = index % tipBuffer.length;
-        showTip(nextIndex);
-        restartTipTimer();
-      }
-
-      function showTip(index) {
-        if (!tipBuffer.length || !tipCard || !tipTitle || !tipBody) {
-          hideTipCard();
-          return;
-        }
-        const tip = tipBuffer[index % tipBuffer.length];
-        activeTipIndex = index % tipBuffer.length;
-        const currentIndex = activeTipIndex;
-        tipTitle.textContent = tip.title;
-        tipBody.textContent = tip.body;
-
-        if (tipImageContainer && tipImage) {
-          tipImage.onload = null;
-          tipImage.onerror = null;
-
-          if (tip.image_url) {
-            tipImageContainer.dataset.visible = "false";
-            tipImage.onerror = () => {
-              hideTipImage();
-              removeTip(currentIndex);
-            };
-            tipImage.onload = () => {
-              tipImageContainer.dataset.visible = "true";
-              tipImage.onload = null;
-            };
-            tipImage.src = tip.image_url;
-          } else {
-            hideTipImage();
-            removeTip(currentIndex);
-            return;
-          }
-        }
-
-        if (tipSource) {
-          if (tip.source_url || tip.source_name) {
-            tipSource.hidden = false;
-            tipSource.textContent = tip.source_name || uiText.tipSourceFallback;
-            if (tip.source_url) {
-              tipSource.href = tip.source_url;
-            } else {
-              tipSource.removeAttribute("href");
-            }
-          } else {
-            tipSource.hidden = true;
-            tipSource.removeAttribute("href");
-          }
-        }
-
-        tipCard.hidden = false;
-      }
-
-      function restartTipTimer() {
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-        }
-        if (tipBuffer.length <= 1) {
-          tipRotationTimer = null;
-          return;
-        }
-        tipRotationTimer = window.setTimeout(() => {
-          const nextIndex = (activeTipIndex + 1) % tipBuffer.length;
-          showTip(nextIndex);
-          restartTipTimer();
-        }, TIP_ROTATION_MS);
       }
 
       function submitUpload() {
@@ -2500,6 +2561,9 @@
         if (state.selectedLanguage) {
           formData.append("output_language", state.selectedLanguage);
         }
+
+        // Fire quick suggestions in parallel for a nicer waiting experience.
+        startMenuSuggestions(formData).catch(() => {});
 
         fetch("/menu/process", {
           method: "POST",
@@ -2523,7 +2587,6 @@
           })
           .finally(() => {
             translateButton.disabled = false;
-            stopTipRotation(false);
           });
       }
 
@@ -3160,7 +3223,6 @@
       setLanguage("");
       renderPreview();
       updateCaptureStatus();
-      window.addEventListener("beforeunload", () => stopTipRotation(false));
     </script>
   </body>
 </html>
