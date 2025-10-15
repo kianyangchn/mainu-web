@@ -757,7 +757,7 @@
         display: none !important;
       }
 
-      .termynal [data-ty][data-ty-prompt=""]:before {
+      .termynal [data-ty][data-ty-prompt="~"]:before {
         margin-right: 0;
       }
 
@@ -825,6 +825,25 @@
         .tip-card-title,
         .tip-card-body {
           text-align: center;
+        }
+
+        #suggest-card {
+          align-items: stretch;
+          text-align: left;
+        }
+
+        #suggest-card .tip-card-content {
+          align-items: stretch;
+        }
+
+        #suggest-card .tip-card-label,
+        #suggest-card .tip-card-title,
+        #suggest-card .tip-card-body {
+          text-align: left;
+        }
+
+        #suggest-card .terminal-pane {
+          align-self: stretch;
         }
       }
 
@@ -2230,7 +2249,7 @@
         }
 
         if (suggestHeader) {
-          suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
+          suggestHeader.textContent = `$ ${SUGGESTION_HEADER}\n`;
         }
 
         const totalDuration = computeSuggestionDuration(sourceLines);
@@ -2254,7 +2273,7 @@
           if (typeof Termynal === "function") {
             const lineData = sourceLines.map((value, index) => ({
               type: "input",
-              prompt: ">>>",
+              prompt: "$",
               value,
               delay: index === sourceLines.length - 1 ? SUGGESTION_FINAL_DELAY_MS : SUGGESTION_INTER_DELAY_MS,
             }));
@@ -2271,7 +2290,7 @@
           } else {
             const pre = document.createElement("pre");
             pre.className = "terminal-fallback";
-            pre.textContent = sourceLines.map((line) => `>>> ${line}`).join("\n");
+            pre.textContent = sourceLines.map((line) => `$ ${line}`).join("\n");
             suggestBody.appendChild(pre);
           }
 
@@ -2294,7 +2313,7 @@
             suggestCard.hidden = false;
           }
           if (suggestHeader) {
-            suggestHeader.textContent = `>>> ${SUGGESTION_HEADER}\n`;
+            suggestHeader.textContent = `$ ${SUGGESTION_HEADER}\n`;
           }
           suggestTerminal.setAttribute("aria-busy", "true");
           const response = await fetch("/menu/suggest", {
