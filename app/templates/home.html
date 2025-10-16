@@ -544,8 +544,18 @@
 
       .processing-card {
         align-items: center;
+        justify-content: center;
         text-align: center;
-        gap: 24px;
+        gap: 0;
+      }
+
+      .processing-terminal {
+        width: min(640px, 100%);
+        text-align: left;
+      }
+
+      .processing-terminal [data-termynal] {
+        width: 100%;
       }
 
       @media (max-width: 640px) {
@@ -581,12 +591,6 @@
         .dropzone[data-mode="empty"] {
           padding: 32px 18px;
         }
-      }
-
-      .processing-card p {
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.5;
       }
 
       .tip-rail {
@@ -687,125 +691,6 @@
         display: none;
       }
 
-      #suggest-card {
-        background: #ffffff;
-        border: 1px solid var(--border-strong);
-        box-shadow: var(--shadow-soft);
-        color: var(--text-strong);
-        flex-direction: column;
-        gap: 16px;
-        min-height: 0;
-        padding: 24px;
-      }
-
-      #suggest-card .tip-card-label {
-        color: var(--text-muted);
-      }
-
-      #suggest-card .tip-card-title {
-        color: var(--primary);
-      }
-
-      #suggest-card .tip-card-body {
-        color: var(--text-muted);
-      }
-
-      #suggest-card .tip-card-content {
-        gap: 12px;
-      }
-
-      .terminal-pane {
-        margin-top: 12px;
-        width: 100%;
-        border-radius: 14px;
-        border: 1px solid var(--border-strong);
-        background: #ffffff;
-        padding: 18px 16px;
-        font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        font-size: 0.95rem;
-        line-height: 1.55;
-        color: var(--text-strong);
-        min-height: 96px;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: auto;
-      }
-
-      .terminal-header {
-        margin: 0 0 12px;
-        white-space: pre-wrap;
-        font: inherit;
-        color: inherit;
-      }
-
-      .termynal {
-        flex: 1 1 auto;
-      }
-
-      .termynal[data-termynal] {
-        width: 100% !important;
-        min-height: 96px !important;
-        padding: 0 !important;
-        background: transparent !important;
-        color: inherit !important;
-        font-size: inherit !important;
-        font-family: inherit !important;
-        border-radius: 0 !important;
-      }
-
-      .termynal[data-termynal]::before,
-      .termynal[data-termynal]::after,
-      .terminal-pane::before,
-      .terminal-pane::after {
-        display: none !important;
-      }
-
-      .termynal [data-ty][data-ty-prompt="~"]:before {
-        margin-right: 0;
-      }
-
-      .termynal [data-ty] {
-        white-space: pre-wrap;
-      }
-
-      .termynal [data-ty-cursor]:after {
-        color: var(--text-strong);
-        margin-left: 0.15em;
-      }
-
-      .terminal-fallback {
-        margin: 0;
-        white-space: pre-wrap;
-      }
-
-      .progress-ring {
-        width: 68px;
-        height: 68px;
-        border-radius: 50%;
-        border: 3px dotted rgba(47, 123, 255, 0.45);
-        display: grid;
-        place-items: center;
-        animation: rotate 2.4s linear infinite;
-      }
-
-      .progress-ring::after {
-        content: "";
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: var(--accent);
-      }
-
-      @keyframes rotate {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
       @media (max-width: 620px) {
         .tip-card {
           flex-direction: column;
@@ -831,24 +716,6 @@
           text-align: center;
         }
 
-        #suggest-card {
-          align-items: stretch;
-          text-align: left;
-        }
-
-        #suggest-card .tip-card-content {
-          align-items: stretch;
-        }
-
-        #suggest-card .tip-card-label,
-        #suggest-card .tip-card-title,
-        #suggest-card .tip-card-body {
-          text-align: left;
-        }
-
-        #suggest-card .terminal-pane {
-          align-self: stretch;
-        }
       }
 
       .menu-results {
@@ -1723,22 +1590,24 @@
         </section>
 
       <section class="card processing-card screen" data-screen="processing" hidden>
-        <div class="progress-ring" aria-hidden="true"></div>
-        <div>
-          <h2 style="margin: 0;">{{ _("AI concierge is unpacking the menu…") }}</h2>
-          <!-- <p>Our AI concierge is reading every page, translating dishes, and organising sections for your group.</p> -->
-        </div>
-        <!-- <p style="font-size: 0.9rem;">Grab a sip – we’ll ping you in a moment.</p> -->
-        <article class="tip-card" id="suggest-card" hidden>
-          <div class="tip-card-content">
-            <!-- <p class="tip-card-label">{{ _("While you wait") }}</p> -->
-            <!-- <h3 class="tip-card-title">{{ _("From your menu") }}</h3> -->
-            <div class="terminal-pane" id="suggest-terminal" aria-live="polite" role="log">
-              <pre class="terminal-header" id="suggest-header"></pre>
-              <div class="termynal" id="suggest-body"></div>
-            </div>
+        <div class="processing-terminal">
+          <div id="termynal" data-termynal>
+            <span data-ty="input">pip install spacy</span>
+            <span data-ty="progress"></span>
+            <span data-ty>Successfully installed spacy</span>
+            <span data-ty></span>
+            <span data-ty="input">python -m spacy download en</span>
+            <span data-ty="progress"></span>
+            <span data-ty>Installed model 'en'</span>
+            <span data-ty></span>
+            <span data-ty="input">python</span>
+            <span data-ty="input" data-ty-prompt=">>>">import spacy</span>
+            <span data-ty="input" data-ty-prompt=">>>">nlp = spacy.load('en')</span>
+            <span data-ty="input" data-ty-prompt=">>>">doc = nlp(u'Hello world')</span>
+            <span data-ty="input" data-ty-prompt=">>>">print([(w.text, w.pos_) for w in doc])</span>
+            <span data-ty>[('Hello', 'INTJ'), ('world', 'NOUN')]</span>
           </div>
-        </article>
+        </div>
       </section>
 
       <section class="menu-results screen" data-screen="menu" hidden>
@@ -1935,7 +1804,7 @@
       </li>
     </template>
 
-    <script src="{{ url_for('static', path='vendor/termynal.js') }}"></script>
+    <script src="{{ url_for('static', path='vendor/termynal.js') }}" data-termynal-container="#termynal"></script>
     <script>
       const screens = new Map(
         Array.from(document.querySelectorAll(".screen"), (node) => [node.dataset.screen, node])
@@ -1944,10 +1813,6 @@
       const translateButton = document.getElementById("translate-button");
       const captureStatus = document.getElementById("capture-status");
       const heroBackButton = document.getElementById("hero-back");
-      const suggestCard = document.getElementById("suggest-card");
-      const suggestTerminal = document.getElementById("suggest-terminal");
-      const suggestHeader = document.getElementById("suggest-header");
-      const suggestBody = document.getElementById("suggest-body");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -2128,232 +1993,14 @@
       let celebrationTimer = null;
       let shareMessageResetTimer = null;
       let shareCopiedResetTimer = null;
-      const SUGGESTION_HEADER = "🤖✨ 🍣 🍜 🍰";
-      const SUGGESTION_TYPE_DELAY_MS = 45;
-      const SUGGESTION_INTER_DELAY_MS = 1500;
-      const SUGGESTION_FINAL_DELAY_MS = 600;
-      const SUGGESTION_START_DELAY_MS = 200;
       const MENU_READY_DELAY_MS = 3000;
-      let suggestionTermynal = null;
-      let suggestionCursorObserver = null;
-      let suggestionAnimationTimer = null;
-      let suggestionCompleted = false;
       let finalizeMenuTimer = null;
       let finalizeMenuInFlight = false;
-
-      function clearSuggestionTerminal() {
-        if (suggestionCursorObserver) {
-          suggestionCursorObserver.disconnect();
-          suggestionCursorObserver = null;
-        }
-        if (suggestionTermynal) {
-          suggestionTermynal = null;
-        }
-        if (suggestBody) {
-          suggestBody.innerHTML = "";
-          suggestBody.removeAttribute("data-termynal");
-          suggestBody.style.width = "";
-          suggestBody.style.minHeight = "";
-        }
-        if (suggestHeader) {
-          suggestHeader.textContent = "";
-        }
-        if (suggestionAnimationTimer) {
-          window.clearTimeout(suggestionAnimationTimer);
-          suggestionAnimationTimer = null;
-        }
-        if (suggestTerminal) {
-          suggestTerminal.setAttribute("aria-busy", "false");
-        }
-      }
-
-      function attachCursorGuard(term) {
-        if (suggestionCursorObserver) {
-          suggestionCursorObserver.disconnect();
-          suggestionCursorObserver = null;
-        }
-        if (!term || !Array.isArray(term.lines) || !term.lines.length) {
-          return;
-        }
-        const lastLine = term.lines[term.lines.length - 1];
-        if (!lastLine) {
-          return;
-        }
-        const ensureCursor = () => {
-          if (!lastLine.hasAttribute("data-ty-cursor")) {
-            lastLine.setAttribute("data-ty-cursor", "|");
-          }
-        };
-        ensureCursor();
-        suggestionCursorObserver = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.type === "attributes" && mutation.attributeName === "data-ty-cursor") {
-              ensureCursor();
-            }
-          }
-        });
-        suggestionCursorObserver.observe(lastLine, {
-          attributes: true,
-          attributeFilter: ["data-ty-cursor"],
-        });
-      }
-
-      function resetSuggestionDisplay() {
-        clearSuggestionTerminal();
-        if (suggestCard) {
-          suggestCard.hidden = true;
-        }
-      }
-
-      const computeSuggestionDuration = (lines) => {
-        if (!Array.isArray(lines) || !lines.length) {
-          return 0;
-        }
-        const lastIndex = lines.length - 1;
-        return (
-          SUGGESTION_START_DELAY_MS +
-          lines.reduce((total, line, index) => {
-            const length = Array.from(line).length;
-            const typingTime = length * SUGGESTION_TYPE_DELAY_MS;
-            const pause = index === lastIndex ? SUGGESTION_FINAL_DELAY_MS : SUGGESTION_INTER_DELAY_MS;
-            return total + typingTime + pause;
-          }, 0)
-        );
-      };
-
-      function renderSuggestionText(text) {
-        if (!suggestTerminal) {
-          return Promise.resolve();
-        }
-        const trimmed = typeof text === "string" ? text.trim() : "";
-        if (!trimmed) {
-          resetSuggestionDisplay();
-          return Promise.resolve();
-        }
-        if (suggestCard) {
-          suggestCard.hidden = false;
-        }
-        if (suggestionCursorObserver) {
-          suggestionCursorObserver.disconnect();
-          suggestionCursorObserver = null;
-        }
-        suggestionTermynal = null;
-        if (suggestBody) {
-          suggestBody.innerHTML = "";
-          suggestBody.removeAttribute("data-termynal");
-          suggestBody.style.width = "";
-          suggestBody.style.minHeight = "";
-        }
-
-        const sourceLines = trimmed
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter((line) => line.length);
-        if (!sourceLines.length) {
-          return Promise.resolve();
-        }
-
-        if (suggestHeader) {
-          suggestHeader.textContent = `$ ${SUGGESTION_HEADER}\n`;
-        }
-
-        const totalDuration = computeSuggestionDuration(sourceLines);
-        if (suggestionAnimationTimer) {
-          window.clearTimeout(suggestionAnimationTimer);
-          suggestionAnimationTimer = null;
-        }
-
-        return new Promise((resolve) => {
-          const finish = () => {
-            if (suggestionAnimationTimer) {
-              window.clearTimeout(suggestionAnimationTimer);
-              suggestionAnimationTimer = null;
-            }
-            if (suggestTerminal) {
-              suggestTerminal.setAttribute("aria-busy", "false");
-            }
-            resolve();
-          };
-
-          if (typeof Termynal === "function") {
-            const lineData = sourceLines.map((value, index) => ({
-              type: "input",
-              prompt: "$",
-              value,
-              delay: index === sourceLines.length - 1 ? SUGGESTION_FINAL_DELAY_MS : SUGGESTION_INTER_DELAY_MS,
-            }));
-            suggestionTermynal = new Termynal(suggestBody, {
-              noInit: true,
-              lineData,
-              startDelay: SUGGESTION_START_DELAY_MS,
-              typeDelay: SUGGESTION_TYPE_DELAY_MS,
-              lineDelay: SUGGESTION_INTER_DELAY_MS,
-              cursor: "|",
-            });
-            suggestionTermynal.init();
-            attachCursorGuard(suggestionTermynal);
-          } else {
-            const pre = document.createElement("pre");
-            pre.className = "terminal-fallback";
-            pre.textContent = sourceLines.map((line) => `$ ${line}`).join("\n");
-            suggestBody.appendChild(pre);
-          }
-
-          if (totalDuration > 0) {
-            suggestionAnimationTimer = window.setTimeout(finish, totalDuration);
-          } else {
-            finish();
-          }
-        });
-      }
-
-      async function startMenuSuggestions(formData) {
-        if (!suggestTerminal) {
-          return;
-        }
-        try {
-          clearSuggestionTerminal();
-          suggestionCompleted = false;
-          if (suggestCard) {
-            suggestCard.hidden = false;
-          }
-          if (suggestHeader) {
-            suggestHeader.textContent = `$ ${SUGGESTION_HEADER}\n`;
-          }
-          suggestTerminal.setAttribute("aria-busy", "true");
-          const response = await fetch("/menu/suggest", {
-            method: "POST",
-            body: formData,
-          });
-          if (!response.ok) {
-            resetSuggestionDisplay();
-            suggestionCompleted = true;
-            finalizeMenuIfReady();
-            return;
-          }
-          const payload = await response.json();
-          const text = typeof payload?.text === "string" ? payload.text.trim() : "";
-          if (!text) {
-            resetSuggestionDisplay();
-            suggestionCompleted = true;
-            finalizeMenuIfReady();
-            return;
-          }
-          await renderSuggestionText(text);
-          suggestionCompleted = true;
-          finalizeMenuIfReady();
-        } catch (_) {
-          resetSuggestionDisplay();
-          suggestionCompleted = true;
-          finalizeMenuIfReady();
-        }
-      }
-
       function finalizeMenuIfReady() {
         if (finalizeMenuInFlight) {
           return;
         }
-        if (!suggestionCompleted || !state.pendingMenuPayload) {
+        if (!state.pendingMenuPayload) {
           return;
         }
         finalizeMenuInFlight = true;
@@ -2373,6 +2020,7 @@
           showScreen("menu");
         }, MENU_READY_DELAY_MS);
       }
+
 
       function showScreen(name) {
         activeScreen = name;
@@ -2407,18 +2055,12 @@
         }
         heroBackButton.hidden = showCapture;
 
-        resetSuggestionDisplay();
         if (name !== "processing") {
           state.pendingMenuPayload = null;
-          suggestionCompleted = false;
           finalizeMenuInFlight = false;
           if (finalizeMenuTimer) {
             window.clearTimeout(finalizeMenuTimer);
             finalizeMenuTimer = null;
-          }
-          if (suggestionAnimationTimer) {
-            window.clearTimeout(suggestionAnimationTimer);
-            suggestionAnimationTimer = null;
           }
         }
       }
@@ -2707,19 +2349,11 @@
 
         state.pendingMenuPayload = null;
         state.shouldCelebrateMenu = false;
-        suggestionCompleted = false;
         finalizeMenuInFlight = false;
         if (finalizeMenuTimer) {
           window.clearTimeout(finalizeMenuTimer);
           finalizeMenuTimer = null;
         }
-        if (suggestionAnimationTimer) {
-          window.clearTimeout(suggestionAnimationTimer);
-          suggestionAnimationTimer = null;
-        }
-
-        // Fire quick suggestions in parallel for a nicer waiting experience.
-        startMenuSuggestions(formData).catch(() => {});
 
         fetch("/menu/process", {
           method: "POST",
@@ -2746,7 +2380,6 @@
               finalizeMenuTimer = null;
             }
             finalizeMenuInFlight = false;
-            suggestionCompleted = false;
           })
           .finally(() => {
             translateButton.disabled = false;
