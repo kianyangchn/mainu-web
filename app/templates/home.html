@@ -4,8 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ _("Mainu on-the-go") }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='vendor/termynal.css') }}" />
-    
     <style>
       :root {
         color-scheme: light;
@@ -545,17 +543,130 @@
       .processing-card {
         align-items: center;
         justify-content: center;
-        text-align: center;
-        gap: 0;
-      }
-
-      .processing-terminal {
-        width: min(640px, 100%);
         text-align: left;
+        gap: clamp(24px, 4vw, 32px);
       }
 
-      .processing-terminal [data-termynal] {
+      .processing-slideshow {
+        width: min(980px, 100%);
+        display: grid;
+        gap: clamp(24px, 5vw, 48px);
+        align-items: center;
+      }
+
+      .processing-photo-frame {
+        position: relative;
         width: 100%;
+        aspect-ratio: 3 / 2;
+        border-radius: 28px;
+        overflow: hidden;
+        background: radial-gradient(
+          circle at center,
+          rgba(234, 42, 51, 0.18),
+          rgba(31, 26, 44, 0.12)
+        );
+      }
+
+      .processing-photo-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        transition: opacity 400ms ease;
+        opacity: 0;
+      }
+
+      .processing-photo-image[data-loaded="true"] {
+        opacity: 1;
+      }
+
+      .processing-slide {
+        display: contents;
+        margin: 0;
+      }
+
+      .processing-caption {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        color: var(--text-muted);
+      }
+
+      .processing-status {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .processing-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-decoration: none;
+        word-break: break-word;
+      }
+
+      .processing-link img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .processing-meta-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .processing-meta-pair {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 18px;
+      }
+
+      .processing-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.98rem;
+        color: var(--text-muted);
+      }
+
+      .processing-meta img {
+        width: 32px;
+        height: 32px;
+      }
+
+      @media (max-width: 767px) {
+        .processing-card {
+          text-align: center;
+        }
+
+        .processing-caption {
+          align-items: center;
+        }
+
+        .processing-meta-pair {
+          justify-content: center;
+        }
+
+        .processing-meta {
+          justify-content: center;
+        }
+
+        .processing-link {
+          justify-content: center;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .processing-slideshow {
+          grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
       }
 
       @media (max-width: 640px) {
@@ -1590,23 +1701,62 @@
         </section>
 
       <section class="card processing-card screen" data-screen="processing" hidden>
-        <div class="processing-terminal">
-          <div id="termynal" data-termynal>
-            <span data-ty="input">pip install spacy</span>
-            <span data-ty="progress"></span>
-            <span data-ty>Successfully installed spacy</span>
-            <span data-ty></span>
-            <span data-ty="input">python -m spacy download en</span>
-            <span data-ty="progress"></span>
-            <span data-ty>Installed model 'en'</span>
-            <span data-ty></span>
-            <span data-ty="input">python</span>
-            <span data-ty="input" data-ty-prompt=">>>">import spacy</span>
-            <span data-ty="input" data-ty-prompt=">>>">nlp = spacy.load('en')</span>
-            <span data-ty="input" data-ty-prompt=">>>">doc = nlp(u'Hello world')</span>
-            <span data-ty="input" data-ty-prompt=">>>">print([(w.text, w.pos_) for w in doc])</span>
-            <span data-ty>[('Hello', 'INTJ'), ('world', 'NOUN')]</span>
-          </div>
+        <div class="processing-slideshow">
+          <figure class="processing-slide" aria-live="polite">
+            <div class="processing-photo-frame" id="processing-photo-frame">
+              <img
+                id="processing-photo-image"
+                class="processing-photo-image"
+                src=""
+                alt=""
+                data-loaded="false"
+                loading="eager"
+              />
+            </div>
+            <figcaption class="processing-caption">
+              <p class="processing-status" id="processing-status-text">
+                {{ _("Translating your menu…") }}
+              </p>
+              <a
+                id="processing-photo-link"
+                class="processing-link"
+                href="#"
+                hidden
+                target="_blank"
+                rel="noopener"
+              >
+                <img
+                  width="24"
+                  height="24"
+                  src="https://img.icons8.com/material-two-tone/24/link--v1.png"
+                  alt="link"
+                />
+                <span id="processing-photo-link-label"></span>
+              </a>
+              <div class="processing-meta-group">
+                <div class="processing-meta-pair">
+                  <div class="processing-meta" id="processing-photo-date" hidden>
+                    <img
+                      width="32"
+                      height="32"
+                      src="https://img.icons8.com/small/32/calendar.png"
+                      alt="calendar"
+                    />
+                    <span id="processing-photo-date-text"></span>
+                  </div>
+                  <div class="processing-meta" id="processing-photo-location" hidden>
+                    <img
+                      width="32"
+                      height="32"
+                      src="https://img.icons8.com/small/32/marker.png"
+                      alt="marker"
+                    />
+                    <span id="processing-photo-location-text"></span>
+                  </div>
+                </div>
+              </div>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -1804,7 +1954,6 @@
       </li>
     </template>
 
-    <script src="{{ url_for('static', path='vendor/termynal.js') }}" data-termynal-container="#termynal"></script>
     <script>
       const screens = new Map(
         Array.from(document.querySelectorAll(".screen"), (node) => [node.dataset.screen, node])
@@ -1813,6 +1962,14 @@
       const translateButton = document.getElementById("translate-button");
       const captureStatus = document.getElementById("capture-status");
       const heroBackButton = document.getElementById("hero-back");
+      const processingPhotoImage = document.getElementById("processing-photo-image");
+      const processingStatusText = document.getElementById("processing-status-text");
+      const processingPhotoLink = document.getElementById("processing-photo-link");
+      const processingPhotoLinkLabel = document.getElementById("processing-photo-link-label");
+      const processingPhotoDate = document.getElementById("processing-photo-date");
+      const processingPhotoDateText = document.getElementById("processing-photo-date-text");
+      const processingPhotoLocation = document.getElementById("processing-photo-location");
+      const processingPhotoLocationText = document.getElementById("processing-photo-location-text");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -1910,6 +2067,15 @@
         defaultMenuTitle: {{ _("Order please") | tojson }},
         menuReadyTitle: {{ _("Menu Ready 🍾") | tojson }},
         interactiveMenu: {{ _("Interactive menu") | tojson }},
+        processing: {
+          status: {{ _("AI is working on it…") | tojson }},
+          loading: {{ _("Fetching travel inspiration…") | tojson }},
+          published: {{ _("Published on {date}") | tojson }},
+          location: {{ _("{location}") | tojson }},
+          linkLabel: {{ _("View on Unsplash") | tojson }},
+          altGeneric: {{ _("Unsplash photo") | tojson }},
+          altWithLocation: {{ _("Unsplash photo in {location}") | tojson }},
+        },
         capture: {
           noPhotos: {{ _("No photos yet") | tojson }},
           addMenuPhotos: {{ _("Add menu photos") | tojson }},
@@ -1949,6 +2115,8 @@
         },
       };
 
+      const matchedPhotoJsonUrl = "{{ url_for('static', path='matched_photo.json') }}";
+
       const SHARE_MESSAGES = uiText.share;
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
       const languageOptions = [
@@ -1963,6 +2131,22 @@
         { code: "it", label: "Italiano" },
         { code: "", label: uiText.autoDetect },
       ];
+
+      const PROCESSING_BATCH_SIZE = 20;
+      const PROCESSING_SLIDE_DURATION_MS = 4800;
+      const processingSlideshow = {
+        all: [],
+        batch: [],
+        index: 0,
+        timer: null,
+        isActive: false,
+        loadingPromise: null,
+      };
+      const publishedDateFormatter = new Intl.DateTimeFormat(undefined, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
 
       const taglineMessages = uiText.taglineMessages;
 
@@ -1996,6 +2180,304 @@
       const MENU_READY_DELAY_MS = 3000;
       let finalizeMenuTimer = null;
       let finalizeMenuInFlight = false;
+
+      function fetchProcessingPhotos() {
+        if (processingSlideshow.all.length) {
+          return Promise.resolve(processingSlideshow.all);
+        }
+        if (processingSlideshow.loadingPromise) {
+          return processingSlideshow.loadingPromise;
+        }
+        processingSlideshow.loadingPromise = fetch(matchedPhotoJsonUrl, {
+          headers: { Accept: "application/json" },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to load photo feed: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (!Array.isArray(data)) {
+              return [];
+            }
+            processingSlideshow.all = data.filter(
+              (item) => item && typeof item.photo_image_url === "string"
+            );
+            return processingSlideshow.all;
+          })
+          .catch((error) => {
+            console.error(error);
+            return [];
+          })
+          .finally(() => {
+            processingSlideshow.loadingPromise = null;
+          });
+        return processingSlideshow.loadingPromise;
+      }
+
+      function startProcessingSlideshow() {
+        if (processingSlideshow.isActive) {
+          return;
+        }
+        processingSlideshow.isActive = true;
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+          processingSlideshow.timer = null;
+        }
+        if (processingStatusText) {
+          processingStatusText.textContent = uiText.processing.status;
+        }
+        fetchProcessingPhotos().then((photos) => {
+          if (!processingSlideshow.isActive) {
+            return;
+          }
+          if (!photos.length) {
+            if (processingStatusText) {
+              processingStatusText.textContent = uiText.processing.loading;
+            }
+            if (processingPhotoImage) {
+              processingPhotoImage.dataset.loaded = "false";
+              processingPhotoImage.removeAttribute("src");
+              processingPhotoImage.alt = "";
+            }
+            if (processingPhotoLink) {
+              processingPhotoLink.hidden = true;
+            }
+            if (processingPhotoDate) {
+              processingPhotoDate.hidden = true;
+            }
+            if (processingPhotoLocation) {
+              processingPhotoLocation.hidden = true;
+            }
+            return;
+          }
+          if (!processingSlideshow.batch.length) {
+            prepareProcessingBatch();
+          }
+          showProcessingSlide();
+        });
+      }
+
+      function stopProcessingSlideshow() {
+        processingSlideshow.isActive = false;
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+          processingSlideshow.timer = null;
+        }
+        processingSlideshow.batch = [];
+        processingSlideshow.index = 0;
+      }
+
+      function scheduleProcessingAdvance(delay = PROCESSING_SLIDE_DURATION_MS) {
+        if (!processingSlideshow.isActive) {
+          return;
+        }
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+        }
+        processingSlideshow.timer = window.setTimeout(() => {
+          showProcessingSlide();
+        }, delay);
+      }
+
+      function prepareProcessingBatch() {
+        if (!processingSlideshow.all.length) {
+          processingSlideshow.batch = [];
+          processingSlideshow.index = 0;
+          return;
+        }
+        const pool = processingSlideshow.all.slice();
+        shuffleArray(pool);
+        processingSlideshow.batch = pool.slice(
+          0,
+          Math.min(PROCESSING_BATCH_SIZE, pool.length)
+        );
+        processingSlideshow.index = 0;
+      }
+
+      function showProcessingSlide() {
+        if (!processingSlideshow.isActive) {
+          return;
+        }
+        if (!processingSlideshow.batch.length) {
+          prepareProcessingBatch();
+        }
+        if (!processingSlideshow.batch.length) {
+          return;
+        }
+        const photo = processingSlideshow.batch[processingSlideshow.index];
+        processingSlideshow.index =
+          (processingSlideshow.index + 1) % processingSlideshow.batch.length;
+        applyProcessingPhoto(photo);
+        if (processingSlideshow.index === 0) {
+          prepareProcessingBatch();
+        }
+        processingSlideshow.timer = window.setTimeout(() => {
+          showProcessingSlide();
+        }, PROCESSING_SLIDE_DURATION_MS);
+      }
+
+      function applyProcessingPhoto(photo) {
+        if (!photo || !processingPhotoImage) {
+          scheduleProcessingAdvance();
+          return;
+        }
+        const {
+          photo_image_url: imageUrlRaw,
+          photo_url,
+          photo_submitted_at,
+          photo_location_country,
+        } = photo;
+        const imageUrl = typeof imageUrlRaw === "string" ? imageUrlRaw : "";
+        if (processingPhotoImage.dataset) {
+          processingPhotoImage.dataset.loaded = "false";
+        }
+        if (imageUrl) {
+          const loader = new Image();
+          loader.decoding = "async";
+          loader.src = imageUrl;
+          loader.onload = () => {
+            if (!processingSlideshow.isActive) {
+              return;
+            }
+            processingPhotoImage.src = loader.src;
+            processingPhotoImage.alt = buildProcessingAlt(photo_location_country);
+            if (processingPhotoImage.dataset) {
+              processingPhotoImage.dataset.loaded = "true";
+            }
+            scheduleProcessingAdvance();
+          };
+          loader.onerror = () => {
+            if (!processingSlideshow.isActive) {
+              return;
+            }
+            if (processingPhotoImage.dataset) {
+              processingPhotoImage.dataset.loaded = "false";
+            }
+            scheduleProcessingAdvance();
+          };
+        } else {
+          processingPhotoImage.removeAttribute("src");
+          processingPhotoImage.alt = "";
+          scheduleProcessingAdvance();
+        }
+        applyProcessingLink(photo_url);
+        applyProcessingMeta(photo_submitted_at, photo_location_country);
+      }
+
+      function applyProcessingLink(photoUrl) {
+        if (!processingPhotoLink || !processingPhotoLinkLabel) {
+          return;
+        }
+        if (typeof photoUrl === "string" && photoUrl) {
+          processingPhotoLink.href = photoUrl;
+          processingPhotoLink.hidden = false;
+          let label = photoUrl.replace(/^https?:\/\//i, "");
+          try {
+            const parsed = new URL(photoUrl);
+            label = `${parsed.hostname}${parsed.pathname}`.replace(/\/$/, "");
+          } catch (error) {
+            // Ignore malformed URLs and fall back to raw string.
+          }
+          processingPhotoLinkLabel.textContent = label || uiText.processing.linkLabel;
+          processingPhotoLink.setAttribute("aria-hidden", "false");
+          processingPhotoLink.title = photoUrl;
+        } else {
+          processingPhotoLink.hidden = true;
+          processingPhotoLink.removeAttribute("href");
+          processingPhotoLinkLabel.textContent = "";
+          processingPhotoLink.setAttribute("aria-hidden", "true");
+          processingPhotoLink.removeAttribute("title");
+        }
+      }
+
+      function applyProcessingMeta(submittedAt, locationCountry) {
+        if (processingPhotoDate && processingPhotoDateText) {
+          const formattedDate = formatPublishedOn(submittedAt);
+          if (formattedDate) {
+            processingPhotoDate.hidden = false;
+            processingPhotoDateText.textContent = uiText.processing.published.replace(
+              "{date}",
+              formattedDate
+            );
+          } else {
+            processingPhotoDate.hidden = true;
+            processingPhotoDateText.textContent = "";
+          }
+        }
+        if (processingPhotoLocation && processingPhotoLocationText) {
+          const formattedLocation = formatLocation(locationCountry);
+          if (formattedLocation) {
+            processingPhotoLocation.hidden = false;
+            processingPhotoLocationText.textContent = formattedLocation;
+          } else {
+            processingPhotoLocation.hidden = true;
+            processingPhotoLocationText.textContent = "";
+          }
+        }
+      }
+
+      function buildProcessingAlt(locationCountry) {
+        if (locationCountry) {
+          return uiText.processing.altWithLocation.replace(
+            "{location}",
+            locationCountry
+          );
+        }
+        return uiText.processing.altGeneric;
+      }
+
+      function formatPublishedOn(value) {
+        if (!value) {
+          return "";
+        }
+        const datePart = String(value).split(" ")[0];
+        if (!datePart) {
+          return "";
+        }
+        const segments = datePart.split("-");
+        if (segments.length !== 3) {
+          return "";
+        }
+        const [yearStr, monthStr, dayStr] = segments;
+        const year = Number.parseInt(yearStr, 10);
+        const month = Number.parseInt(monthStr, 10);
+        const day = Number.parseInt(dayStr, 10);
+        if (
+          Number.isNaN(year) ||
+          Number.isNaN(month) ||
+          Number.isNaN(day) ||
+          month < 1 ||
+          month > 12 ||
+          day < 1 ||
+          day > 31
+        ) {
+          return "";
+        }
+        const date = new Date(Date.UTC(year, month - 1, day));
+        try {
+          return publishedDateFormatter.format(date);
+        } catch (error) {
+          console.error(error);
+          return "";
+        }
+      }
+
+      function formatLocation(locationCountry) {
+        if (!locationCountry) {
+          return "";
+        }
+        return uiText.processing.location.replace("{location}", locationCountry);
+      }
+
+      function shuffleArray(list) {
+        for (let i = list.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [list[i], list[j]] = [list[j], list[i]];
+        }
+      }
+
       function finalizeMenuIfReady() {
         if (finalizeMenuInFlight) {
           return;
@@ -2054,6 +2536,12 @@
           }
         }
         heroBackButton.hidden = showCapture;
+
+        if (name === "processing") {
+          startProcessingSlideshow();
+        } else {
+          stopProcessingSlideshow();
+        }
 
         if (name !== "processing") {
           state.pendingMenuPayload = null;
@@ -3018,6 +3506,8 @@
           adjustDishQuantity(dishCard, -1);
         }
       });
+
+      fetchProcessingPhotos().catch(() => {});
 
       languageOptions.forEach((option, index) => {
         const chip = document.createElement("button");
