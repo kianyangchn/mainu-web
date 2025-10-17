@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ _("Mainu on-the-go") }}</title>
-    
     <style>
       :root {
         color-scheme: light;
@@ -543,8 +542,139 @@
 
       .processing-card {
         align-items: center;
-        text-align: center;
-        gap: 24px;
+        justify-content: center;
+        text-align: left;
+        gap: clamp(24px, 4vw, 32px);
+      }
+
+      .processing-slideshow {
+        width: min(980px, 100%);
+        display: grid;
+        gap: clamp(24px, 5vw, 48px);
+        align-items: center;
+      }
+
+      .processing-photo-frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        border-radius: 28px;
+        overflow: hidden;
+        background: radial-gradient(
+          circle at center,
+          rgba(234, 42, 51, 0.18),
+          rgba(31, 26, 44, 0.12)
+        );
+      }
+
+      .processing-photo-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+        transition: opacity 400ms ease;
+        opacity: 0;
+      }
+
+      .processing-photo-image[data-loaded="true"] {
+        opacity: 1;
+      }
+
+      .processing-slide {
+        display: contents;
+        margin: 0;
+      }
+
+      .processing-caption {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        color: var(--text-muted);
+      }
+
+      .processing-status {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+
+      .processing-status-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .processing-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--text-muted);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: processing-spin 0.9s linear infinite;
+      }
+
+      @keyframes processing-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .processing-info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        color: var(--text-muted);
+      }
+
+      .processing-line {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.98rem;
+        color: var(--text-muted);
+      }
+
+      .processing-line img {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+      }
+
+      .processing-line a {
+        color: inherit;
+        text-decoration: underline;
+        word-break: break-word;
+      }
+
+      @media (max-width: 767px) {
+        .processing-card {
+          text-align: center;
+        }
+
+        .processing-caption {
+          align-items: center;
+        }
+
+        .processing-info {
+          align-items: center;
+        }
+
+        .processing-line {
+          justify-content: center;
+          text-align: center;
+          width: 100%;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .processing-slideshow {
+          grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
       }
 
       @media (max-width: 640px) {
@@ -554,6 +684,10 @@
 
         .app-shell {
           padding: 36px 18px 140px;
+        }
+        .section-nav {
+          margin: 0 -18px;
+          padding: 0 18px;
         }
 
         .capture-card {
@@ -576,12 +710,6 @@
         .dropzone[data-mode="empty"] {
           padding: 32px 18px;
         }
-      }
-
-      .processing-card p {
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.5;
       }
 
       .tip-rail {
@@ -682,33 +810,6 @@
         display: none;
       }
 
-      .progress-ring {
-        width: 68px;
-        height: 68px;
-        border-radius: 50%;
-        border: 3px dotted rgba(47, 123, 255, 0.45);
-        display: grid;
-        place-items: center;
-        animation: rotate 2.4s linear infinite;
-      }
-
-      .progress-ring::after {
-        content: "";
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: var(--accent);
-      }
-
-      @keyframes rotate {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
       @media (max-width: 620px) {
         .tip-card {
           flex-direction: column;
@@ -733,6 +834,7 @@
         .tip-card-body {
           text-align: center;
         }
+
       }
 
       .menu-results {
@@ -927,7 +1029,8 @@
         z-index: 12;
         display: flex;
         gap: 12px;
-        padding: 0 4px;
+        margin: 0 -24px;
+        padding: 0 24px;
         border-bottom: 1px solid rgba(31, 26, 44, 0.08);
         background: var(--page-bg);
         overflow-x: auto;
@@ -1606,33 +1709,61 @@
         </section>
 
       <section class="card processing-card screen" data-screen="processing" hidden>
-        <div class="progress-ring" aria-hidden="true"></div>
-        <div>
-          <h2 style="margin: 0;">{{ _("AI concierge is unpacking the menu…") }}</h2>
-          <!-- <p>Our AI concierge is reading every page, translating dishes, and organising sections for your group.</p> -->
-        </div>
-        <!-- <p style="font-size: 0.9rem;">Grab a sip – we’ll ping you in a moment.</p> -->
-        <div class="tip-rail" id="tip-rail" aria-live="polite">
-          <article class="tip-card" id="tip-card" hidden>
-            <figure class="tip-card-figure" id="tip-image-container" data-visible="false">
-              <img id="tip-image" alt="" />
-            </figure>
-            <div class="tip-card-content">
-              <p class="tip-card-label">{{ _("While you wait") }}</p>
-              <h3 class="tip-card-title" id="tip-title"></h3>
-              <p class="tip-card-body" id="tip-body"></p>
-              <a
-                class="tip-card-source"
-                id="tip-source"
-                href="#"
-                rel="noopener"
-                target="_blank"
-                hidden
-              >
-                {{ _("Source") }}
-              </a>
+        <div class="processing-slideshow">
+          <figure class="processing-slide" aria-live="polite">
+            <div class="processing-photo-frame" id="processing-photo-frame">
+              <img
+                id="processing-photo-image"
+                class="processing-photo-image"
+                src=""
+                alt=""
+                data-loaded="false"
+                loading="eager"
+              />
             </div>
-          </article>
+            <figcaption class="processing-caption">
+              <p class="processing-status" id="processing-status-text">
+                <span class="processing-status-row">
+                  <span class="processing-spinner" aria-hidden="true"></span>
+                  <span id="processing-status-label">{{ _("AI is preparing your menu…") }}</span>
+                </span>
+              </p>
+              <div class="processing-info">
+                <p class="processing-line" id="processing-photo-location-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/marker.png"
+                    alt="marker"
+                  />
+                  <span id="processing-photo-location-text"></span>
+                </p>
+                <p class="processing-line" id="processing-photo-date-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/calendar.png"
+                    alt="calendar"
+                  />
+                  <span id="processing-photo-date-text"></span>
+                </p>
+                <p class="processing-line" id="processing-photo-link-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/link.png"
+                    alt="link"
+                  />
+                  <a
+                    id="processing-photo-link-anchor"
+                    href="#"
+                    target="_blank"
+                    rel="noopener"
+                  ></a>
+                </p>
+              </div>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -1838,6 +1969,15 @@
       const translateButton = document.getElementById("translate-button");
       const captureStatus = document.getElementById("capture-status");
       const heroBackButton = document.getElementById("hero-back");
+      const processingPhotoImage = document.getElementById("processing-photo-image");
+      const processingStatusText = document.getElementById("processing-status-text");
+      const processingStatusLabel = document.getElementById("processing-status-label");
+      const processingPhotoLinkLine = document.getElementById("processing-photo-link-line");
+      const processingPhotoLinkAnchor = document.getElementById("processing-photo-link-anchor");
+      const processingPhotoDateLine = document.getElementById("processing-photo-date-line");
+      const processingPhotoDateText = document.getElementById("processing-photo-date-text");
+      const processingPhotoLocationLine = document.getElementById("processing-photo-location-line");
+      const processingPhotoLocationText = document.getElementById("processing-photo-location-text");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -1870,13 +2010,6 @@
       const cartDialogEmpty = document.getElementById("cart-dialog-empty");
       const closeCartDialogButton = document.getElementById("close-cart-dialog");
       const menuCelebration = document.getElementById("menu-celebration");
-      const tipRail = document.getElementById("tip-rail");
-      const tipCard = document.getElementById("tip-card");
-      const tipImageContainer = document.getElementById("tip-image-container");
-      const tipImage = document.getElementById("tip-image");
-      const tipTitle = document.getElementById("tip-title");
-      const tipBody = document.getElementById("tip-body");
-      const tipSource = document.getElementById("tip-source");
       const uiLanguageButton = document.getElementById("ui-language-button");
       const uiLanguageMenu = document.getElementById("ui-language-menu");
       let uiLanguageMenuOpen = false;
@@ -1942,6 +2075,15 @@
         defaultMenuTitle: {{ _("Order please") | tojson }},
         menuReadyTitle: {{ _("Menu Ready 🍾") | tojson }},
         interactiveMenu: {{ _("Interactive menu") | tojson }},
+        processing: {
+          status: {{ _("AI is preparing your menu…") | tojson }},
+          loading: {{ _("Fetching travel inspiration…") | tojson }},
+          published: {{ _("Published on {date}") | tojson }},
+          location: {{ _("Location: {location}") | tojson }},
+          linkLabel: {{ _("View on Unsplash") | tojson }},
+          altGeneric: {{ _("Unsplash photo") | tojson }},
+          altWithLocation: {{ _("Unsplash photo in {location}") | tojson }},
+        },
         capture: {
           noPhotos: {{ _("No photos yet") | tojson }},
           addMenuPhotos: {{ _("Add menu photos") | tojson }},
@@ -1979,8 +2121,9 @@
           copied: {{ _("Copied") | tojson }},
           copyNote: {{ _("Copy note") | tojson }},
         },
-        tipSourceFallback: {{ _("Source") | tojson }},
       };
+
+      const matchedPhotoJsonUrl = "{{ url_for('static', path='matched_photo.json') }}";
 
       const SHARE_MESSAGES = uiText.share;
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
@@ -1996,6 +2139,22 @@
         { code: "it", label: "Italiano" },
         { code: "", label: uiText.autoDetect },
       ];
+
+      const PROCESSING_BATCH_SIZE = 20;
+      const PROCESSING_SLIDE_DURATION_MS = 4800;
+      const processingSlideshow = {
+        all: [],
+        batch: [],
+        index: 0,
+        timer: null,
+        isActive: false,
+        loadingPromise: null,
+      };
+      const publishedDateFormatter = new Intl.DateTimeFormat(undefined, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
 
       const taglineMessages = uiText.taglineMessages;
 
@@ -2018,6 +2177,7 @@
         selectedLanguage: "",
         shouldCelebrateMenu: false,
         isSharing: false,
+        pendingMenuPayload: null,
       };
 
       let menuTitleText = uiText.defaultMenuTitle;
@@ -2025,10 +2185,341 @@
       let celebrationTimer = null;
       let shareMessageResetTimer = null;
       let shareCopiedResetTimer = null;
-      const tipBuffer = [];
-      let tipRotationTimer = null;
-      let activeTipIndex = 0;
-      const TIP_ROTATION_MS = 10000;
+      const MENU_READY_DELAY_MS = 3000;
+      let finalizeMenuTimer = null;
+      let finalizeMenuInFlight = false;
+
+      function fetchProcessingPhotos() {
+        if (processingSlideshow.all.length) {
+          return Promise.resolve(processingSlideshow.all);
+        }
+        if (processingSlideshow.loadingPromise) {
+          return processingSlideshow.loadingPromise;
+        }
+        processingSlideshow.loadingPromise = fetch(matchedPhotoJsonUrl, {
+          headers: { Accept: "application/json" },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to load photo feed: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (!Array.isArray(data)) {
+              return [];
+            }
+            processingSlideshow.all = data.filter(
+              (item) => item && typeof item.photo_image_url === "string"
+            );
+            return processingSlideshow.all;
+          })
+          .catch((error) => {
+            console.error(error);
+            return [];
+          })
+          .finally(() => {
+            processingSlideshow.loadingPromise = null;
+          });
+        return processingSlideshow.loadingPromise;
+      }
+
+      function startProcessingSlideshow() {
+        if (processingSlideshow.isActive) {
+          return;
+        }
+        processingSlideshow.isActive = true;
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+          processingSlideshow.timer = null;
+        }
+        if (processingStatusLabel) {
+          processingStatusLabel.textContent = uiText.processing.status;
+        }
+        fetchProcessingPhotos().then((photos) => {
+          if (!processingSlideshow.isActive) {
+            return;
+          }
+          if (!photos.length) {
+            if (processingStatusLabel) {
+              processingStatusLabel.textContent = uiText.processing.loading;
+            }
+            if (processingPhotoImage) {
+              processingPhotoImage.dataset.loaded = "false";
+              processingPhotoImage.removeAttribute("src");
+              processingPhotoImage.alt = "";
+            }
+            if (processingPhotoLinkLine) {
+              processingPhotoLinkLine.hidden = true;
+            }
+            if (processingPhotoLinkAnchor) {
+              processingPhotoLinkAnchor.textContent = "";
+              processingPhotoLinkAnchor.removeAttribute("href");
+              processingPhotoLinkAnchor.removeAttribute("title");
+            }
+            if (processingPhotoDateLine) {
+              processingPhotoDateLine.hidden = true;
+            }
+            if (processingPhotoDateText) {
+              processingPhotoDateText.textContent = "";
+            }
+            if (processingPhotoLocationLine) {
+              processingPhotoLocationLine.hidden = true;
+            }
+            if (processingPhotoLocationText) {
+              processingPhotoLocationText.textContent = "";
+            }
+            return;
+          }
+          if (!processingSlideshow.batch.length) {
+            prepareProcessingBatch();
+          }
+          showProcessingSlide();
+        });
+      }
+
+      function stopProcessingSlideshow() {
+        processingSlideshow.isActive = false;
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+          processingSlideshow.timer = null;
+        }
+        processingSlideshow.batch = [];
+        processingSlideshow.index = 0;
+      }
+
+      function scheduleProcessingAdvance(delay = PROCESSING_SLIDE_DURATION_MS) {
+        if (!processingSlideshow.isActive) {
+          return;
+        }
+        if (processingSlideshow.timer) {
+          window.clearTimeout(processingSlideshow.timer);
+        }
+        processingSlideshow.timer = window.setTimeout(() => {
+          showProcessingSlide();
+        }, delay);
+      }
+
+      function prepareProcessingBatch() {
+        if (!processingSlideshow.all.length) {
+          processingSlideshow.batch = [];
+          processingSlideshow.index = 0;
+          return;
+        }
+        const pool = processingSlideshow.all.slice();
+        shuffleArray(pool);
+        processingSlideshow.batch = pool.slice(
+          0,
+          Math.min(PROCESSING_BATCH_SIZE, pool.length)
+        );
+        processingSlideshow.index = 0;
+      }
+
+      function showProcessingSlide() {
+        if (!processingSlideshow.isActive) {
+          return;
+        }
+        if (!processingSlideshow.batch.length) {
+          prepareProcessingBatch();
+        }
+        if (!processingSlideshow.batch.length) {
+          return;
+        }
+        const photo = processingSlideshow.batch[processingSlideshow.index];
+        processingSlideshow.index =
+          (processingSlideshow.index + 1) % processingSlideshow.batch.length;
+        applyProcessingPhoto(photo);
+        if (processingSlideshow.index === 0) {
+          prepareProcessingBatch();
+        }
+        processingSlideshow.timer = window.setTimeout(() => {
+          showProcessingSlide();
+        }, PROCESSING_SLIDE_DURATION_MS);
+      }
+
+      function applyProcessingPhoto(photo) {
+        if (!photo || !processingPhotoImage) {
+          scheduleProcessingAdvance();
+          return;
+        }
+        const {
+          photo_image_url: imageUrlRaw,
+          photo_url,
+          photo_submitted_at,
+          photo_location_country,
+        } = photo;
+        const imageUrl = typeof imageUrlRaw === "string" ? imageUrlRaw : "";
+        if (processingPhotoImage.dataset) {
+          processingPhotoImage.dataset.loaded = "false";
+        }
+        if (imageUrl) {
+          const loader = new Image();
+          loader.decoding = "async";
+          loader.src = imageUrl;
+          loader.onload = () => {
+            if (!processingSlideshow.isActive) {
+              return;
+            }
+            processingPhotoImage.src = loader.src;
+            processingPhotoImage.alt = buildProcessingAlt(photo_location_country);
+            if (processingPhotoImage.dataset) {
+              processingPhotoImage.dataset.loaded = "true";
+            }
+            scheduleProcessingAdvance();
+          };
+          loader.onerror = () => {
+            if (!processingSlideshow.isActive) {
+              return;
+            }
+            if (processingPhotoImage.dataset) {
+              processingPhotoImage.dataset.loaded = "false";
+            }
+            scheduleProcessingAdvance();
+          };
+        } else {
+          processingPhotoImage.removeAttribute("src");
+          processingPhotoImage.alt = "";
+          scheduleProcessingAdvance();
+        }
+        applyProcessingLink(photo_url);
+        applyProcessingMeta(photo_submitted_at, photo_location_country);
+      }
+
+      function applyProcessingLink(photoUrl) {
+        if (!processingPhotoLinkLine || !processingPhotoLinkAnchor) {
+          return;
+        }
+        if (typeof photoUrl === "string" && photoUrl) {
+          let label = photoUrl.replace(/^https?:\/\//i, "");
+          try {
+            const parsed = new URL(photoUrl);
+            label = `${parsed.hostname}${parsed.pathname}`.replace(/\/$/, "");
+          } catch (error) {
+            // Ignore malformed URLs and fall back to raw string.
+          }
+          processingPhotoLinkAnchor.href = photoUrl;
+          processingPhotoLinkAnchor.textContent = label || uiText.processing.linkLabel;
+          processingPhotoLinkAnchor.title = photoUrl;
+          processingPhotoLinkLine.hidden = false;
+        } else {
+          processingPhotoLinkLine.hidden = true;
+          processingPhotoLinkAnchor.textContent = "";
+          processingPhotoLinkAnchor.removeAttribute("href");
+          processingPhotoLinkAnchor.removeAttribute("title");
+        }
+      }
+
+      function applyProcessingMeta(submittedAt, locationCountry) {
+        if (processingPhotoDateLine && processingPhotoDateText) {
+          const formattedDate = formatPublishedOn(submittedAt);
+          if (formattedDate) {
+            processingPhotoDateLine.hidden = false;
+            processingPhotoDateText.textContent = uiText.processing.published.replace(
+              "{date}",
+              formattedDate
+            );
+          } else {
+            processingPhotoDateLine.hidden = true;
+            processingPhotoDateText.textContent = "";
+          }
+        }
+        if (processingPhotoLocationLine && processingPhotoLocationText) {
+          const formattedLocation = formatLocation(locationCountry);
+          if (formattedLocation) {
+            processingPhotoLocationLine.hidden = false;
+            processingPhotoLocationText.textContent = formattedLocation;
+          } else {
+            processingPhotoLocationLine.hidden = true;
+            processingPhotoLocationText.textContent = "";
+          }
+        }
+      }
+
+      function buildProcessingAlt(locationCountry) {
+        if (locationCountry) {
+          return uiText.processing.altWithLocation.replace(
+            "{location}",
+            locationCountry
+          );
+        }
+        return uiText.processing.altGeneric;
+      }
+
+      function formatPublishedOn(value) {
+        if (!value) {
+          return "";
+        }
+        const datePart = String(value).split(" ")[0];
+        if (!datePart) {
+          return "";
+        }
+        const segments = datePart.split("-");
+        if (segments.length !== 3) {
+          return "";
+        }
+        const [yearStr, monthStr, dayStr] = segments;
+        const year = Number.parseInt(yearStr, 10);
+        const month = Number.parseInt(monthStr, 10);
+        const day = Number.parseInt(dayStr, 10);
+        if (
+          Number.isNaN(year) ||
+          Number.isNaN(month) ||
+          Number.isNaN(day) ||
+          month < 1 ||
+          month > 12 ||
+          day < 1 ||
+          day > 31
+        ) {
+          return "";
+        }
+        const date = new Date(Date.UTC(year, month - 1, day));
+        try {
+          return publishedDateFormatter.format(date);
+        } catch (error) {
+          console.error(error);
+          return "";
+        }
+      }
+
+      function formatLocation(locationCountry) {
+        if (!locationCountry) {
+          return "";
+        }
+        return uiText.processing.location.replace("{location}", locationCountry);
+      }
+
+      function shuffleArray(list) {
+        for (let i = list.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [list[i], list[j]] = [list[j], list[i]];
+        }
+      }
+
+      function finalizeMenuIfReady() {
+        if (finalizeMenuInFlight) {
+          return;
+        }
+        if (!state.pendingMenuPayload) {
+          return;
+        }
+        finalizeMenuInFlight = true;
+        if (finalizeMenuTimer) {
+          window.clearTimeout(finalizeMenuTimer);
+        }
+        finalizeMenuTimer = window.setTimeout(() => {
+          finalizeMenuTimer = null;
+          finalizeMenuInFlight = false;
+          const payload = state.pendingMenuPayload;
+          state.pendingMenuPayload = null;
+          if (!payload) {
+            return;
+          }
+          state.shouldCelebrateMenu = true;
+          renderResults(payload);
+          showScreen("menu");
+        }, MENU_READY_DELAY_MS);
+      }
+
 
       function showScreen(name) {
         activeScreen = name;
@@ -2045,6 +2536,12 @@
           playMenuCelebration();
           state.shouldCelebrateMenu = false;
         }
+        if (showMenu) {
+          // Ensure the interactive menu opens at the top after loading finishes.
+          window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+          });
+        }
         if (shareFab) {
           const shouldShowShareFab = showMenu && !!state.menu;
           shareFab.hidden = !shouldShowShareFab;
@@ -2058,9 +2555,18 @@
         heroBackButton.hidden = showCapture;
 
         if (name === "processing") {
-          loadTips();
+          startProcessingSlideshow();
         } else {
-          stopTipRotation(false);
+          stopProcessingSlideshow();
+        }
+
+        if (name !== "processing") {
+          state.pendingMenuPayload = null;
+          finalizeMenuInFlight = false;
+          if (finalizeMenuTimer) {
+            window.clearTimeout(finalizeMenuTimer);
+            finalizeMenuTimer = null;
+          }
         }
       }
 
@@ -2327,161 +2833,6 @@
         languageChoices.querySelectorAll(".language-chip").forEach((chip) => {
           chip.dataset.active = chip.dataset.lang === code ? "true" : "false";
         });
-        if (activeScreen === "processing") {
-          reloadTips();
-        }
-      }
-
-      async function loadTips() {
-        tipBuffer.length = 0;
-        activeTipIndex = 0;
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        hideTipCard();
-
-        try {
-          const response = await fetch(`/menu/tips`, {
-            headers: {
-              Accept: "application/json",
-            },
-          });
-          if (!response.ok) {
-            throw new Error(`Tip fetch failed (${response.status})`);
-          }
-          const tips = await response.json();
-          const withImages = Array.isArray(tips)
-            ? tips.filter((tip) => tip && typeof tip.image_url === "string" && tip.image_url.length)
-            : [];
-          if (!withImages.length) {
-            return;
-          }
-          tipBuffer.push(...withImages);
-          showTip(0);
-          restartTipTimer();
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      function stopTipRotation(resetDisplay = true) {
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        if (resetDisplay) {
-          tipBuffer.length = 0;
-          hideTipCard();
-        }
-      }
-
-      function reloadTips() {
-        stopTipRotation(true);
-        if (activeScreen === "processing") {
-          loadTips();
-        }
-      }
-
-      function hideTipImage() {
-        if (tipImage) {
-          tipImage.onload = null;
-          tipImage.onerror = null;
-          tipImage.removeAttribute("src");
-        }
-        if (tipImageContainer) {
-          tipImageContainer.dataset.visible = "false";
-        }
-      }
-
-      function hideTipCard() {
-        if (tipCard) {
-          tipCard.hidden = true;
-        }
-      }
-
-      function removeTip(index) {
-        if (index < 0 || index >= tipBuffer.length) {
-          return;
-        }
-        tipBuffer.splice(index, 1);
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-          tipRotationTimer = null;
-        }
-        if (!tipBuffer.length) {
-          hideTipCard();
-          return;
-        }
-        const nextIndex = index % tipBuffer.length;
-        showTip(nextIndex);
-        restartTipTimer();
-      }
-
-      function showTip(index) {
-        if (!tipBuffer.length || !tipCard || !tipTitle || !tipBody) {
-          hideTipCard();
-          return;
-        }
-        const tip = tipBuffer[index % tipBuffer.length];
-        activeTipIndex = index % tipBuffer.length;
-        const currentIndex = activeTipIndex;
-        tipTitle.textContent = tip.title;
-        tipBody.textContent = tip.body;
-
-        if (tipImageContainer && tipImage) {
-          tipImage.onload = null;
-          tipImage.onerror = null;
-
-          if (tip.image_url) {
-            tipImageContainer.dataset.visible = "false";
-            tipImage.onerror = () => {
-              hideTipImage();
-              removeTip(currentIndex);
-            };
-            tipImage.onload = () => {
-              tipImageContainer.dataset.visible = "true";
-              tipImage.onload = null;
-            };
-            tipImage.src = tip.image_url;
-          } else {
-            hideTipImage();
-            removeTip(currentIndex);
-            return;
-          }
-        }
-
-        if (tipSource) {
-          if (tip.source_url || tip.source_name) {
-            tipSource.hidden = false;
-            tipSource.textContent = tip.source_name || uiText.tipSourceFallback;
-            if (tip.source_url) {
-              tipSource.href = tip.source_url;
-            } else {
-              tipSource.removeAttribute("href");
-            }
-          } else {
-            tipSource.hidden = true;
-            tipSource.removeAttribute("href");
-          }
-        }
-
-        tipCard.hidden = false;
-      }
-
-      function restartTipTimer() {
-        if (tipRotationTimer) {
-          clearTimeout(tipRotationTimer);
-        }
-        if (tipBuffer.length <= 1) {
-          tipRotationTimer = null;
-          return;
-        }
-        tipRotationTimer = window.setTimeout(() => {
-          const nextIndex = (activeTipIndex + 1) % tipBuffer.length;
-          showTip(nextIndex);
-          restartTipTimer();
-        }, TIP_ROTATION_MS);
       }
 
       function submitUpload() {
@@ -2501,6 +2852,14 @@
           formData.append("output_language", state.selectedLanguage);
         }
 
+        state.pendingMenuPayload = null;
+        state.shouldCelebrateMenu = false;
+        finalizeMenuInFlight = false;
+        if (finalizeMenuTimer) {
+          window.clearTimeout(finalizeMenuTimer);
+          finalizeMenuTimer = null;
+        }
+
         fetch("/menu/process", {
           method: "POST",
           body: formData,
@@ -2513,17 +2872,22 @@
             return response.json();
           })
           .then((payload) => {
-            renderResults(payload);
-            state.shouldCelebrateMenu = true;
-            showScreen("menu");
+            state.pendingMenuPayload = payload;
+            finalizeMenuIfReady();
           })
           .catch((error) => {
             showScreen("capture");
             setWarning(error.message || uiText.warnings.prepareFailed);
+            state.pendingMenuPayload = null;
+            state.shouldCelebrateMenu = false;
+            if (finalizeMenuTimer) {
+              window.clearTimeout(finalizeMenuTimer);
+              finalizeMenuTimer = null;
+            }
+            finalizeMenuInFlight = false;
           })
           .finally(() => {
             translateButton.disabled = false;
-            stopTipRotation(false);
           });
       }
 
@@ -2568,9 +2932,22 @@
 
         const navButtons = [];
         const setActiveNav = (targetId) => {
+          let activeButton = null;
           navButtons.forEach((button) => {
-            button.dataset.active = button.dataset.target === targetId ? "true" : "false";
+            const isActive = button.dataset.target === targetId;
+            button.dataset.active = isActive ? "true" : "false";
+            if (isActive) {
+              activeButton = button;
+            }
           });
+          if (activeButton) {
+            const navBounds = sectionNav.getBoundingClientRect();
+            const buttonBounds = activeButton.getBoundingClientRect();
+            const buffer = 24;
+            if (buttonBounds.left < navBounds.left + buffer || buttonBounds.right > navBounds.right - buffer) {
+              activeButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+          }
         };
 
         state.menu.sections.forEach((section, index) => {
@@ -3147,6 +3524,8 @@
         }
       });
 
+      fetchProcessingPhotos().catch(() => {});
+
       languageOptions.forEach((option, index) => {
         const chip = document.createElement("button");
         chip.type = "button";
@@ -3160,7 +3539,6 @@
       setLanguage("");
       renderPreview();
       updateCaptureStatus();
-      window.addEventListener("beforeunload", () => stopTipRotation(false));
     </script>
   </body>
 </html>

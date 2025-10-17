@@ -39,6 +39,7 @@ _JPEG_QUALITY = 80
 _PNG_COMPRESS_LEVEL = 6
 _TIP_STREAM_INTERVAL_SECONDS = 10.0
 _MENU_PROCESSING_TIMEOUT_SECONDS = 120.0
+_MENU_SUGGESTION_TIMEOUT_SECONDS = 35.0
 _LANGUAGE_CODE_TO_LABEL = {
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",
@@ -115,6 +116,59 @@ async def process_menu(
         template=generation_result.template,
         detected_language=None,
     )
+
+
+@router.post("/suggest")
+async def suggest_menu_highlights(
+    request: Request,
+    files: List[UploadFile] = File(...),
+    requested_output_language: str | None = Form(
+        default=None, alias="output_language"
+    ),
+    menu_service: LLMMenuService = Depends(get_menu_service),
+) -> dict[str, str]:
+    """Return a quick, friendly suggestion snippet from the uploaded menu images.
+
+    Designed to complete in ~10–30 seconds to improve perceived latency
+    while the main extraction runs.
+    """
+    if not files:
+        raise HTTPException(status_code=400, detail="At least one image is required")
+
+    contents: List[bytes] = []
+    filenames: List[str] = []
+    content_types: List[str] = []
+    for upload in files:
+        if upload.content_type not in {"image/jpeg", "image/png", "image/heic"}:
+            raise HTTPException(status_code=400, detail="Unsupported file type")
+        raw = await upload.read()
+        if not raw:
+            raise HTTPException(status_code=400, detail="Empty file uploaded")
+        optimised, content_type = _optimise_image_payload(raw, upload.content_type)
+        contents.append(optimised)
+        filenames.append(upload.filename or "menu-page")
+        content_types.append(content_type)
+
+    resolved_language = _resolve_output_language(requested_output_language)
+    output_language = resolved_language or _detect_language(request)
+
+    try:
+        text: str = await asyncio.wait_for(
+            menu_service.generate_quick_suggestions(
+                contents,
+                filenames,
+                content_types,
+                output_language=output_language,
+            ),
+            timeout=_MENU_SUGGESTION_TIMEOUT_SECONDS,
+        )
+    except asyncio.TimeoutError:
+        # Graceful timeout — front-end treats empty text as "no suggestions".
+        text = ""
+    except Exception:  # pragma: no cover - defensive user experience path
+        text = ""
+
+    return {"text": text}
 
 
 @router.post("/share", response_model=ShareMenuResponse)

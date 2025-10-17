@@ -87,6 +87,10 @@ msgstr "支持 JPEG、PNG 或 HEIC · 每次最多上傳 10 頁。"
 msgid "AI concierge is unpacking the menu…"
 msgstr "AI 禮賓正在解析菜單…"
 
+#: app/templates/home.html:1726 app/templates/home.html:2056
+msgid "AI is preparing your menu…"
+msgstr "AI 正在為你準備菜單…"
+
 #: app/templates/home.html:1627
 msgid "While you wait"
 msgstr "等待期間"
