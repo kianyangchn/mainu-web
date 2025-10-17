@@ -611,8 +611,17 @@
 
       .processing-line {
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
         font-size: 0.98rem;
         color: var(--text-muted);
+      }
+
+      .processing-line img {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
       }
 
       .processing-line a {
@@ -635,6 +644,7 @@
         }
 
         .processing-line {
+          justify-content: center;
           text-align: center;
           width: 100%;
         }
@@ -1695,9 +1705,31 @@
                 {{ _("Translating your menu…") }}
               </p>
               <div class="processing-info">
-                <p class="processing-line" id="processing-photo-location" hidden></p>
-                <p class="processing-line" id="processing-photo-date" hidden></p>
-                <p class="processing-line" id="processing-photo-link" hidden>
+                <p class="processing-line" id="processing-photo-location-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/marker.png"
+                    alt="marker"
+                  />
+                  <span id="processing-photo-location-text"></span>
+                </p>
+                <p class="processing-line" id="processing-photo-date-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/calendar.png"
+                    alt="calendar"
+                  />
+                  <span id="processing-photo-date-text"></span>
+                </p>
+                <p class="processing-line" id="processing-photo-link-line" hidden>
+                  <img
+                    width="32"
+                    height="32"
+                    src="https://img.icons8.com/small/32/link.png"
+                    alt="link"
+                  />
                   <a
                     id="processing-photo-link-anchor"
                     href="#"
@@ -1915,10 +1947,12 @@
       const heroBackButton = document.getElementById("hero-back");
       const processingPhotoImage = document.getElementById("processing-photo-image");
       const processingStatusText = document.getElementById("processing-status-text");
-      const processingPhotoLinkLine = document.getElementById("processing-photo-link");
+      const processingPhotoLinkLine = document.getElementById("processing-photo-link-line");
       const processingPhotoLinkAnchor = document.getElementById("processing-photo-link-anchor");
-      const processingPhotoDate = document.getElementById("processing-photo-date");
-      const processingPhotoLocation = document.getElementById("processing-photo-location");
+      const processingPhotoDateLine = document.getElementById("processing-photo-date-line");
+      const processingPhotoDateText = document.getElementById("processing-photo-date-text");
+      const processingPhotoLocationLine = document.getElementById("processing-photo-location-line");
+      const processingPhotoLocationText = document.getElementById("processing-photo-location-text");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -2198,13 +2232,17 @@
               processingPhotoLinkAnchor.removeAttribute("href");
               processingPhotoLinkAnchor.removeAttribute("title");
             }
-            if (processingPhotoDate) {
-              processingPhotoDate.hidden = true;
-              processingPhotoDate.textContent = "";
+            if (processingPhotoDateLine) {
+              processingPhotoDateLine.hidden = true;
             }
-            if (processingPhotoLocation) {
-              processingPhotoLocation.hidden = true;
-              processingPhotoLocation.textContent = "";
+            if (processingPhotoDateText) {
+              processingPhotoDateText.textContent = "";
+            }
+            if (processingPhotoLocationLine) {
+              processingPhotoLocationLine.hidden = true;
+            }
+            if (processingPhotoLocationText) {
+              processingPhotoLocationText.textContent = "";
             }
             return;
           }
@@ -2347,27 +2385,27 @@
       }
 
       function applyProcessingMeta(submittedAt, locationCountry) {
-        if (processingPhotoDate) {
+        if (processingPhotoDateLine && processingPhotoDateText) {
           const formattedDate = formatPublishedOn(submittedAt);
           if (formattedDate) {
-            processingPhotoDate.hidden = false;
-            processingPhotoDate.textContent = uiText.processing.published.replace(
+            processingPhotoDateLine.hidden = false;
+            processingPhotoDateText.textContent = uiText.processing.published.replace(
               "{date}",
               formattedDate
             );
           } else {
-            processingPhotoDate.hidden = true;
-            processingPhotoDate.textContent = "";
+            processingPhotoDateLine.hidden = true;
+            processingPhotoDateText.textContent = "";
           }
         }
-        if (processingPhotoLocation) {
+        if (processingPhotoLocationLine && processingPhotoLocationText) {
           const formattedLocation = formatLocation(locationCountry);
           if (formattedLocation) {
-            processingPhotoLocation.hidden = false;
-            processingPhotoLocation.textContent = formattedLocation;
+            processingPhotoLocationLine.hidden = false;
+            processingPhotoLocationText.textContent = formattedLocation;
           } else {
-            processingPhotoLocation.hidden = true;
-            processingPhotoLocation.textContent = "";
+            processingPhotoLocationLine.hidden = true;
+            processingPhotoLocationText.textContent = "";
           }
         }
       }
