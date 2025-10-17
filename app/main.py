@@ -16,6 +16,7 @@ from .i18n import (
 from .routes import router as menu_router
 from .routes.menu import get_share_service
 from .schemas import MenuTemplate
+from .static_data import get_matched_photo_feed
 
 templates = Jinja2Templates(directory="app/templates")
 templates.env.add_extension("jinja2.ext.i18n")
@@ -105,6 +106,7 @@ async def home(request: Request):
             {
                 "title": "Mainu on-the-go",
                 "subtitle": "Make it easy to order",
+                "matched_photo_feed": get_matched_photo_feed(),
             },
         ),
     )

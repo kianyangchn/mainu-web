@@ -2123,7 +2123,7 @@
         },
       };
 
-      const matchedPhotoJsonUrl = "{{ url_for('static', path='matched_photo.json') }}";
+      const matchedPhotoFeed = {{ (matched_photo_feed or []) | tojson }};
 
       const SHARE_MESSAGES = uiText.share;
       const allowedTypes = new Set(["image/jpeg", "image/png", "image/heic"]);
@@ -2196,20 +2196,12 @@
         if (processingSlideshow.loadingPromise) {
           return processingSlideshow.loadingPromise;
         }
-        processingSlideshow.loadingPromise = fetch(matchedPhotoJsonUrl, {
-          headers: { Accept: "application/json" },
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`Failed to load photo feed: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            if (!Array.isArray(data)) {
+        processingSlideshow.loadingPromise = Promise.resolve()
+          .then(() => {
+            if (!Array.isArray(matchedPhotoFeed)) {
               return [];
             }
-            processingSlideshow.all = data.filter(
+            processingSlideshow.all = matchedPhotoFeed.filter(
               (item) => item && typeof item.photo_image_url === "string"
             );
             return processingSlideshow.all;
