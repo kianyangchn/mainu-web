@@ -601,44 +601,24 @@
         color: var(--text-muted);
       }
 
-      .processing-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--text-muted);
-        font-weight: 600;
-        text-decoration: none;
-        word-break: break-word;
-      }
-
-      .processing-link img {
-        width: 32px;
-        height: 32px;
-      }
-
-      .processing-meta-group {
+      .processing-info {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        align-items: flex-start;
+        color: var(--text-muted);
       }
 
-      .processing-meta-pair {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px 18px;
-      }
-
-      .processing-meta {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
+      .processing-line {
+        margin: 0;
         font-size: 0.98rem;
         color: var(--text-muted);
       }
 
-      .processing-meta img {
-        width: 32px;
-        height: 32px;
+      .processing-line a {
+        color: inherit;
+        text-decoration: underline;
+        word-break: break-word;
       }
 
       @media (max-width: 767px) {
@@ -650,16 +630,13 @@
           align-items: center;
         }
 
-        .processing-meta-pair {
-          justify-content: center;
+        .processing-info {
+          align-items: center;
         }
 
-        .processing-meta {
-          justify-content: center;
-        }
-
-        .processing-link {
-          justify-content: center;
+        .processing-line {
+          text-align: center;
+          width: 100%;
         }
       }
 
@@ -1717,43 +1694,17 @@
               <p class="processing-status" id="processing-status-text">
                 {{ _("Translating your menu…") }}
               </p>
-              <a
-                id="processing-photo-link"
-                class="processing-link"
-                href="#"
-                hidden
-                target="_blank"
-                rel="noopener"
-              >
-                <img
-                  width="24"
-                  height="24"
-                  src="https://img.icons8.com/material-two-tone/24/link--v1.png"
-                  alt="link"
-                />
-                <span id="processing-photo-link-label"></span>
-              </a>
-              <div class="processing-meta-group">
-                <div class="processing-meta-pair">
-                  <div class="processing-meta" id="processing-photo-date" hidden>
-                    <img
-                      width="32"
-                      height="32"
-                      src="https://img.icons8.com/small/32/calendar.png"
-                      alt="calendar"
-                    />
-                    <span id="processing-photo-date-text"></span>
-                  </div>
-                  <div class="processing-meta" id="processing-photo-location" hidden>
-                    <img
-                      width="32"
-                      height="32"
-                      src="https://img.icons8.com/small/32/marker.png"
-                      alt="marker"
-                    />
-                    <span id="processing-photo-location-text"></span>
-                  </div>
-                </div>
+              <div class="processing-info">
+                <p class="processing-line" id="processing-photo-location" hidden></p>
+                <p class="processing-line" id="processing-photo-date" hidden></p>
+                <p class="processing-line" id="processing-photo-link" hidden>
+                  <a
+                    id="processing-photo-link-anchor"
+                    href="#"
+                    target="_blank"
+                    rel="noopener"
+                  ></a>
+                </p>
               </div>
             </figcaption>
           </figure>
@@ -1964,12 +1915,10 @@
       const heroBackButton = document.getElementById("hero-back");
       const processingPhotoImage = document.getElementById("processing-photo-image");
       const processingStatusText = document.getElementById("processing-status-text");
-      const processingPhotoLink = document.getElementById("processing-photo-link");
-      const processingPhotoLinkLabel = document.getElementById("processing-photo-link-label");
+      const processingPhotoLinkLine = document.getElementById("processing-photo-link");
+      const processingPhotoLinkAnchor = document.getElementById("processing-photo-link-anchor");
       const processingPhotoDate = document.getElementById("processing-photo-date");
-      const processingPhotoDateText = document.getElementById("processing-photo-date-text");
       const processingPhotoLocation = document.getElementById("processing-photo-location");
-      const processingPhotoLocationText = document.getElementById("processing-photo-location-text");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -2068,10 +2017,10 @@
         menuReadyTitle: {{ _("Menu Ready 🍾") | tojson }},
         interactiveMenu: {{ _("Interactive menu") | tojson }},
         processing: {
-          status: {{ _("AI is working on it…") | tojson }},
+          status: {{ _("Translating your menu…") | tojson }},
           loading: {{ _("Fetching travel inspiration…") | tojson }},
           published: {{ _("Published on {date}") | tojson }},
-          location: {{ _("{location}") | tojson }},
+          location: {{ _("Location: {location}") | tojson }},
           linkLabel: {{ _("View on Unsplash") | tojson }},
           altGeneric: {{ _("Unsplash photo") | tojson }},
           altWithLocation: {{ _("Unsplash photo in {location}") | tojson }},
@@ -2241,14 +2190,21 @@
               processingPhotoImage.removeAttribute("src");
               processingPhotoImage.alt = "";
             }
-            if (processingPhotoLink) {
-              processingPhotoLink.hidden = true;
+            if (processingPhotoLinkLine) {
+              processingPhotoLinkLine.hidden = true;
+            }
+            if (processingPhotoLinkAnchor) {
+              processingPhotoLinkAnchor.textContent = "";
+              processingPhotoLinkAnchor.removeAttribute("href");
+              processingPhotoLinkAnchor.removeAttribute("title");
             }
             if (processingPhotoDate) {
               processingPhotoDate.hidden = true;
+              processingPhotoDate.textContent = "";
             }
             if (processingPhotoLocation) {
               processingPhotoLocation.hidden = true;
+              processingPhotoLocation.textContent = "";
             }
             return;
           }
@@ -2367,12 +2323,10 @@
       }
 
       function applyProcessingLink(photoUrl) {
-        if (!processingPhotoLink || !processingPhotoLinkLabel) {
+        if (!processingPhotoLinkLine || !processingPhotoLinkAnchor) {
           return;
         }
         if (typeof photoUrl === "string" && photoUrl) {
-          processingPhotoLink.href = photoUrl;
-          processingPhotoLink.hidden = false;
           let label = photoUrl.replace(/^https?:\/\//i, "");
           try {
             const parsed = new URL(photoUrl);
@@ -2380,40 +2334,40 @@
           } catch (error) {
             // Ignore malformed URLs and fall back to raw string.
           }
-          processingPhotoLinkLabel.textContent = label || uiText.processing.linkLabel;
-          processingPhotoLink.setAttribute("aria-hidden", "false");
-          processingPhotoLink.title = photoUrl;
+          processingPhotoLinkAnchor.href = photoUrl;
+          processingPhotoLinkAnchor.textContent = label || uiText.processing.linkLabel;
+          processingPhotoLinkAnchor.title = photoUrl;
+          processingPhotoLinkLine.hidden = false;
         } else {
-          processingPhotoLink.hidden = true;
-          processingPhotoLink.removeAttribute("href");
-          processingPhotoLinkLabel.textContent = "";
-          processingPhotoLink.setAttribute("aria-hidden", "true");
-          processingPhotoLink.removeAttribute("title");
+          processingPhotoLinkLine.hidden = true;
+          processingPhotoLinkAnchor.textContent = "";
+          processingPhotoLinkAnchor.removeAttribute("href");
+          processingPhotoLinkAnchor.removeAttribute("title");
         }
       }
 
       function applyProcessingMeta(submittedAt, locationCountry) {
-        if (processingPhotoDate && processingPhotoDateText) {
+        if (processingPhotoDate) {
           const formattedDate = formatPublishedOn(submittedAt);
           if (formattedDate) {
             processingPhotoDate.hidden = false;
-            processingPhotoDateText.textContent = uiText.processing.published.replace(
+            processingPhotoDate.textContent = uiText.processing.published.replace(
               "{date}",
               formattedDate
             );
           } else {
             processingPhotoDate.hidden = true;
-            processingPhotoDateText.textContent = "";
+            processingPhotoDate.textContent = "";
           }
         }
-        if (processingPhotoLocation && processingPhotoLocationText) {
+        if (processingPhotoLocation) {
           const formattedLocation = formatLocation(locationCountry);
           if (formattedLocation) {
             processingPhotoLocation.hidden = false;
-            processingPhotoLocationText.textContent = formattedLocation;
+            processingPhotoLocation.textContent = formattedLocation;
           } else {
             processingPhotoLocation.hidden = true;
-            processingPhotoLocationText.textContent = "";
+            processingPhotoLocation.textContent = "";
           }
         }
       }
