@@ -601,6 +601,27 @@
         color: var(--text-muted);
       }
 
+      .processing-status-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .processing-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--text-muted);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: processing-spin 0.9s linear infinite;
+      }
+
+      @keyframes processing-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
       .processing-info {
         display: flex;
         flex-direction: column;
@@ -1702,7 +1723,10 @@
             </div>
             <figcaption class="processing-caption">
               <p class="processing-status" id="processing-status-text">
-                {{ _("Translating your menu…") }}
+                <span class="processing-status-row">
+                  <span class="processing-spinner" aria-hidden="true"></span>
+                  <span id="processing-status-label">{{ _("AI is preparing your menu…") }}</span>
+                </span>
               </p>
               <div class="processing-info">
                 <p class="processing-line" id="processing-photo-location-line" hidden>
@@ -1947,6 +1971,7 @@
       const heroBackButton = document.getElementById("hero-back");
       const processingPhotoImage = document.getElementById("processing-photo-image");
       const processingStatusText = document.getElementById("processing-status-text");
+      const processingStatusLabel = document.getElementById("processing-status-label");
       const processingPhotoLinkLine = document.getElementById("processing-photo-link-line");
       const processingPhotoLinkAnchor = document.getElementById("processing-photo-link-anchor");
       const processingPhotoDateLine = document.getElementById("processing-photo-date-line");
@@ -2051,7 +2076,7 @@
         menuReadyTitle: {{ _("Menu Ready 🍾") | tojson }},
         interactiveMenu: {{ _("Interactive menu") | tojson }},
         processing: {
-          status: {{ _("Translating your menu…") | tojson }},
+          status: {{ _("AI is preparing your menu…") | tojson }},
           loading: {{ _("Fetching travel inspiration…") | tojson }},
           published: {{ _("Published on {date}") | tojson }},
           location: {{ _("Location: {location}") | tojson }},
@@ -2208,16 +2233,16 @@
           window.clearTimeout(processingSlideshow.timer);
           processingSlideshow.timer = null;
         }
-        if (processingStatusText) {
-          processingStatusText.textContent = uiText.processing.status;
+        if (processingStatusLabel) {
+          processingStatusLabel.textContent = uiText.processing.status;
         }
         fetchProcessingPhotos().then((photos) => {
           if (!processingSlideshow.isActive) {
             return;
           }
           if (!photos.length) {
-            if (processingStatusText) {
-              processingStatusText.textContent = uiText.processing.loading;
+            if (processingStatusLabel) {
+              processingStatusLabel.textContent = uiText.processing.loading;
             }
             if (processingPhotoImage) {
               processingPhotoImage.dataset.loaded = "false";

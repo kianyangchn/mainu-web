@@ -87,6 +87,10 @@ msgstr "JPEG, PNG or HEIC · Add up to 10 pages per session."
 msgid "AI concierge is unpacking the menu…"
 msgstr "AI concierge is unpacking the menu…"
 
+#: app/templates/home.html:1726 app/templates/home.html:2056
+msgid "AI is preparing your menu…"
+msgstr "AI is preparing your menu…"
+
 #: app/templates/home.html:1627
 msgid "While you wait"
 msgstr "While you wait"
