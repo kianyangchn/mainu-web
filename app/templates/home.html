@@ -596,7 +596,7 @@
 
       .processing-status {
         margin: 0;
-        font-size: 1.05rem;
+        font-size: 0.79rem;
         font-weight: 600;
         color: var(--text-muted);
       }
@@ -608,9 +608,9 @@
       }
 
       .processing-spinner {
-        width: 16px;
-        height: 16px;
-        border: 2px solid var(--text-muted);
+        width: 12px;
+        height: 12px;
+        border: 1.5px solid var(--text-muted);
         border-top-color: transparent;
         border-radius: 50%;
         animation: processing-spin 0.9s linear infinite;
@@ -635,13 +635,13 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        font-size: 0.98rem;
+        font-size: 0.74rem;
         color: var(--text-muted);
       }
 
       .processing-line img {
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
         flex-shrink: 0;
       }
 
@@ -653,20 +653,20 @@
 
       @media (max-width: 767px) {
         .processing-card {
-          text-align: center;
+          text-align: left;
         }
 
         .processing-caption {
-          align-items: center;
+          align-items: flex-start;
         }
 
         .processing-info {
-          align-items: center;
+          align-items: flex-start;
         }
 
         .processing-line {
-          justify-content: center;
-          text-align: center;
+          justify-content: flex-start;
+          text-align: left;
           width: 100%;
         }
       }
