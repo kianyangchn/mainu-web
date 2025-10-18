@@ -39,7 +39,9 @@ _JPEG_QUALITY = 80
 _PNG_COMPRESS_LEVEL = 6
 _TIP_STREAM_INTERVAL_SECONDS = 10.0
 _MENU_PROCESSING_TIMEOUT_SECONDS = 120.0
-_MENU_SUGGESTION_TIMEOUT_SECONDS = 35.0
+_MENU_SUGGESTION_TIMEOUT_SECONDS = max(
+    3.0, float(settings.quick_suggestion_timeout_seconds)
+)
 _LANGUAGE_CODE_TO_LABEL = {
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",

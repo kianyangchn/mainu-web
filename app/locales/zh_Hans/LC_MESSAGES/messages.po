@@ -89,7 +89,15 @@ msgstr "AI正在为您准备菜单…"
 
 #: app/templates/home.html:1726 app/templates/home.html:2056
 msgid "AI is preparing your menu…"
-msgstr "AI 正在为你准备菜单…"
+msgstr "AI正在为你准备菜单…"
+
+#: app/templates/home.html:2058
+msgid "Analyzing..."
+msgstr "正在分析..."
+
+#: app/templates/home.html:2059
+msgid "AI is almost done..."
+msgstr "AI即将完成菜单..."
 
 #: app/templates/home.html:1627
 msgid "While you wait"
