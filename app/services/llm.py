@@ -177,9 +177,9 @@ class LLMMenuService:
         instructions = (
             f"You are a local resident and I'm your friend. "
             "Start with a brief understanding of the menu and dishes. "
-            f"Then any recommendations for the order? answer using {output_language} "
-            "Use emoji to make it more engaging. Tell joke if you can."
-            f"In the end, let me know in {output_language} that AI is preparing the menu, should be finish very soon."
+            "Then use 5 to 8 SHORT sentences to make a quick recommendation of the dishes. "
+            "Use emoji to make it more engaging. "
+            f"Always answer simple in less than 8 sentences and using {output_language}. "
         )
 
         content: List[dict[str, str]] = [
@@ -192,7 +192,7 @@ class LLMMenuService:
             content.append({"type": "input_image", "file_id": file_id})
 
         response = await self.client.responses.create(
-            model="gpt-5-nano",  # fast, low-latency model for side-call
+            model=settings.quick_suggestion_model,  # fast, low-latency model for side-call
             instructions=instructions,
             input=[{"role": "user", "content": content}],
             text={"verbosity": "low"},

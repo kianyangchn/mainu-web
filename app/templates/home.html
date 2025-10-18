@@ -2057,6 +2057,8 @@
         processing: {
           status: {{ _("AI is preparing your menu…") | tojson }},
           loading: {{ _("Fetching travel inspiration…") | tojson }},
+          analyzing: {{ _("Analysing…") | tojson }},
+          almostDone: {{ _("AI is almost done…") | tojson }},
           linkLabel: {{ _("View on Unsplash") | tojson }},
           altGeneric: {{ _("Unsplash photo") | tojson }},
         },
@@ -2182,6 +2184,9 @@
 
       const PROCESSING_BATCH_SIZE = 20;
       const PROCESSING_SLIDE_DURATION_MS = 8000;
+      const QUICK_INTRO_ANALYZING_MS = 3500;
+      const QUICK_INTRO_LINE_INTERVAL_MS = 8000;
+      const QUICK_INTRO_FETCH_TIMEOUT_MS = 12000;
       const processingSlideshow = {
         all: [],
         batch: [],
@@ -2222,6 +2227,10 @@
       const MENU_READY_DELAY_MS = 3000;
       let finalizeMenuTimer = null;
       let finalizeMenuInFlight = false;
+      let quickIntroTimers = [];
+      let quickIntroFetchTimeoutId = null;
+      let quickIntroAbort = null;
+      let quickIntroActive = false;
 
       function fetchProcessingPhotos() {
         if (processingSlideshow.all.length) {
@@ -2246,8 +2255,132 @@
           })
           .finally(() => {
             processingSlideshow.loadingPromise = null;
-          });
+        });
         return processingSlideshow.loadingPromise;
+      }
+
+      function setProcessingStatus(text) {
+        if (processingStatusLabel && typeof text === "string") {
+          processingStatusLabel.textContent = text;
+        }
+      }
+
+      function clearQuickIntroTimers() {
+        quickIntroTimers.forEach((timer) => {
+          window.clearTimeout(timer);
+        });
+        quickIntroTimers = [];
+      }
+
+      function stopQuickIntro(options = {}) {
+        const resetStatus = Boolean(options?.resetStatus);
+        quickIntroActive = false;
+        clearQuickIntroTimers();
+        if (quickIntroAbort) {
+          quickIntroAbort.abort();
+          quickIntroAbort = null;
+        }
+        if (quickIntroFetchTimeoutId) {
+          window.clearTimeout(quickIntroFetchTimeoutId);
+          quickIntroFetchTimeoutId = null;
+        }
+        if (resetStatus && activeScreen === "processing") {
+          setProcessingStatus(uiText.processing.status);
+        }
+      }
+
+      function playQuickIntro(rawText) {
+        if (activeScreen !== "processing") {
+          return;
+        }
+        const text = typeof rawText === "string" ? rawText.trim() : "";
+        if (!text) {
+          return;
+        }
+        stopQuickIntro();
+        quickIntroActive = true;
+        setProcessingStatus(uiText.processing.analyzing);
+        const lines = text
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+        const beginTimer = window.setTimeout(() => {
+          if (!quickIntroActive || activeScreen !== "processing") {
+            return;
+          }
+          if (!lines.length) {
+            setProcessingStatus(uiText.processing.almostDone);
+            return;
+          }
+          lines.forEach((line, index) => {
+            const lineTimer = window.setTimeout(() => {
+              if (!quickIntroActive || activeScreen !== "processing") {
+                return;
+              }
+              setProcessingStatus(line);
+              if (index === lines.length - 1) {
+                const finalTimer = window.setTimeout(() => {
+                  if (quickIntroActive && activeScreen === "processing") {
+                    setProcessingStatus(uiText.processing.almostDone);
+                  }
+                }, QUICK_INTRO_LINE_INTERVAL_MS);
+                quickIntroTimers.push(finalTimer);
+              }
+            }, index * QUICK_INTRO_LINE_INTERVAL_MS);
+            quickIntroTimers.push(lineTimer);
+          });
+        }, QUICK_INTRO_ANALYZING_MS);
+        quickIntroTimers.push(beginTimer);
+      }
+
+      function triggerQuickIntro(formData) {
+        stopQuickIntro();
+        if (!(formData instanceof FormData)) {
+          return;
+        }
+        let controller = null;
+        if (typeof AbortController !== "undefined") {
+          controller = new AbortController();
+          quickIntroAbort = controller;
+        } else {
+          quickIntroAbort = null;
+        }
+        if (controller) {
+          quickIntroFetchTimeoutId = window.setTimeout(() => {
+            controller.abort();
+          }, QUICK_INTRO_FETCH_TIMEOUT_MS);
+        }
+        const requestOptions = {
+          method: "POST",
+          body: formData,
+        };
+        if (controller) {
+          requestOptions.signal = controller.signal;
+        }
+        fetch("/menu/suggest", requestOptions)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Quick intro request failed");
+            }
+            return response.json();
+          })
+          .then((payload) => {
+            if (activeScreen !== "processing") {
+              return;
+            }
+            const text = typeof payload?.text === "string" ? payload.text.trim() : "";
+            if (text) {
+              playQuickIntro(text);
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            if (quickIntroFetchTimeoutId) {
+              window.clearTimeout(quickIntroFetchTimeoutId);
+              quickIntroFetchTimeoutId = null;
+            }
+            quickIntroAbort = null;
+          });
       }
 
       function startProcessingSlideshow() {
@@ -2259,16 +2392,16 @@
           window.clearTimeout(processingSlideshow.timer);
           processingSlideshow.timer = null;
         }
-        if (processingStatusLabel) {
-          processingStatusLabel.textContent = uiText.processing.status;
+        if (!quickIntroActive) {
+          setProcessingStatus(uiText.processing.status);
         }
         fetchProcessingPhotos().then((photos) => {
           if (!processingSlideshow.isActive) {
             return;
           }
           if (!photos.length) {
-            if (processingStatusLabel) {
-              processingStatusLabel.textContent = uiText.processing.loading;
+            if (!quickIntroActive) {
+              setProcessingStatus(uiText.processing.status);
             }
             if (processingPhotoImage) {
               processingPhotoImage.dataset.loaded = "false";
@@ -2490,6 +2623,7 @@
         }
 
         if (name !== "processing") {
+          stopQuickIntro();
           state.pendingMenuPayload = null;
           finalizeMenuInFlight = false;
           if (finalizeMenuTimer) {
@@ -2766,6 +2900,17 @@
         });
       }
 
+      function buildUploadFormData() {
+        const payload = new FormData();
+        state.files.forEach((entry) => {
+          payload.append("files", entry.file, entry.file.name);
+        });
+        if (state.selectedLanguage) {
+          payload.append("output_language", state.selectedLanguage);
+        }
+        return payload;
+      }
+
       function submitUpload() {
         if (!state.files.length) {
           setWarning(uiText.capture.addOneWarning);
@@ -2773,15 +2918,12 @@
         }
         setWarning("");
         showScreen("processing");
+        stopQuickIntro({ resetStatus: true });
         translateButton.disabled = true;
 
-        const formData = new FormData();
-        state.files.forEach((entry) => {
-          formData.append("files", entry.file, entry.file.name);
-        });
-        if (state.selectedLanguage) {
-          formData.append("output_language", state.selectedLanguage);
-        }
+        const processFormData = buildUploadFormData();
+        const quickIntroFormData = buildUploadFormData();
+        triggerQuickIntro(quickIntroFormData);
 
         state.pendingMenuPayload = null;
         state.shouldCelebrateMenu = false;
@@ -2793,7 +2935,7 @@
 
         fetch("/menu/process", {
           method: "POST",
-          body: formData,
+          body: processFormData,
         })
           .then(async (response) => {
             if (!response.ok) {
