@@ -1729,24 +1729,6 @@
                 </span>
               </p>
               <div class="processing-info">
-                <p class="processing-line" id="processing-photo-location-line" hidden>
-                  <img
-                    width="32"
-                    height="32"
-                    src="https://img.icons8.com/small/32/marker.png"
-                    alt="marker"
-                  />
-                  <span id="processing-photo-location-text"></span>
-                </p>
-                <p class="processing-line" id="processing-photo-date-line" hidden>
-                  <img
-                    width="32"
-                    height="32"
-                    src="https://img.icons8.com/small/32/calendar.png"
-                    alt="calendar"
-                  />
-                  <span id="processing-photo-date-text"></span>
-                </p>
                 <p class="processing-line" id="processing-photo-link-line" hidden>
                   <img
                     width="32"
@@ -1974,10 +1956,6 @@
       const processingStatusLabel = document.getElementById("processing-status-label");
       const processingPhotoLinkLine = document.getElementById("processing-photo-link-line");
       const processingPhotoLinkAnchor = document.getElementById("processing-photo-link-anchor");
-      const processingPhotoDateLine = document.getElementById("processing-photo-date-line");
-      const processingPhotoDateText = document.getElementById("processing-photo-date-text");
-      const processingPhotoLocationLine = document.getElementById("processing-photo-location-line");
-      const processingPhotoLocationText = document.getElementById("processing-photo-location-text");
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("menu-files");
@@ -2078,11 +2056,8 @@
         processing: {
           status: {{ _("AI is preparing your menu…") | tojson }},
           loading: {{ _("Fetching travel inspiration…") | tojson }},
-          published: {{ _("Published on {date}") | tojson }},
-          location: {{ _("Location: {location}") | tojson }},
           linkLabel: {{ _("View on Unsplash") | tojson }},
           altGeneric: {{ _("Unsplash photo") | tojson }},
-          altWithLocation: {{ _("Unsplash photo in {location}") | tojson }},
         },
         capture: {
           noPhotos: {{ _("No photos yet") | tojson }},
@@ -2140,8 +2115,72 @@
         { code: "", label: uiText.autoDetect },
       ];
 
+      function resolveDefaultOutputLanguage() {
+        const fallback = "English";
+        const candidates = [];
+
+        if (typeof navigator !== "undefined") {
+          if (Array.isArray(navigator.languages)) {
+            candidates.push(...navigator.languages);
+          }
+          if (navigator.language) {
+            candidates.push(navigator.language);
+          }
+        }
+
+        const htmlLang = document.documentElement?.lang;
+        if (htmlLang) {
+          candidates.push(htmlLang);
+        }
+
+        const normalized = candidates
+          .map((value) =>
+            typeof value === "string" ? value.trim().toLowerCase() : ""
+          )
+          .filter(Boolean);
+
+        for (const code of normalized) {
+          if (
+            code.startsWith("zh-hant") ||
+            code.startsWith("zh-tw") ||
+            code.startsWith("zh-hk") ||
+            code.startsWith("zh-mo")
+          ) {
+            return "zh-TW";
+          }
+          if (code.startsWith("zh")) {
+            return "zh-CN";
+          }
+          if (code.startsWith("ja")) {
+            return "ja";
+          }
+          if (code.startsWith("ko")) {
+            return "ko";
+          }
+          if (code.startsWith("es")) {
+            return "es";
+          }
+          if (code.startsWith("fr")) {
+            return "fr";
+          }
+          if (code.startsWith("de")) {
+            return "de";
+          }
+          if (code.startsWith("it")) {
+            return "it";
+          }
+          if (code.startsWith("en")) {
+            return "English";
+          }
+        }
+
+        return fallback;
+      }
+
+      const defaultOutputLanguage = resolveDefaultOutputLanguage();
+
       const PROCESSING_BATCH_SIZE = 20;
-      const PROCESSING_SLIDE_DURATION_MS = 4800;
+      const PROCESSING_SLIDE_DURATION_MS = 8000;
       const processingSlideshow = {
         all: [],
         batch: [],
@@ -2150,12 +2189,6 @@
         isActive: false,
         loadingPromise: null,
       };
-      const publishedDateFormatter = new Intl.DateTimeFormat(undefined, {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
-
       const taglineMessages = uiText.taglineMessages;
 
       let taglineIndex = 0;
@@ -2174,7 +2207,7 @@
         menu: null,
         share: null,
         sectionObserver: null,
-        selectedLanguage: "",
+        selectedLanguage: defaultOutputLanguage,
         shouldCelebrateMenu: false,
         isSharing: false,
         pendingMenuPayload: null,
@@ -2249,18 +2282,6 @@
               processingPhotoLinkAnchor.removeAttribute("href");
               processingPhotoLinkAnchor.removeAttribute("title");
             }
-            if (processingPhotoDateLine) {
-              processingPhotoDateLine.hidden = true;
-            }
-            if (processingPhotoDateText) {
-              processingPhotoDateText.textContent = "";
-            }
-            if (processingPhotoLocationLine) {
-              processingPhotoLocationLine.hidden = true;
-            }
-            if (processingPhotoLocationText) {
-              processingPhotoLocationText.textContent = "";
-            }
             return;
           }
           if (!processingSlideshow.batch.length) {
@@ -2334,12 +2355,7 @@
           scheduleProcessingAdvance();
           return;
         }
-        const {
-          photo_image_url: imageUrlRaw,
-          photo_url,
-          photo_submitted_at,
-          photo_location_country,
-        } = photo;
+        const { photo_image_url: imageUrlRaw, photo_url } = photo;
         const imageUrl = typeof imageUrlRaw === "string" ? imageUrlRaw : "";
         if (processingPhotoImage.dataset) {
           processingPhotoImage.dataset.loaded = "false";
@@ -2353,7 +2369,7 @@
               return;
             }
             processingPhotoImage.src = loader.src;
-            processingPhotoImage.alt = buildProcessingAlt(photo_location_country);
+            processingPhotoImage.alt = uiText.processing.altGeneric;
             if (processingPhotoImage.dataset) {
               processingPhotoImage.dataset.loaded = "true";
             }
@@ -2374,7 +2390,6 @@
           scheduleProcessingAdvance();
         }
         applyProcessingLink(photo_url);
-        applyProcessingMeta(photo_submitted_at, photo_location_country);
       }
 
       function applyProcessingLink(photoUrl) {
@@ -2399,85 +2414,6 @@
           processingPhotoLinkAnchor.removeAttribute("href");
           processingPhotoLinkAnchor.removeAttribute("title");
         }
-      }
-
-      function applyProcessingMeta(submittedAt, locationCountry) {
-        if (processingPhotoDateLine && processingPhotoDateText) {
-          const formattedDate = formatPublishedOn(submittedAt);
-          if (formattedDate) {
-            processingPhotoDateLine.hidden = false;
-            processingPhotoDateText.textContent = uiText.processing.published.replace(
-              "{date}",
-              formattedDate
-            );
-          } else {
-            processingPhotoDateLine.hidden = true;
-            processingPhotoDateText.textContent = "";
-          }
-        }
-        if (processingPhotoLocationLine && processingPhotoLocationText) {
-          const formattedLocation = formatLocation(locationCountry);
-          if (formattedLocation) {
-            processingPhotoLocationLine.hidden = false;
-            processingPhotoLocationText.textContent = formattedLocation;
-          } else {
-            processingPhotoLocationLine.hidden = true;
-            processingPhotoLocationText.textContent = "";
-          }
-        }
-      }
-
-      function buildProcessingAlt(locationCountry) {
-        if (locationCountry) {
-          return uiText.processing.altWithLocation.replace(
-            "{location}",
-            locationCountry
-          );
-        }
-        return uiText.processing.altGeneric;
-      }
-
-      function formatPublishedOn(value) {
-        if (!value) {
-          return "";
-        }
-        const datePart = String(value).split(" ")[0];
-        if (!datePart) {
-          return "";
-        }
-        const segments = datePart.split("-");
-        if (segments.length !== 3) {
-          return "";
-        }
-        const [yearStr, monthStr, dayStr] = segments;
-        const year = Number.parseInt(yearStr, 10);
-        const month = Number.parseInt(monthStr, 10);
-        const day = Number.parseInt(dayStr, 10);
-        if (
-          Number.isNaN(year) ||
-          Number.isNaN(month) ||
-          Number.isNaN(day) ||
-          month < 1 ||
-          month > 12 ||
-          day < 1 ||
-          day > 31
-        ) {
-          return "";
-        }
-        const date = new Date(Date.UTC(year, month - 1, day));
-        try {
-          return publishedDateFormatter.format(date);
-        } catch (error) {
-          console.error(error);
-          return "";
-        }
-      }
-
-      function formatLocation(locationCountry) {
-        if (!locationCountry) {
-          return "";
-        }
-        return uiText.processing.location.replace("{location}", locationCountry);
       }
 
       function shuffleArray(list) {
@@ -2823,7 +2759,9 @@
         state.selectedLanguage = code;
         outputLanguageInput.value = code;
         languageChoices.querySelectorAll(".language-chip").forEach((chip) => {
-          chip.dataset.active = chip.dataset.lang === code ? "true" : "false";
+          const isActive = chip.dataset.lang === code;
+          chip.dataset.active = isActive ? "true" : "false";
+          chip.setAttribute("aria-pressed", isActive ? "true" : "false");
         });
       }
 
@@ -3518,17 +3456,19 @@
 
       fetchProcessingPhotos().catch(() => {});
 
-      languageOptions.forEach((option, index) => {
+      languageOptions.forEach((option) => {
         const chip = document.createElement("button");
         chip.type = "button";
         chip.className = "language-chip";
         chip.textContent = option.label;
         chip.dataset.lang = option.code;
-        chip.dataset.active = index === 0 ? "true" : "false";
+        const isActive = option.code === defaultOutputLanguage;
+        chip.dataset.active = isActive ? "true" : "false";
+        chip.setAttribute("aria-pressed", isActive ? "true" : "false");
         chip.addEventListener("click", () => setLanguage(option.code));
         languageChoices.appendChild(chip);
       });
-      setLanguage("");
+      setLanguage(defaultOutputLanguage);
       renderPreview();
       updateCaptureStatus();
     </script>
