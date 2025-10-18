@@ -91,6 +91,14 @@ msgstr "AI concierge is unpacking the menu…"
 msgid "AI is preparing your menu…"
 msgstr "AI is preparing your menu…"
 
+#: app/templates/home.html:2058
+msgid "Analyzing..."
+msgstr "Analyzing..."
+
+#: app/templates/home.html:2059
+msgid "AI is almost done..."
+msgstr "AI is almost done..."
+
 #: app/templates/home.html:1627
 msgid "While you wait"
 msgstr "While you wait"
