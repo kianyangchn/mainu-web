@@ -2140,6 +2140,70 @@
         { code: "", label: uiText.autoDetect },
       ];
 
+      function resolveDefaultOutputLanguage() {
+        const fallback = "English";
+        const candidates = [];
+
+        if (typeof navigator !== "undefined") {
+          if (Array.isArray(navigator.languages)) {
+            candidates.push(...navigator.languages);
+          }
+          if (navigator.language) {
+            candidates.push(navigator.language);
+          }
+        }
+
+        const htmlLang = document.documentElement?.lang;
+        if (htmlLang) {
+          candidates.push(htmlLang);
+        }
+
+        const normalized = candidates
+          .map((value) =>
+            typeof value === "string" ? value.trim().toLowerCase() : ""
+          )
+          .filter(Boolean);
+
+        for (const code of normalized) {
+          if (
+            code.startsWith("zh-hant") ||
+            code.startsWith("zh-tw") ||
+            code.startsWith("zh-hk") ||
+            code.startsWith("zh-mo")
+          ) {
+            return "zh-TW";
+          }
+          if (code.startsWith("zh")) {
+            return "zh-CN";
+          }
+          if (code.startsWith("ja")) {
+            return "ja";
+          }
+          if (code.startsWith("ko")) {
+            return "ko";
+          }
+          if (code.startsWith("es")) {
+            return "es";
+          }
+          if (code.startsWith("fr")) {
+            return "fr";
+          }
+          if (code.startsWith("de")) {
+            return "de";
+          }
+          if (code.startsWith("it")) {
+            return "it";
+          }
+          if (code.startsWith("en")) {
+            return "English";
+          }
+        }
+
+        return fallback;
+      }
+
+      const defaultOutputLanguage = resolveDefaultOutputLanguage();
+
       const PROCESSING_BATCH_SIZE = 20;
       const PROCESSING_SLIDE_DURATION_MS = 4800;
       const processingSlideshow = {
@@ -2174,7 +2238,7 @@
         menu: null,
         share: null,
         sectionObserver: null,
-        selectedLanguage: "",
+        selectedLanguage: defaultOutputLanguage,
         shouldCelebrateMenu: false,
         isSharing: false,
         pendingMenuPayload: null,
@@ -2823,7 +2887,9 @@
         state.selectedLanguage = code;
         outputLanguageInput.value = code;
         languageChoices.querySelectorAll(".language-chip").forEach((chip) => {
-          chip.dataset.active = chip.dataset.lang === code ? "true" : "false";
+          const isActive = chip.dataset.lang === code;
+          chip.dataset.active = isActive ? "true" : "false";
+          chip.setAttribute("aria-pressed", isActive ? "true" : "false");
         });
       }
 
@@ -3518,17 +3584,19 @@
 
       fetchProcessingPhotos().catch(() => {});
 
-      languageOptions.forEach((option, index) => {
+      languageOptions.forEach((option) => {
         const chip = document.createElement("button");
         chip.type = "button";
         chip.className = "language-chip";
         chip.textContent = option.label;
         chip.dataset.lang = option.code;
-        chip.dataset.active = index === 0 ? "true" : "false";
+        const isActive = option.code === defaultOutputLanguage;
+        chip.dataset.active = isActive ? "true" : "false";
+        chip.setAttribute("aria-pressed", isActive ? "true" : "false");
         chip.addEventListener("click", () => setLanguage(option.code));
         languageChoices.appendChild(chip);
       });
-      setLanguage("");
+      setLanguage(defaultOutputLanguage);
       renderPreview();
       updateCaptureStatus();
     </script>
