@@ -2290,7 +2290,7 @@
       }
 
       function playQuickIntro(rawText) {
-        if (activeScreen !== "processing") {
+        if (activeScreen !== "processing" || finalizeMenuInFlight) {
           return;
         }
         const text = typeof rawText === "string" ? rawText.trim() : "";
@@ -2305,7 +2305,7 @@
           .map((line) => line.trim())
           .filter((line) => line.length > 0);
         const beginTimer = window.setTimeout(() => {
-          if (!quickIntroActive || activeScreen !== "processing") {
+          if (!quickIntroActive || activeScreen !== "processing" || finalizeMenuInFlight) {
             return;
           }
           if (!lines.length) {
@@ -2314,13 +2314,13 @@
           }
           lines.forEach((line, index) => {
             const lineTimer = window.setTimeout(() => {
-              if (!quickIntroActive || activeScreen !== "processing") {
+              if (!quickIntroActive || activeScreen !== "processing" || finalizeMenuInFlight) {
                 return;
               }
               setProcessingStatus(line);
               if (index === lines.length - 1) {
                 const finalTimer = window.setTimeout(() => {
-                  if (quickIntroActive && activeScreen === "processing") {
+                  if (quickIntroActive && activeScreen === "processing" && !finalizeMenuInFlight) {
                     setProcessingStatus(uiText.processing.almostDone);
                   }
                 }, QUICK_INTRO_LINE_INTERVAL_MS);
@@ -2365,7 +2365,7 @@
             return response.json();
           })
           .then((payload) => {
-            if (activeScreen !== "processing") {
+            if (activeScreen !== "processing" || finalizeMenuInFlight) {
               return;
             }
             const text = typeof payload?.text === "string" ? payload.text.trim() : "";
@@ -2392,7 +2392,7 @@
           window.clearTimeout(processingSlideshow.timer);
           processingSlideshow.timer = null;
         }
-        if (!quickIntroActive) {
+        if (!quickIntroActive && !finalizeMenuInFlight) {
           setProcessingStatus(uiText.processing.status);
         }
         fetchProcessingPhotos().then((photos) => {
@@ -2400,7 +2400,7 @@
             return;
           }
           if (!photos.length) {
-            if (!quickIntroActive) {
+            if (!quickIntroActive && !finalizeMenuInFlight) {
               setProcessingStatus(uiText.processing.status);
             }
             if (processingPhotoImage) {
@@ -2568,6 +2568,8 @@
         if (finalizeMenuTimer) {
           window.clearTimeout(finalizeMenuTimer);
         }
+        stopQuickIntro();
+        setProcessingStatus(uiText.processing.almostDone);
         finalizeMenuTimer = window.setTimeout(() => {
           finalizeMenuTimer = null;
           finalizeMenuInFlight = false;
