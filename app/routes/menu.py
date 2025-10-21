@@ -22,7 +22,7 @@ from app.schemas import (
     ShareMenuRequest,
     ShareMenuResponse,
 )
-from app.services.llm import LLMMenuService, MenuGenerationResult
+from app.services.llm import LLMMenuService, MenuProcessingArtifacts
 from app.services.tips import Tip, TipService
 from app.services.share import ShareService
 
@@ -97,12 +97,13 @@ async def process_menu(
     output_language = resolved_language or _detect_language(request)
     logger.debug("Processing menu with output language: %s", output_language)
     try:
-        generation_result: MenuGenerationResult = await asyncio.wait_for(
-            menu_service.generate_menu_template(
+        artifacts: MenuProcessingArtifacts = await asyncio.wait_for(
+            menu_service.process_menu(
                 contents,
                 filenames,
                 content_types,
                 output_language=output_language,
+                suggestion_timeout=_MENU_SUGGESTION_TIMEOUT_SECONDS,
             ),
             timeout=_MENU_PROCESSING_TIMEOUT_SECONDS,
         )
@@ -114,8 +115,10 @@ async def process_menu(
             status_code=504,
             detail="Menu processing took too long. Please try again.",
         ) from exc
+
     return MenuProcessingResponse(
-        template=generation_result.template,
+        template=artifacts.template,
+        quick_suggestion=artifacts.quick_suggestion,
         detected_language=None,
     )
 

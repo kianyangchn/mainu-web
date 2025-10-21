@@ -38,6 +38,10 @@ class MenuProcessingResponse(BaseModel):
     """Response payload after processing uploaded menus."""
 
     template: MenuTemplate
+    quick_suggestion: str = Field(
+        default="",
+        description="Short highlight surfaced while the full template renders.",
+    )
     detected_language: str | None = Field(
         default=None,
         description="Temporary debug field exposing the derived output language. Remove before GA.",

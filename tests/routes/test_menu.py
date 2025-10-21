@@ -8,7 +8,7 @@ from PIL import Image
 from app.main import app
 from app.routes import menu as menu_routes
 from app.schemas import MenuDish, MenuSection, MenuTemplate
-from app.services.llm import MenuGenerationResult
+from app.services.llm import MenuProcessingArtifacts
 from app.services.tips import Tip
 
 
@@ -20,13 +20,15 @@ def reset_services(monkeypatch):
     menu_routes._share_service.reset()
     menu_routes._expected_output_language = "zh-CN"
 
-    async def fake_generate_menu_template(
+    async def fake_process_menu(
         images,
         filenames,
         content_types=None,
         *,
         output_language=None,
-    ) -> MenuGenerationResult:
+        include_quick_suggestion=True,
+        suggestion_timeout=None,
+    ) -> MenuProcessingArtifacts:  # noqa: ARG001
         assert output_language == menu_routes._expected_output_language
         menu_routes._last_uploads = [bytes(blob) for blob in images]
         template = MenuTemplate(
@@ -44,10 +46,20 @@ def reset_services(monkeypatch):
                 )
             ]
         )
-        return MenuGenerationResult(template=template)
+        quick_suggestion = (
+            "Try the Mapo Tofu tonight!"
+            if include_quick_suggestion
+            else ""
+        )
+        return MenuProcessingArtifacts(
+            template=template,
+            quick_suggestion=quick_suggestion,
+        )
 
     monkeypatch.setattr(
-        menu_routes._menu_service, "generate_menu_template", fake_generate_menu_template
+        menu_routes._menu_service,
+        "process_menu",
+        fake_process_menu,
     )
     yield
     menu_routes._share_service.reset()
@@ -83,6 +95,7 @@ def test_process_menu_returns_template_without_sharing():
         payload["template"]["sections"][0]["dishes"][0]["translated_name"]
         == "Spicy Mapo Tofu"
     )
+    assert payload["quick_suggestion"] == "Try the Mapo Tofu tonight!"
     assert payload["detected_language"] is None
     assert "share_token" not in payload
 
@@ -184,16 +197,19 @@ def test_process_menu_respects_manual_language_selection():
 
 
 def test_process_menu_times_out(monkeypatch):
-    async def slow_generate_menu_template(
+    async def slow_process_menu(
         images,
         filenames,
         content_types=None,
         *,
         output_language=None,
-    ):
+        include_quick_suggestion=True,
+        suggestion_timeout=None,
+    ):  # noqa: ARG001
         await asyncio.sleep(0.05)
-        return MenuGenerationResult(
+        return MenuProcessingArtifacts(
             template=MenuTemplate(sections=[]),
+            quick_suggestion="",
         )
 
     monkeypatch.setattr(
@@ -201,8 +217,8 @@ def test_process_menu_times_out(monkeypatch):
     )
     monkeypatch.setattr(
         menu_routes._menu_service,
-        "generate_menu_template",
-        slow_generate_menu_template,
+        "process_menu",
+        slow_process_menu,
     )
 
     response = client.post(
