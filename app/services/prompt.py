@@ -123,7 +123,7 @@ def build_prompt(
     )
 
     structure_rule = (
-        "Based on the extracted text, you can construct a structured menu. "
+        "Based on the items in the photos, build a structured menu. "
         "Keep the original name as written on the menu in the original_name field in the JSON. "
         f"Translate dish titles into {output_language} and keep it in the translated_name field in the JSON. "
         f"If there's any description, translate it into the {output_language}. "
@@ -131,7 +131,7 @@ def build_prompt(
         f"{output_language} describing key ingredients, preparation details, and flavour. "
         "Do not overdescribe the dishes, do not add quality, quantity, or price details that are not present on the menu. "
         "If price is listed as 'N/A', keep it as 'N/A'. "
-        f"Translate section names into {output_language}. "
+        f"Translate section names into {output_language} and store it in the section field in the JSON. "
     )
     json_rule = (
         "Last step, respond strictly with JSON that matches the provided schema. "
@@ -139,12 +139,12 @@ def build_prompt(
     )
     double_check = (
         "Double check the language used in the output json. "
-        "Don't forget to translate section name, translated name and description."
+        f"Don't forget to translate section name, translated name and description into {output_language}."
     )
 
     content: List[dict[str, str]] = [
         {"type": "input_text", "text": language_hint},
-        {"type": "input_text", "text": transcription_rule},
+        # {"type": "input_text", "text": transcription_rule},
         {"type": "input_text", "text": structure_rule},
         {"type": "input_text", "text": json_rule},
         {"type": "input_text", "text": double_check},
