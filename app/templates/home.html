@@ -873,6 +873,33 @@
         gap: 12px;
       }
 
+      .menu-retry-button {
+        border-radius: 14px;
+        border: 1px solid rgba(234, 42, 51, 0.16);
+        background: rgba(234, 42, 51, 0.08);
+        color: var(--primary-dark);
+        padding: 10px 16px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+      }
+
+      .menu-retry-button:not(:disabled):hover,
+      .menu-retry-button:not(:disabled):focus-visible {
+        background: rgba(234, 42, 51, 0.14);
+        border-color: rgba(234, 42, 51, 0.24);
+      }
+
+      .menu-retry-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .menu-retry-button[hidden] {
+        display: none;
+      }
+
       .menu-icon-button {
         position: relative;
         width: 44px;
@@ -1760,6 +1787,14 @@
           <div class="menu-header-actions">
             <button
               type="button"
+              class="menu-retry-button"
+              id="retry-menu-button"
+              hidden
+            >
+              {{ _("Retry") }}
+            </button>
+            <button
+              type="button"
               class="menu-icon-button share-fab"
               id="share-fab"
               aria-label="{{ _('Share this menu') }}"
@@ -1980,6 +2015,7 @@
       const sectionsContainer = document.getElementById("sections");
       const emptyState = document.getElementById("empty-state");
       const menuHeaderTitle = document.getElementById("menu-header-title");
+      const retryButton = document.getElementById("retry-menu-button");
       const cartSummaryButton = document.getElementById("cart-summary-button");
       const menuSummaryCount = document.getElementById("menu-summary-count");
       const menuSummaryPrice = document.getElementById("menu-summary-price");
@@ -2089,6 +2125,9 @@
         warnings: {
           addDishes: {{ _("Add dishes to your table before creating an order.") | tojson }},
           prepareFailed: {{ _("We couldn't prepare that menu just now.") | tojson }},
+          retryExpired: {{ _("This capture session has ended. Please upload the menu again.") | tojson }},
+          retryLimit: {{ _("You've reached the retry limit. Upload new menu photos to continue.") | tojson }},
+          retryFailed: {{ _("We couldn't build a fresh menu. Try again or upload new photos.") | tojson }},
         },
         errors: {
           unknown: {{ _("Unknown error") | tojson }},
@@ -2102,6 +2141,8 @@
         actions: {
           copied: {{ _("Copied") | tojson }},
           copyNote: {{ _("Copy note") | tojson }},
+          retry: {{ _("Retry") | tojson }},
+          retrying: {{ _("Retrying…") | tojson }},
         },
       };
 
@@ -2221,6 +2262,7 @@
         shouldCelebrateMenu: false,
         isSharing: false,
         pendingMenuPayload: null,
+        uploadSessionId: null,
       };
 
       let menuTitleText = uiText.defaultMenuTitle;
@@ -2291,6 +2333,62 @@
         if (resetStatus && activeScreen === "processing") {
           setProcessingStatus(uiText.processing.status);
         }
+      }
+
+      function syncRetryButton() {
+        if (!retryButton) {
+          return;
+        }
+        const hasSession = Boolean(state.uploadSessionId && state.menu);
+        const isLoading = retryButton.dataset.loading === "true";
+        const isProcessing = activeScreen === "processing";
+        retryButton.hidden = !hasSession;
+        retryButton.disabled = !hasSession || isLoading || isProcessing;
+      }
+
+      function setRetryButtonLoading(isLoading) {
+        if (!retryButton) {
+          return;
+        }
+        retryButton.dataset.loading = isLoading ? "true" : "false";
+        retryButton.textContent = isLoading ? uiText.actions.retrying : uiText.actions.retry;
+        syncRetryButton();
+      }
+
+      async function disposeUploadSession(token) {
+        if (!token) {
+          return;
+        }
+        try {
+          await fetch(`/menu/session/${encodeURIComponent(token)}`, { method: "DELETE" });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      function clearUploadSession({ dispose = true } = {}) {
+        const previous = state.uploadSessionId;
+        state.uploadSessionId = null;
+        syncRetryButton();
+        if (dispose && previous) {
+          disposeUploadSession(previous).catch((error) => {
+            console.error(error);
+          });
+        }
+      }
+
+      function applyUploadSession(token) {
+        if (!token) {
+          clearUploadSession({ dispose: false });
+          return;
+        }
+        if (state.uploadSessionId && state.uploadSessionId !== token) {
+          disposeUploadSession(state.uploadSessionId).catch((error) => {
+            console.error(error);
+          });
+        }
+        state.uploadSessionId = token;
+        syncRetryButton();
       }
 
       function playQuickIntro(rawText) {
@@ -2637,6 +2735,7 @@
             finalizeMenuTimer = null;
           }
         }
+        syncRetryButton();
       }
 
       function playMenuCelebration() {
@@ -2927,6 +3026,8 @@
         stopQuickIntro({ resetStatus: true });
         translateButton.disabled = true;
 
+        clearUploadSession();
+
         const processFormData = buildUploadFormData();
         const quickIntroFormData = buildUploadFormData();
         triggerQuickIntro(quickIntroFormData);
@@ -2970,9 +3071,76 @@
           });
       }
 
+      async function retryMenuCapture() {
+        if (!state.uploadSessionId) {
+          return;
+        }
+        setWarning("");
+        setRetryButtonLoading(true);
+        translateButton.disabled = true;
+        showScreen("processing");
+        stopQuickIntro({ resetStatus: true });
+
+        const quickIntroFormData = new FormData();
+        quickIntroFormData.append("upload_session_id", state.uploadSessionId);
+        if (state.selectedLanguage) {
+          quickIntroFormData.append("output_language", state.selectedLanguage);
+        }
+        triggerQuickIntro(quickIntroFormData);
+
+        state.pendingMenuPayload = null;
+        state.shouldCelebrateMenu = false;
+        finalizeMenuInFlight = false;
+        if (finalizeMenuTimer) {
+          window.clearTimeout(finalizeMenuTimer);
+          finalizeMenuTimer = null;
+        }
+
+        const retryPayload = {
+          upload_session_id: state.uploadSessionId,
+        };
+        if (state.selectedLanguage) {
+          retryPayload.output_language = state.selectedLanguage;
+        }
+
+        try {
+          const response = await fetch("/menu/retry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(retryPayload),
+          });
+          if (response.status === 404) {
+            throw new Error("retryExpired");
+          }
+          if (response.status === 429) {
+            throw new Error("retryLimit");
+          }
+          if (!response.ok) {
+            throw new Error("retryFailed");
+          }
+          const payload = await response.json();
+          state.pendingMenuPayload = payload;
+          finalizeMenuIfReady();
+        } catch (error) {
+          const warningKey =
+            error instanceof Error && uiText.warnings[error.message]
+              ? error.message
+              : "retryFailed";
+          if (warningKey === "retryExpired" || warningKey === "retryLimit") {
+            clearUploadSession();
+          }
+          setWarning(uiText.warnings[warningKey] || uiText.warnings.retryFailed);
+          showScreen("capture");
+        } finally {
+          setRetryButtonLoading(false);
+          translateButton.disabled = false;
+        }
+      }
+
       function renderResults(payload) {
         state.menu = payload.template;
         resetShareState();
+        applyUploadSession(payload?.upload_session_id);
 
         const rawTitle =
           payload?.template?.menu_title ??
@@ -3386,6 +3554,7 @@
         state.menu = null;
         resetShareState();
         state.shouldCelebrateMenu = false;
+        clearUploadSession();
         if (shareFab) {
           shareFab.hidden = true;
           shareFab.setAttribute("aria-expanded", "false");
@@ -3413,6 +3582,7 @@
         if (menuHeaderTitle) {
           menuHeaderTitle.textContent = uiText.interactiveMenu;
         }
+        clearUploadSession({ dispose: false });
       }
 
       addFilesButton.addEventListener("click", () => fileInput.click());
@@ -3447,6 +3617,17 @@
       });
 
       translateButton.addEventListener("click", submitUpload);
+
+      if (retryButton) {
+        retryButton.addEventListener("click", () => {
+          if (retryButton.disabled) {
+            return;
+          }
+          retryMenuCapture().catch((error) => {
+            console.error(error);
+          });
+        });
+      }
 
       async function ensureShareLink() {
         if (state.share) {
@@ -3620,6 +3801,11 @@
       setLanguage(defaultOutputLanguage);
       renderPreview();
       updateCaptureStatus();
+      if (retryButton) {
+        retryButton.dataset.loading = "false";
+        retryButton.textContent = uiText.actions.retry;
+      }
+      syncRetryButton();
     </script>
   </body>
 </html>

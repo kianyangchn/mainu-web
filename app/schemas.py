@@ -42,9 +42,24 @@ class MenuProcessingResponse(BaseModel):
         default="",
         description="Short highlight surfaced while the full template renders.",
     )
+    upload_session_id: str = Field(
+        description="Session token used to reuse uploaded files for retries."
+    )
     detected_language: str | None = Field(
         default=None,
         description="Temporary debug field exposing the derived output language. Remove before GA.",
+    )
+
+
+class MenuRetryRequest(BaseModel):
+    """Request body for rebuilding an existing interactive menu session."""
+
+    upload_session_id: str = Field(
+        description="Session token returned from the initial menu processing call."
+    )
+    output_language: str | None = Field(
+        default=None,
+        description="Optional language override applied to the regenerated menu.",
     )
 
 
