@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     openai_model: str = "gpt-5-mini"
     quick_suggestion_model: str = "gpt-5-nano"
-    quick_suggestion_timeout_seconds: int = 12
+    quick_suggestion_timeout_seconds: int = 20
     default_output_language: str = "English"
     share_token_ttl_minutes: int = 240  # 4 hours default
     database_url: Optional[str] = None
