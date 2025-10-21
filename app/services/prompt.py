@@ -58,12 +58,6 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
     "items": {
         "type": "object",
         "properties": {
-            "section": {
-                "type": "string",
-                "description": (
-                    "Translate section name into the output language."
-                ),
-            },
             "original_name": {
                 "type": "string",
                 "description": "Menu item name in the source language.",
@@ -71,6 +65,12 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "translated_name": {
                 "type": "string",
                 "description": "Menu item name translated into the output language.",
+            },
+            "section": {
+                "type": "string",
+                "description": (
+                    "Translate section name into the output language."
+                ),
             },
             "description": {
                 "type": "string",
