@@ -40,15 +40,16 @@ class PromptRequest:
 # )
 
 SYSTEM_INSTRUCTIONS = (
-    "You are a meticulous transcription assistant for restaurant menus. Your responsibilities are to: "
-    "- Accurately recognize the original language of the menu. "
-    "- Transcribe all dishes information exactly as written, preserving the original ordering even if the photos are of low quality. "
-    "- Identify and transcribe every section, dish and price, including those listed on the sides of the menu image, ensuring that no sections or dishes are omitted. "
-    "- Understand regional and specialty dishes, offering translations into any requested language(s). "
-    "- For each dish, provide a single, approachable sentence summarizing its flavor, ingredients, and preparation details using contextual clues. "
+    "You are a meticulous transcription assistant for restaurant menus. Given photos of a menu, your responsibilities are to extract menu information and structure it into JSON format. "
+#     "- Accurately recognize the original language of the menu. "
+#     "- Transcribe all dishes information exactly as written, preserving the original ordering even if the photos are of low quality. "
+#     "- Identify and transcribe every section, dish and price, including those listed on the sides of the menu image, ensuring that no sections or dishes are omitted. "
+#     "- Understand regional and specialty dishes, offering translations into any requested language(s). "
+#     "- For each dish, provide a single, approachable sentence summarizing its flavor, ingredients, and preparation details using contextual clues. "
     
-    "After transcribing and producing the output, validate that all menu items and sections are present, fields contain appropriate placeholder values where necessary, and ordering is preserved. If any inconsistency or probable omission is detected, self-correct before returning the final output. "
-    "Your final goal is to represent the menu information as an array of explicit JSON objects, each detailing a menu item while preserving its original order as displayed in the menu image. "
+#     "After transcribing and producing the output, validate that all menu items and sections are present, fields contain appropriate placeholder values where necessary, and ordering is preserved. If any inconsistency or probable omission is detected, self-correct before returning the final output. "
+#     "Your final goal is to represent the menu information as an array of explicit JSON objects, each detailing a menu item while preserving its original order as displayed in the menu image. "
+# )
 )
 
 JSON_SCHEMA_NAME = "menu_items"
@@ -58,6 +59,12 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
     "items": {
         "type": "object",
         "properties": {
+            "section": {
+                "type": "string",
+                "description": (
+                    "Translate section name into the output language."
+                ),
+            },
             "original_name": {
                 "type": "string",
                 "description": "Menu item name in the source language.",
@@ -65,12 +72,6 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "translated_name": {
                 "type": "string",
                 "description": "Menu item name translated into the output language.",
-            },
-            "section": {
-                "type": "string",
-                "description": (
-                    "Translate section name into the output language."
-                ),
             },
             "description": {
                 "type": "string",
@@ -124,7 +125,7 @@ def build_prompt(
 
     structure_rule = (
         "Based on the items in the photos, build a structured menu. "
-        "Keep the original name as written on the menu in the original_name field in the JSON. "
+        "Keep the original dish name as written on the menu in the original_name field in the JSON. "
         f"Translate dish titles into {output_language} and keep it in the translated_name field in the JSON. "
         f"If there's any description, translate it into the {output_language}. "
         "But if there's no description on the menu, write a natural one-sentence description in the "
@@ -132,6 +133,7 @@ def build_prompt(
         "Do not overdescribe the dishes, do not add quality, quantity, or price details that are not present on the menu. "
         "If price is listed as 'N/A', keep it as 'N/A'. "
         f"Translate section names into {output_language} and store it in the section field in the JSON. "
+        "Do not treat a section as a dish. "
     )
     json_rule = (
         "Last step, respond strictly with JSON that matches the provided schema. "
@@ -139,7 +141,8 @@ def build_prompt(
     )
     double_check = (
         "Double check the language used in the output json. "
-        f"Don't forget to translate section name, translated name and description into {output_language}."
+        f"Don't forget to translate section name, translated name and description into {output_language}. "
+        "DO NOT treat a section as a dish and put section name in the dish related field"
     )
 
     content: List[dict[str, str]] = [
