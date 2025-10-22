@@ -2,6 +2,12 @@
 
 Web application of Mainu
 
+## Menu processing
+
+- `POST /menu/process` uploads the current batch of menu photos and returns an `upload_session_id` that can be reused without re-uploading the images.
+- `POST /menu/retry` rebuilds quick suggestions and the interactive menu using an existing `upload_session_id`.
+- `DELETE /menu/session/{id}` clears the session and releases the temporary OpenAI file handles; the frontend calls this when a capture flow is abandoned.
+
 ## Internationalization
 
 The frontend now supports locale-aware UI copy (English, Simplified Chinese, Traditional Chinese) driven by gettext catalogs stored under `app/locales/`.

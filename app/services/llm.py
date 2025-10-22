@@ -5,8 +5,9 @@ from __future__ import annotations
 import asyncio
 import json
 from collections import defaultdict
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence
+from typing import AsyncIterator, Iterable, List, Sequence
 
 from openai import AsyncOpenAI, OpenAIError
 
@@ -23,6 +24,14 @@ class MenuGenerationResult:
     """Structured result produced by the LLM generation flow."""
 
     template: MenuTemplate
+
+
+@dataclass(frozen=True)
+class MenuProcessingArtifacts:
+    """Combined payload for the full menu processing flow."""
+
+    template: MenuTemplate
+    quick_suggestion: str
 
 
 class LLMMenuService:
@@ -44,6 +53,23 @@ class LLMMenuService:
             self._client = AsyncOpenAI(api_key=settings.openai_api_key)
         return self._client
 
+    async def upload_images(
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None = None,
+        content_types: Sequence[str] | None = None,
+    ) -> List[str]:
+        """Upload images and return raw OpenAI file IDs."""
+
+        if not images:
+            raise ValueError("At least one image is required")
+        return await self._upload_images(images, filenames, content_types)
+
+    async def delete_files(self, file_ids: Sequence[str]) -> None:
+        """Best-effort deletion of uploaded files."""
+
+        await self._delete_files(file_ids)
+
     async def generate_menu_template(
         self,
         images: Sequence[bytes],
@@ -53,17 +79,78 @@ class LLMMenuService:
         output_language: str | None = None,
     ) -> MenuGenerationResult:
         """Invoke the multimodal LLM and coerce the response into a template."""
+        if not images:
+            raise ValueError("At least one image is required")
+
+        language = output_language or settings.default_output_language
+        async with self._image_batch(images, filenames, content_types) as file_ids:
+            return await self.generate_template_from_file_ids(
+                file_ids, output_language=language
+            )
+
+    async def process_menu(
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None = None,
+        content_types: Sequence[str] | None = None,
+        *,
+        output_language: str | None = None,
+        include_quick_suggestion: bool = True,
+        suggestion_timeout: float | None = None,
+    ) -> MenuProcessingArtifacts:
+        """Generate both the structured template and quick suggestion in a single upload."""
 
         if not images:
             raise ValueError("At least one image is required")
 
-        file_ids = await self._upload_images(images, filenames, content_types)
+        language = output_language or settings.default_output_language
+        async with self._image_batch(images, filenames, content_types) as file_ids:
+            suggestion_task: asyncio.Task[str] | None = None
+            if include_quick_suggestion and settings.quick_suggestion_model:
+                suggestion_task = asyncio.create_task(
+                    self.generate_quick_suggestions_from_file_ids(
+                        file_ids, output_language=language
+                    )
+                )
+
+            try:
+                template_result = await self.generate_template_from_file_ids(
+                    file_ids, output_language=language
+                )
+            except OpenAIError as exc:  # pragma: no cover - network failure path
+                if suggestion_task:
+                    suggestion_task.cancel()
+                    with suppress(Exception):
+                        await suggestion_task
+                raise RuntimeError("Failed to call OpenAI API") from exc
+
+            quick_suggestion = ""
+            if suggestion_task is not None:
+                quick_suggestion = await self._consume_suggestion_task(
+                    suggestion_task, suggestion_timeout
+                )
+
+        return MenuProcessingArtifacts(
+            template=template_result.template,
+            quick_suggestion=quick_suggestion,
+        )
+
+    async def generate_template_from_file_ids(
+        self,
+        file_ids: Sequence[str],
+        *,
+        output_language: str | None = None,
+    ) -> MenuGenerationResult:
+        """Generate a menu template using existing file IDs."""
+
+        if not file_ids:
+            raise ValueError("At least one file id is required")
+
+        language = output_language or settings.default_output_language
         try:
-            payload = await self._run_extract_request(file_ids, output_language or settings.default_output_language)
+            payload = await self._run_extract_request(file_ids, language)
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API") from exc
-        finally:
-            await self._delete_files(file_ids)
 
         template = _build_menu_template(payload)
         return MenuGenerationResult(template=template)
@@ -86,18 +173,65 @@ class LLMMenuService:
         if not images:
             raise ValueError("At least one image is required")
 
-        file_ids = await self._upload_images(images, filenames, content_types)
+        language = output_language or settings.default_output_language
+        async with self._image_batch(images, filenames, content_types) as file_ids:
+            return await self.generate_quick_suggestions_from_file_ids(
+                file_ids, output_language=language
+            )
+
+    async def generate_quick_suggestions_from_file_ids(
+        self,
+        file_ids: Sequence[str],
+        *,
+        output_language: str | None = None,
+    ) -> str:
+        """Generate quick suggestions using existing file IDs."""
+
+        if not file_ids:
+            raise ValueError("At least one file id is required")
+
+        language = output_language or settings.default_output_language
         try:
-            text = await self._run_quick_suggest_request(
+            return await self._run_quick_suggest_request(
                 file_ids,
-                output_language or settings.default_output_language,
+                language,
             )
         except OpenAIError as exc:  # pragma: no cover - network failure path
             raise RuntimeError("Failed to call OpenAI API for suggestions") from exc
+
+    @asynccontextmanager
+    async def _image_batch(
+        self,
+        images: Sequence[bytes],
+        filenames: Sequence[str] | None,
+        content_types: Sequence[str] | None,
+    ) -> AsyncIterator[List[str]]:
+        """Upload menu images once and guarantee cleanup."""
+
+        file_ids = await self._upload_images(images, filenames, content_types)
+        try:
+            yield file_ids
         finally:
             await self._delete_files(file_ids)
 
-        return text
+    async def _consume_suggestion_task(
+        self,
+        task: asyncio.Task[str],
+        timeout_seconds: float | None,
+    ) -> str:
+        """Resolve the quick suggestion task with defensive handling."""
+
+        try:
+            if timeout_seconds is not None:
+                return await asyncio.wait_for(task, timeout_seconds)
+            return await task
+        except asyncio.TimeoutError:  # pragma: no cover - latency guard rails
+            task.cancel()
+            with suppress(Exception):
+                await task
+            return ""
+        except Exception:  # pragma: no cover - defensive fallback
+            return ""
 
     async def _upload_images(
         self,

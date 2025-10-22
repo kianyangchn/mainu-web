@@ -109,8 +109,8 @@ msgstr "Source"
 
 #: app/templates/home.html:1647 app/templates/home.html:1949
 #: app/templates/share.html:1007 app/templates/share.html:1274
-msgid "Menu Ready 🍾"
-msgstr "Menu Ready 🍾"
+msgid "Menu Ready"
+msgstr "Menu Ready"
 
 #: app/templates/home.html:1653 app/templates/home.html:1695
 #: app/templates/share.html:1081
@@ -142,6 +142,22 @@ msgstr "Generate a link to share and scan the QR to join in."
 #: app/templates/home.html:1709 app/templates/share.html:1095
 msgid "QR code to open this menu"
 msgstr "QR code to open this menu"
+
+#: app/templates/home.html:2035
+msgid "Retry menu capture?"
+msgstr "Retry menu capture?"
+
+#: app/templates/home.html:2038
+msgid "Not satisfied with the menu? Let AI try again!"
+msgstr "Not satisfied with the menu? Let AI try again!"
+
+#: app/templates/home.html:2048
+msgid "Keep current menu"
+msgstr "Keep current menu"
+
+#: app/templates/home.html:2056
+msgid "Yes, retry"
+msgstr "Yes, retry"
 
 #: app/templates/home.html:1714 app/templates/share.html:1044
 msgid "Menu sections"

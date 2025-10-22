@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     quick_suggestion_timeout_seconds: int = 20
     default_output_language: str = "English"
     share_token_ttl_minutes: int = 240  # 4 hours default
+    upload_session_ttl_minutes: int = 60  # keep uploaded files for retries
     database_url: Optional[str] = None
 
 
