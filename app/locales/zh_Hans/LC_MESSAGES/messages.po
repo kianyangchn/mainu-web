@@ -143,6 +143,22 @@ msgstr "生成分享链接，扫描二维码即可加入。"
 msgid "QR code to open this menu"
 msgstr "打开此菜单的二维码"
 
+#: app/templates/home.html:2035
+msgid "Retry menu capture?"
+msgstr "重新生成菜单？"
+
+#: app/templates/home.html:2038
+msgid "Not satisfied with the menu? Let AI try again!"
+msgstr "对当前的菜单不满意？让 AI 再试一次！"
+
+#: app/templates/home.html:2048
+msgid "Keep current menu"
+msgstr "保留菜单"
+
+#: app/templates/home.html:2056
+msgid "Yes, retry"
+msgstr "重新生成"
+
 #: app/templates/home.html:1714 app/templates/share.html:1044
 msgid "Menu sections"
 msgstr "菜单分区"

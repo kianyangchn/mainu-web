@@ -143,6 +143,22 @@ msgstr "生成分享鏈接，掃描二維碼即可加入。"
 msgid "QR code to open this menu"
 msgstr "打開此菜單的二維碼"
 
+#: app/templates/home.html:2035
+msgid "Retry menu capture?"
+msgstr "重新分析這份菜單？"
+
+#: app/templates/home.html:2038
+msgid "Not satisfied with the menu? Let AI try again!"
+msgstr "對目前的菜單不滿意嗎？讓 AI 再試一次！"
+
+#: app/templates/home.html:2048
+msgid "Keep current menu"
+msgstr "保留菜單"
+
+#: app/templates/home.html:2056
+msgid "Yes, retry"
+msgstr "重新嘗試"
+
 #: app/templates/home.html:1714 app/templates/share.html:1044
 msgid "Menu sections"
 msgstr "菜單分區"
