@@ -80,6 +80,10 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
                 "type": "number",
                 "description": "Price number exactly as seen without currency text.",
             },
+            "keywords": {
+                "type": "string",
+                "description": "Keywords to use if I need to search for more information/pictures in google about the dish. ",
+            },
         },
         "required": [
             "section",
@@ -87,6 +91,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             "translated_name",
             "description",
             "price",
+            "keywords",
         ],
         "additionalProperties": False,
     },
@@ -133,6 +138,7 @@ def build_prompt(
         "If price is listed as 'N/A', keep it as 'N/A'. "
         f"Translate section names into {output_language} and store it in the section field in the JSON. "
         "Do not treat a section as a dish. "
+        "Generate keywords to use if I need to search for more information/pictures in google about this dish and store it in the keywords field in the JSON. "
     )
     json_rule = (
         "Last step, respond strictly with JSON that matches the provided schema. "
