@@ -110,7 +110,7 @@ msgstr "来源"
 #: app/templates/home.html:1647 app/templates/home.html:1949
 #: app/templates/share.html:1007 app/templates/share.html:1274
 msgid "Menu Ready"
-msgstr "菜单就绪"
+msgstr "菜单准备就绪"
 
 #: app/templates/home.html:1653 app/templates/home.html:1695
 #: app/templates/share.html:1081

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class MenuDish(BaseModel):
@@ -17,12 +17,21 @@ class MenuDish(BaseModel):
         description="Short dish explanation in the output language"
     )
     price: str | None = Field(default=None, description="Price extracted from the menu")
+    keywords: str | None = Field(
+        default=None,
+        description="Keywords to aid downstream dish lookups",
+    )
 
 
 class MenuSection(BaseModel):
     """Top-level grouping of dishes."""
 
-    title: str
+    model_config = ConfigDict(populate_by_name=True)
+
+    translated_section_name: str = Field(
+        description="Section name translated into the output language",
+        validation_alias=AliasChoices("translated_section_name", "title"),
+    )
     dishes: List[MenuDish]
 
 

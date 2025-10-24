@@ -48,7 +48,7 @@ def reset_services(monkeypatch):
         template = MenuTemplate(
             sections=[
                 MenuSection(
-                    title="Chef's Picks",
+                    translated_section_name="Chef's Picks",
                     dishes=[
                         MenuDish(
                             original_name="Mapo Tofu",

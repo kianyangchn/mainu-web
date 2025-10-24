@@ -3603,9 +3603,15 @@
 
         state.menu.sections.forEach((section, index) => {
           const anchor = `section-${index}`;
+          const resolvedSectionName =
+            (typeof section.translated_section_name === "string"
+              ? section.translated_section_name.trim()
+              : "") ||
+            (typeof section.title === "string" ? section.title.trim() : "") ||
+            "Menu";
           const navButton = document.createElement("button");
           navButton.type = "button";
-          navButton.textContent = `${section.title}`;
+          navButton.textContent = resolvedSectionName;
           navButton.dataset.target = anchor;
           if (index === 0) {
             navButton.dataset.active = "true";
@@ -3623,20 +3629,20 @@
 
           const title = document.createElement("h3");
           title.className = "section-title";
-          title.textContent = section.title;
+          title.textContent = resolvedSectionName;
           sectionCard.appendChild(title);
 
           const list = document.createElement("ul");
           list.className = "dish-list";
 
           section.dishes.forEach((dish) => {
-            const key = buildKey(section.title, dish.original_name);
+            const key = buildKey(resolvedSectionName, dish.original_name);
             const template = document.getElementById("dish-template");
             if (!template) {
               return;
             }
             const node = template.content.firstElementChild.cloneNode(true);
-            node.dataset.section = section.title;
+            node.dataset.translatedSectionName = resolvedSectionName;
             node.dataset.original = dish.original_name;
             node.dataset.translated = dish.translated_name;
             node.dataset.price = dish.price || "";
@@ -3874,7 +3880,13 @@
 
       function extractDishData(dishCard) {
         const key = dishCard.dataset.key || "";
-        const sectionTitle = dishCard.dataset.section || "";
+        const sectionTitle =
+          (
+            dishCard.dataset.translatedSectionName ||
+            dishCard.getAttribute?.("data-translated-section-name") ||
+            dishCard.dataset.section ||
+            ""
+          ).trim();
         const originalName = dishCard.dataset.original || "";
         const translatedName = dishCard.dataset.translated || "";
         const priceDisplay = dishCard.dataset.price || "";
