@@ -112,6 +112,26 @@ msgstr "Source"
 msgid "Menu Ready"
 msgstr "Menu Ready"
 
+#: app/templates/home.html:2261 app/templates/share.html:1329
+msgid "Dish spotlight"
+msgstr "Learn more"
+
+#: app/templates/home.html:2269 app/templates/share.html:1337
+msgid "Close dish spotlight"
+msgstr "Close"
+
+#: app/templates/home.html:2276 app/templates/share.html:1344
+msgid "Tap a result to open the full page in a new tab."
+msgstr "Tap a result to open the full page in a new tab."
+
+#: app/templates/home.html:2288 app/templates/share.html:1356
+msgid "Open in Google Images"
+msgstr "Open in Google Images"
+
+#: app/templates/home.html:2290 app/templates/share.html:1358
+msgid "Results by Google"
+msgstr "Results by Google"
+
 #: app/templates/home.html:1653 app/templates/home.html:1695
 #: app/templates/share.html:1081
 msgid "Share this menu"
