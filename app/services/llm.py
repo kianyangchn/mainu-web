@@ -367,11 +367,22 @@ def _build_menu_template(payload: dict) -> MenuTemplate:
         if not isinstance(item, dict):
             continue
 
-        section = str(item.get("section") or "Menu")
+        section_raw = (
+            item.get("translated_section_name")
+            or item.get("section")
+            or "Menu"
+        )
+        section = str(section_raw).strip() or "Menu"
         original_name = str(item.get("original_name") or "").strip()
         translated_name = str(item.get("translated_name") or "").strip()
         description = str(item.get("description") or "").strip()
         price = _format_price(item.get("price"))
+        keywords_value = item.get("keywords")
+        keywords = None
+        if keywords_value not in (None, ""):
+            keywords_text = str(keywords_value).strip()
+            if keywords_text:
+                keywords = keywords_text
 
         if not original_name or not translated_name or not description:
             continue
@@ -382,11 +393,13 @@ def _build_menu_template(payload: dict) -> MenuTemplate:
                 translated_name=translated_name,
                 description=description,
                 price=price,
+                keywords=keywords,
             )
         )
 
     section_models = [
-        MenuSection(title=title, dishes=dishes) for title, dishes in sections.items()
+        MenuSection(translated_section_name=title, dishes=dishes)
+        for title, dishes in sections.items()
     ]
 
     return MenuTemplate(sections=section_models)

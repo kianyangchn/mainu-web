@@ -58,10 +58,10 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
     "items": {
         "type": "object",
         "properties": {
-            "section": {
+            "translated_section_name": {
                 "type": "string",
                 "description": (
-                    "Translate section name into the output language."
+                    "Section name translated into the output language."
                 ),
             },
             "original_name": {
@@ -86,7 +86,7 @@ RESPONSE_JSON_SCHEMA: dict[str, object] = {
             },
         },
         "required": [
-            "section",
+            "translated_section_name",
             "original_name",
             "translated_name",
             "description",
@@ -136,7 +136,7 @@ def build_prompt(
         f"{output_language} describing key ingredients, preparation details, and flavour. "
         "Do not overdescribe the dishes, do not add quality, quantity, or price details that are not present on the menu. "
         "If price is listed as 'N/A', keep it as 'N/A'. "
-        f"Translate section names into {output_language} and store it in the section field in the JSON. "
+        f"Translate section names into {output_language} and store it in the translated_section_name field in the JSON. "
         "Do not treat a section as a dish. "
         "Generate keywords to use if I need to search for more information/pictures in google about this dish and store it in the keywords field in the JSON. "
     )
