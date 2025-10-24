@@ -112,6 +112,26 @@ msgstr "來源"
 msgid "Menu Ready"
 msgstr "菜單就緒"
 
+#: app/templates/home.html:2261 app/templates/share.html:1329
+msgid "Dish spotlight"
+msgstr "了解更多"
+
+#: app/templates/home.html:2269 app/templates/share.html:1337
+msgid "Close dish spotlight"
+msgstr "關閉"
+
+#: app/templates/home.html:2276 app/templates/share.html:1344
+msgid "Tap a result to open the full page in a new tab."
+msgstr "點按結果即可在新分頁開啟完整頁面"
+
+#: app/templates/home.html:2288 app/templates/share.html:1356
+msgid "Open in Google Images"
+msgstr "在Google中開啟"
+
+#: app/templates/home.html:2290 app/templates/share.html:1358
+msgid "Results by Google"
+msgstr "結果由Google提供"
+
 #: app/templates/home.html:1653 app/templates/home.html:1695
 #: app/templates/share.html:1081
 msgid "Share this menu"
