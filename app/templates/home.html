@@ -3640,6 +3640,7 @@
             node.dataset.original = dish.original_name;
             node.dataset.translated = dish.translated_name;
             node.dataset.price = dish.price || "";
+            node.dataset.keywords = dish.keywords || "";
             node.dataset.key = key;
 
             node.querySelector(".translated-name").textContent = dish.translated_name;
@@ -3824,19 +3825,13 @@
         if (!dishCard) {
           return;
         }
+        const keywords = (dishCard.dataset.keywords || "").trim();
         const translated = (dishCard.dataset.translated || "").trim();
         const original = (dishCard.dataset.original || "").trim();
-        const parts = [];
-        if (original) {
-          parts.push(original);
+        let query = keywords || original;
+        if (!query && translated) {
+          query = translated;
         }
-        if (
-          translated &&
-          (!original || translated.toLowerCase() !== original.toLowerCase())
-        ) {
-          parts.push(translated);
-        }
-        const query = parts.join(" ").trim();
         if (!query) {
           return;
         }
